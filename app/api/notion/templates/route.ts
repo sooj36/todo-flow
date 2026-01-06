@@ -4,12 +4,13 @@ import { notion, getTaskTemplates, getFlowSteps } from '@/lib/notion';
 
 export async function GET() {
   try {
+    const apiKey = process.env.NOTION_API_KEY;
     const templateDbId = process.env.NOTION_TEMPLATE_DB_ID;
     const stepDbId = process.env.NOTION_STEP_DB_ID;
 
-    if (!templateDbId || !stepDbId) {
+    if (!apiKey || !templateDbId || !stepDbId) {
       return NextResponse.json(
-        { error: 'Server configuration error: Missing Notion database IDs' },
+        { error: 'Server configuration error: Missing Notion API key or database IDs' },
         { status: 500 }
       );
     }

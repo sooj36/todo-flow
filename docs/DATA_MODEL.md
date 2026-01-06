@@ -1,6 +1,6 @@
 # Data Model
 // 타입과 DB 스키마 – Phase 2 Notion 연동을 위한 설계
-// 현재 코드에는 types/index.ts가 아직 없음 (Phase 2에서 추가 예정)
+// types/index.ts에 정의됨 (Phase 2에서 추가 완료)
 
 ## TypeScript Types
 
