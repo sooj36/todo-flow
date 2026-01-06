@@ -1,4 +1,6 @@
 # Data Model
+// 타입과 DB 스키마 – Phase 2 Notion 연동을 위한 설계
+// 현재 코드에는 types/index.ts가 아직 없음 (Phase 2에서 추가 예정)
 
 ## TypeScript Types
 
@@ -107,6 +109,7 @@ export interface CreateTaskModalState {
 | Status | Select | todo, doing, done |
 | Current Step | Relation | → FlowStep DB |
 | Completed Steps | Relation (Multi) | → FlowStep DB |
+| Completed At | Date | (Optional) 완료 시간 |
 
 ---
 
@@ -118,44 +121,4 @@ NOTION_API_KEY=secret_xxx
 NOTION_TEMPLATE_DB_ID=xxx
 NOTION_STEP_DB_ID=xxx
 NOTION_INSTANCE_DB_ID=xxx
-```
-
----
-
-## Mock Data Example
-
-```typescript
-// data/mock.ts
-
-export const mockTemplates: TaskTemplate[] = [
-  {
-    id: 'tpl-1',
-    name: 'Morning Routine',
-    icon: '☀️',
-    color: 'yellow',
-    isRepeating: true,
-    defaultFrequency: 'daily',
-    active: true,
-    flowSteps: [
-      { id: 'step-1-1', name: 'Wake up', order: 1, parentTemplateId: 'tpl-1' },
-      { id: 'step-1-2', name: 'Exercise', order: 2, parentTemplateId: 'tpl-1' },
-      { id: 'step-1-3', name: 'Shower', order: 3, parentTemplateId: 'tpl-1' },
-    ],
-  },
-  {
-    id: 'tpl-2',
-    name: 'Work Session',
-    icon: '💼',
-    color: 'blue',
-    isRepeating: true,
-    defaultFrequency: 'daily',
-    active: true,
-    flowSteps: [
-      { id: 'step-2-1', name: 'Check emails', order: 1, parentTemplateId: 'tpl-2' },
-      { id: 'step-2-2', name: 'Priority tasks', order: 2, parentTemplateId: 'tpl-2' },
-      { id: 'step-2-3', name: 'Meetings', order: 3, parentTemplateId: 'tpl-2' },
-      { id: 'step-2-4', name: 'Review & plan', order: 4, parentTemplateId: 'tpl-2' },
-    ],
-  },
-];
 ```

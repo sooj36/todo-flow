@@ -1,26 +1,23 @@
 // app/api/notion/instances/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { createNotionClient, getTaskInstances, createTaskInstance, getTaskTemplates } from '@/lib/notion';
+import { notion, getTaskInstances, createTaskInstance, getTaskTemplates } from '@/lib/notion';
 
 export async function GET(request: NextRequest) {
   try {
+    const instanceDbId = process.env.NOTION_INSTANCE_DB_ID;
     const searchParams = request.nextUrl.searchParams;
-    const apiKey = searchParams.get('apiKey');
-    const instanceDbId = searchParams.get('instanceDbId');
     const date = searchParams.get('date');
 
-    if (!apiKey || !instanceDbId) {
+    if (!instanceDbId) {
       return NextResponse.json(
-        { error: 'Missing required parameters: apiKey, instanceDbId' },
-        { status: 400 }
+        { error: 'Server configuration error: Missing Notion database IDs' },
+        { status: 500 }
       );
     }
 
-    const client = createNotionClient(apiKey);
-
     // Get task instances (optionally filtered by date)
     const instances = await getTaskInstances(
-      client,
+      notion,
       instanceDbId,
       date || undefined
     );
@@ -37,20 +34,28 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { apiKey, instanceDbId, templateDbId, templateId, date } = body;
+    const instanceDbId = process.env.NOTION_INSTANCE_DB_ID;
+    const templateDbId = process.env.NOTION_TEMPLATE_DB_ID;
 
-    if (!apiKey || !instanceDbId || !templateDbId || !templateId || !date) {
+    if (!instanceDbId || !templateDbId) {
       return NextResponse.json(
-        { error: 'Missing required parameters: apiKey, instanceDbId, templateDbId, templateId, date' },
+        { error: 'Server configuration error: Missing Notion database IDs' },
+        { status: 500 }
+      );
+    }
+
+    const body = await request.json();
+    const { templateId, date } = body;
+
+    if (!templateId || !date) {
+      return NextResponse.json(
+        { error: 'Missing required parameters: templateId, date' },
         { status: 400 }
       );
     }
 
-    const client = createNotionClient(apiKey);
-
     // Get template to fetch its name
-    const templates = await getTaskTemplates(client, templateDbId);
+    const templates = await getTaskTemplates(notion, templateDbId);
     const template = templates.find(t => t.id === templateId);
 
     if (!template) {
@@ -62,7 +67,7 @@ export async function POST(request: NextRequest) {
 
     // Create task instance
     const instance = await createTaskInstance(
-      client,
+      notion,
       instanceDbId,
       templateId,
       template.name,
