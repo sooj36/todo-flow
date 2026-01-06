@@ -13,6 +13,7 @@ import {
   Database,
   CheckCircle2,
   ArrowRight,
+  Loader2,
 } from "lucide-react";
 
 interface FlowBoardProps {

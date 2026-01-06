@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { X } from "lucide-react";
 
 export interface NotionConnectionConfig {
@@ -50,6 +50,7 @@ export const NotionConnectionModal: React.FC<NotionConnectionModalProps> = ({
     stepDbId: false,
     instanceDbId: false,
   });
+  const firstInputRef = useRef<HTMLInputElement>(null);
 
   const errors = useMemo(() => {
     return {
@@ -92,6 +93,40 @@ export const NotionConnectionModal: React.FC<NotionConnectionModalProps> = ({
     };
   };
 
+  const handleClose = () => {
+    setValues(emptyConfig);
+    setTouched({
+      apiKey: false,
+      templateDbId: false,
+      stepDbId: false,
+      instanceDbId: false,
+    });
+    onClose();
+  };
+
+  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      handleClose();
+    }
+  };
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        handleClose();
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (isOpen && firstInputRef.current) {
+      firstInputRef.current.focus();
+    }
+  }, [isOpen]);
+
   const handleSave = () => {
     setTouched({
       apiKey: true,
@@ -107,13 +142,53 @@ export const NotionConnectionModal: React.FC<NotionConnectionModalProps> = ({
       stepDbId: values.stepDbId.trim(),
       instanceDbId: values.instanceDbId.trim(),
     });
-    onClose();
+    handleClose();
   };
+
+  const inputFields: Array<{
+    key: keyof NotionConnectionConfig;
+    label: string;
+    id: string;
+    type: string;
+    placeholder: string;
+  }> = [
+    {
+      key: "apiKey",
+      label: "Notion API Key",
+      id: "notion-api-key",
+      type: "password",
+      placeholder: "secret_...",
+    },
+    {
+      key: "templateDbId",
+      label: "Template DB ID",
+      id: "template-db-id",
+      type: "text",
+      placeholder: "32-char Notion ID",
+    },
+    {
+      key: "stepDbId",
+      label: "Step DB ID",
+      id: "step-db-id",
+      type: "text",
+      placeholder: "32-char Notion ID",
+    },
+    {
+      key: "instanceDbId",
+      label: "Instance DB ID",
+      id: "instance-db-id",
+      type: "text",
+      placeholder: "32-char Notion ID",
+    },
+  ];
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-6">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-6"
+      onClick={handleOverlayClick}
+    >
       <div className="w-full max-w-lg rounded-xl border border-[#ececeb] bg-white shadow-2xl">
         <div className="flex items-center justify-between border-b border-[#ececeb] px-5 py-4">
           <div>
@@ -124,7 +199,7 @@ export const NotionConnectionModal: React.FC<NotionConnectionModalProps> = ({
           </div>
           <button
             aria-label="Close"
-            onClick={onClose}
+            onClick={handleClose}
             className="rounded-full p-1 text-[#37352f]/50 hover:bg-[#efefed] hover:text-[#37352f] transition-all"
           >
             <X size={16} />
@@ -132,82 +207,31 @@ export const NotionConnectionModal: React.FC<NotionConnectionModalProps> = ({
         </div>
 
         <div className="space-y-4 px-5 py-5">
-          <div>
-            <label htmlFor="notion-api-key" className="text-xs font-semibold text-[#37352f]">
-              Notion API Key
-            </label>
-            <input
-              id="notion-api-key"
-              type="password"
-              value={values.apiKey}
-              onChange={handleChange("apiKey")}
-              onBlur={handleBlur("apiKey")}
-              placeholder="secret_..."
-              className="mt-2 w-full rounded-md border border-[#ececeb] px-3 py-2 text-sm text-[#37352f] placeholder:text-[#37352f]/30 focus:border-[#37352f] focus:outline-none"
-            />
-            {touched.apiKey && errors.apiKey && (
-              <p className="mt-1 text-[11px] text-red-500">{errors.apiKey}</p>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="template-db-id" className="text-xs font-semibold text-[#37352f]">
-              Template DB ID
-            </label>
-            <input
-              id="template-db-id"
-              type="text"
-              value={values.templateDbId}
-              onChange={handleChange("templateDbId")}
-              onBlur={handleBlur("templateDbId")}
-              placeholder="32-char Notion ID"
-              className="mt-2 w-full rounded-md border border-[#ececeb] px-3 py-2 text-sm text-[#37352f] placeholder:text-[#37352f]/30 focus:border-[#37352f] focus:outline-none"
-            />
-            {touched.templateDbId && errors.templateDbId && (
-              <p className="mt-1 text-[11px] text-red-500">{errors.templateDbId}</p>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="step-db-id" className="text-xs font-semibold text-[#37352f]">
-              Step DB ID
-            </label>
-            <input
-              id="step-db-id"
-              type="text"
-              value={values.stepDbId}
-              onChange={handleChange("stepDbId")}
-              onBlur={handleBlur("stepDbId")}
-              placeholder="32-char Notion ID"
-              className="mt-2 w-full rounded-md border border-[#ececeb] px-3 py-2 text-sm text-[#37352f] placeholder:text-[#37352f]/30 focus:border-[#37352f] focus:outline-none"
-            />
-            {touched.stepDbId && errors.stepDbId && (
-              <p className="mt-1 text-[11px] text-red-500">{errors.stepDbId}</p>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="instance-db-id" className="text-xs font-semibold text-[#37352f]">
-              Instance DB ID
-            </label>
-            <input
-              id="instance-db-id"
-              type="text"
-              value={values.instanceDbId}
-              onChange={handleChange("instanceDbId")}
-              onBlur={handleBlur("instanceDbId")}
-              placeholder="32-char Notion ID"
-              className="mt-2 w-full rounded-md border border-[#ececeb] px-3 py-2 text-sm text-[#37352f] placeholder:text-[#37352f]/30 focus:border-[#37352f] focus:outline-none"
-            />
-            {touched.instanceDbId && errors.instanceDbId && (
-              <p className="mt-1 text-[11px] text-red-500">{errors.instanceDbId}</p>
-            )}
-          </div>
+          {inputFields.map((field, index) => (
+            <div key={field.key}>
+              <label htmlFor={field.id} className="text-xs font-semibold text-[#37352f]">
+                {field.label}
+              </label>
+              <input
+                ref={index === 0 ? firstInputRef : undefined}
+                id={field.id}
+                type={field.type}
+                value={values[field.key]}
+                onChange={handleChange(field.key)}
+                onBlur={handleBlur(field.key)}
+                placeholder={field.placeholder}
+                className="mt-2 w-full rounded-md border border-[#ececeb] px-3 py-2 text-sm text-[#37352f] placeholder:text-[#37352f]/30 focus:border-[#37352f] focus:outline-none"
+              />
+              {touched[field.key] && errors[field.key] && (
+                <p className="mt-1 text-[11px] text-red-500">{errors[field.key]}</p>
+              )}
+            </div>
+          ))}
         </div>
 
         <div className="flex items-center justify-end gap-2 border-t border-[#ececeb] px-5 py-4">
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="rounded-md border border-[#ececeb] px-3 py-2 text-xs font-semibold text-[#37352f]/70 hover:text-[#37352f] transition-all"
           >
             Cancel
