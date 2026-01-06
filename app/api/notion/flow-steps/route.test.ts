@@ -1,5 +1,5 @@
 // app/api/notion/flow-steps/route.test.ts
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { GET } from './route';
 import { NextRequest } from 'next/server';
 import * as notionLib from '@/lib/notion';
@@ -7,20 +7,31 @@ import * as notionLib from '@/lib/notion';
 vi.mock('@/lib/notion');
 
 describe('GET /api/notion/flow-steps', () => {
+  const originalEnv = process.env;
+
   beforeEach(() => {
     vi.clearAllMocks();
+    process.env = { ...originalEnv };
   });
 
-  it('should return 400 if required parameters are missing', async () => {
+  afterEach(() => {
+    process.env = originalEnv;
+  });
+
+  it('should return 500 if environment variables are missing', async () => {
+    delete process.env.NOTION_STEP_DB_ID;
+
     const request = new NextRequest('http://localhost:3000/api/notion/flow-steps');
     const response = await GET(request);
     const data = await response.json();
 
-    expect(response.status).toBe(400);
-    expect(data.error).toBe('Missing required parameters: apiKey, stepDbId');
+    expect(response.status).toBe(500);
+    expect(data.error).toBe('Server configuration error: Missing Notion database IDs');
   });
 
   it('should return flow steps', async () => {
+    process.env.NOTION_STEP_DB_ID = 'step-db-id';
+
     const mockSteps = [
       {
         id: 'step-1',
@@ -36,12 +47,9 @@ describe('GET /api/notion/flow-steps', () => {
       },
     ];
 
-    vi.mocked(notionLib.createNotionClient).mockReturnValue({} as any);
     vi.mocked(notionLib.getFlowSteps).mockResolvedValue(mockSteps);
 
-    const request = new NextRequest(
-      'http://localhost:3000/api/notion/flow-steps?apiKey=test&stepDbId=db2'
-    );
+    const request = new NextRequest('http://localhost:3000/api/notion/flow-steps');
     const response = await GET(request);
     const data = await response.json();
 
@@ -51,6 +59,8 @@ describe('GET /api/notion/flow-steps', () => {
   });
 
   it('should filter steps by templateId', async () => {
+    process.env.NOTION_STEP_DB_ID = 'step-db-id';
+
     const mockSteps = [
       {
         id: 'step-1',
@@ -60,11 +70,10 @@ describe('GET /api/notion/flow-steps', () => {
       },
     ];
 
-    vi.mocked(notionLib.createNotionClient).mockReturnValue({} as any);
     vi.mocked(notionLib.getFlowSteps).mockResolvedValue(mockSteps);
 
     const request = new NextRequest(
-      'http://localhost:3000/api/notion/flow-steps?apiKey=test&stepDbId=db2&templateId=template-1'
+      'http://localhost:3000/api/notion/flow-steps?templateId=template-1'
     );
     const response = await GET(request);
     const data = await response.json();
@@ -73,19 +82,17 @@ describe('GET /api/notion/flow-steps', () => {
     expect(data.steps).toHaveLength(1);
     expect(vi.mocked(notionLib.getFlowSteps)).toHaveBeenCalledWith(
       expect.anything(),
-      'db2',
+      'step-db-id',
       'template-1'
     );
   });
 
   it('should return 500 on error', async () => {
-    vi.mocked(notionLib.createNotionClient).mockImplementation(() => {
-      throw new Error('Connection failed');
-    });
+    process.env.NOTION_STEP_DB_ID = 'step-db-id';
 
-    const request = new NextRequest(
-      'http://localhost:3000/api/notion/flow-steps?apiKey=test&stepDbId=db2'
-    );
+    vi.mocked(notionLib.getFlowSteps).mockRejectedValue(new Error('Connection failed'));
+
+    const request = new NextRequest('http://localhost:3000/api/notion/flow-steps');
     const response = await GET(request);
     const data = await response.json();
 

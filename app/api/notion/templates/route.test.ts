@@ -1,26 +1,37 @@
 // app/api/notion/templates/route.test.ts
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { GET } from './route';
-import { NextRequest } from 'next/server';
 import * as notionLib from '@/lib/notion';
 
 vi.mock('@/lib/notion');
 
 describe('GET /api/notion/templates', () => {
+  const originalEnv = process.env;
+
   beforeEach(() => {
     vi.clearAllMocks();
+    process.env = { ...originalEnv };
   });
 
-  it('should return 400 if required parameters are missing', async () => {
-    const request = new NextRequest('http://localhost:3000/api/notion/templates');
-    const response = await GET(request);
+  afterEach(() => {
+    process.env = originalEnv;
+  });
+
+  it('should return 500 if environment variables are missing', async () => {
+    delete process.env.NOTION_TEMPLATE_DB_ID;
+    delete process.env.NOTION_STEP_DB_ID;
+
+    const response = await GET();
     const data = await response.json();
 
-    expect(response.status).toBe(400);
-    expect(data.error).toBe('Missing required parameters: apiKey, templateDbId, stepDbId');
+    expect(response.status).toBe(500);
+    expect(data.error).toBe('Server configuration error: Missing Notion database IDs');
   });
 
   it('should return templates with flow steps', async () => {
+    process.env.NOTION_TEMPLATE_DB_ID = 'template-db-id';
+    process.env.NOTION_STEP_DB_ID = 'step-db-id';
+
     const mockTemplates = [
       {
         id: 'template-1',
@@ -43,14 +54,10 @@ describe('GET /api/notion/templates', () => {
       },
     ];
 
-    vi.mocked(notionLib.createNotionClient).mockReturnValue({} as any);
     vi.mocked(notionLib.getTaskTemplates).mockResolvedValue(mockTemplates);
     vi.mocked(notionLib.getFlowSteps).mockResolvedValue(mockSteps);
 
-    const request = new NextRequest(
-      'http://localhost:3000/api/notion/templates?apiKey=test&templateDbId=db1&stepDbId=db2'
-    );
-    const response = await GET(request);
+    const response = await GET();
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -60,14 +67,12 @@ describe('GET /api/notion/templates', () => {
   });
 
   it('should return 500 on error', async () => {
-    vi.mocked(notionLib.createNotionClient).mockImplementation(() => {
-      throw new Error('Connection failed');
-    });
+    process.env.NOTION_TEMPLATE_DB_ID = 'template-db-id';
+    process.env.NOTION_STEP_DB_ID = 'step-db-id';
 
-    const request = new NextRequest(
-      'http://localhost:3000/api/notion/templates?apiKey=test&templateDbId=db1&stepDbId=db2'
-    );
-    const response = await GET(request);
+    vi.mocked(notionLib.getTaskTemplates).mockRejectedValue(new Error('Connection failed'));
+
+    const response = await GET();
     const data = await response.json();
 
     expect(response.status).toBe(500);

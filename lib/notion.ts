@@ -215,6 +215,12 @@ export async function getTaskInstances(
     // Created time
     const createdAt = 'created_time' in page ? page.created_time : new Date().toISOString();
 
+    // Completed At (Date) - if exists in Notion DB
+    const completedAtProperty = properties['Completed At'];
+    const completedAt = completedAtProperty?.type === 'date' && completedAtProperty.date
+      ? completedAtProperty.date.start
+      : null;
+
     instances.push({
       id: page.id,
       templateId,
@@ -224,7 +230,7 @@ export async function getTaskInstances(
       currentStepId,
       completedStepIds,
       createdAt,
-      completedAt: status === 'done' ? createdAt : null,
+      completedAt,
     });
   }
 

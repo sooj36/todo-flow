@@ -1,28 +1,24 @@
 // app/api/notion/templates/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-import { createNotionClient, getTaskTemplates, getFlowSteps } from '@/lib/notion';
+import { NextResponse } from 'next/server';
+import { notion, getTaskTemplates, getFlowSteps } from '@/lib/notion';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const searchParams = request.nextUrl.searchParams;
-    const apiKey = searchParams.get('apiKey');
-    const templateDbId = searchParams.get('templateDbId');
-    const stepDbId = searchParams.get('stepDbId');
+    const templateDbId = process.env.NOTION_TEMPLATE_DB_ID;
+    const stepDbId = process.env.NOTION_STEP_DB_ID;
 
-    if (!apiKey || !templateDbId || !stepDbId) {
+    if (!templateDbId || !stepDbId) {
       return NextResponse.json(
-        { error: 'Missing required parameters: apiKey, templateDbId, stepDbId' },
-        { status: 400 }
+        { error: 'Server configuration error: Missing Notion database IDs' },
+        { status: 500 }
       );
     }
 
-    const client = createNotionClient(apiKey);
-
     // Get templates
-    const templates = await getTaskTemplates(client, templateDbId);
+    const templates = await getTaskTemplates(notion, templateDbId);
 
     // Get all flow steps
-    const allSteps = await getFlowSteps(client, stepDbId);
+    const allSteps = await getFlowSteps(notion, stepDbId);
 
     // Attach flow steps to each template
     const templatesWithSteps = templates.map(template => ({

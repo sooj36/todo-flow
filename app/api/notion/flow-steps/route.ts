@@ -1,26 +1,23 @@
 // app/api/notion/flow-steps/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { createNotionClient, getFlowSteps } from '@/lib/notion';
+import { notion, getFlowSteps } from '@/lib/notion';
 
 export async function GET(request: NextRequest) {
   try {
+    const stepDbId = process.env.NOTION_STEP_DB_ID;
     const searchParams = request.nextUrl.searchParams;
-    const apiKey = searchParams.get('apiKey');
-    const stepDbId = searchParams.get('stepDbId');
     const templateId = searchParams.get('templateId');
 
-    if (!apiKey || !stepDbId) {
+    if (!stepDbId) {
       return NextResponse.json(
-        { error: 'Missing required parameters: apiKey, stepDbId' },
-        { status: 400 }
+        { error: 'Server configuration error: Missing Notion database IDs' },
+        { status: 500 }
       );
     }
 
-    const client = createNotionClient(apiKey);
-
     // Get flow steps (optionally filtered by templateId)
     const steps = await getFlowSteps(
-      client,
+      notion,
       stepDbId,
       templateId || undefined
     );

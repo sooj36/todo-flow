@@ -1,5 +1,5 @@
 // app/api/notion/instances/route.test.ts
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { GET, POST } from './route';
 import { NextRequest } from 'next/server';
 import * as notionLib from '@/lib/notion';
@@ -7,20 +7,31 @@ import * as notionLib from '@/lib/notion';
 vi.mock('@/lib/notion');
 
 describe('GET /api/notion/instances', () => {
+  const originalEnv = process.env;
+
   beforeEach(() => {
     vi.clearAllMocks();
+    process.env = { ...originalEnv };
   });
 
-  it('should return 400 if required parameters are missing', async () => {
+  afterEach(() => {
+    process.env = originalEnv;
+  });
+
+  it('should return 500 if environment variables are missing', async () => {
+    delete process.env.NOTION_INSTANCE_DB_ID;
+
     const request = new NextRequest('http://localhost:3000/api/notion/instances');
     const response = await GET(request);
     const data = await response.json();
 
-    expect(response.status).toBe(400);
-    expect(data.error).toBe('Missing required parameters: apiKey, instanceDbId');
+    expect(response.status).toBe(500);
+    expect(data.error).toBe('Server configuration error: Missing Notion database IDs');
   });
 
   it('should return task instances', async () => {
+    process.env.NOTION_INSTANCE_DB_ID = 'instance-db-id';
+
     const mockInstances = [
       {
         id: 'instance-1',
@@ -35,12 +46,9 @@ describe('GET /api/notion/instances', () => {
       },
     ];
 
-    vi.mocked(notionLib.createNotionClient).mockReturnValue({} as any);
     vi.mocked(notionLib.getTaskInstances).mockResolvedValue(mockInstances);
 
-    const request = new NextRequest(
-      'http://localhost:3000/api/notion/instances?apiKey=test&instanceDbId=db3'
-    );
+    const request = new NextRequest('http://localhost:3000/api/notion/instances');
     const response = await GET(request);
     const data = await response.json();
 
@@ -50,6 +58,8 @@ describe('GET /api/notion/instances', () => {
   });
 
   it('should filter instances by date', async () => {
+    process.env.NOTION_INSTANCE_DB_ID = 'instance-db-id';
+
     const mockInstances = [
       {
         id: 'instance-1',
@@ -64,29 +74,26 @@ describe('GET /api/notion/instances', () => {
       },
     ];
 
-    vi.mocked(notionLib.createNotionClient).mockReturnValue({} as any);
     vi.mocked(notionLib.getTaskInstances).mockResolvedValue(mockInstances);
 
     const request = new NextRequest(
-      'http://localhost:3000/api/notion/instances?apiKey=test&instanceDbId=db3&date=2026-01-07'
+      'http://localhost:3000/api/notion/instances?date=2026-01-07'
     );
     const response = await GET(request);
 
     expect(vi.mocked(notionLib.getTaskInstances)).toHaveBeenCalledWith(
       expect.anything(),
-      'db3',
+      'instance-db-id',
       '2026-01-07'
     );
   });
 
   it('should return 500 on error', async () => {
-    vi.mocked(notionLib.createNotionClient).mockImplementation(() => {
-      throw new Error('Connection failed');
-    });
+    process.env.NOTION_INSTANCE_DB_ID = 'instance-db-id';
 
-    const request = new NextRequest(
-      'http://localhost:3000/api/notion/instances?apiKey=test&instanceDbId=db3'
-    );
+    vi.mocked(notionLib.getTaskInstances).mockRejectedValue(new Error('Connection failed'));
+
+    const request = new NextRequest('http://localhost:3000/api/notion/instances');
     const response = await GET(request);
     const data = await response.json();
 
@@ -96,11 +103,39 @@ describe('GET /api/notion/instances', () => {
 });
 
 describe('POST /api/notion/instances', () => {
+  const originalEnv = process.env;
+
   beforeEach(() => {
     vi.clearAllMocks();
+    process.env = { ...originalEnv };
+  });
+
+  afterEach(() => {
+    process.env = originalEnv;
+  });
+
+  it('should return 500 if environment variables are missing', async () => {
+    delete process.env.NOTION_INSTANCE_DB_ID;
+    delete process.env.NOTION_TEMPLATE_DB_ID;
+
+    const request = new NextRequest('http://localhost:3000/api/notion/instances', {
+      method: 'POST',
+      body: JSON.stringify({
+        templateId: 'template-1',
+        date: '2026-01-07',
+      }),
+    });
+    const response = await POST(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(data.error).toBe('Server configuration error: Missing Notion database IDs');
   });
 
   it('should return 400 if required parameters are missing', async () => {
+    process.env.NOTION_INSTANCE_DB_ID = 'instance-db-id';
+    process.env.NOTION_TEMPLATE_DB_ID = 'template-db-id';
+
     const request = new NextRequest('http://localhost:3000/api/notion/instances', {
       method: 'POST',
       body: JSON.stringify({}),
@@ -109,10 +144,13 @@ describe('POST /api/notion/instances', () => {
     const data = await response.json();
 
     expect(response.status).toBe(400);
-    expect(data.error).toContain('Missing required parameters');
+    expect(data.error).toBe('Missing required parameters: templateId, date');
   });
 
   it('should create a task instance', async () => {
+    process.env.NOTION_INSTANCE_DB_ID = 'instance-db-id';
+    process.env.NOTION_TEMPLATE_DB_ID = 'template-db-id';
+
     const mockTemplate = {
       id: 'template-1',
       name: 'Morning Routine',
@@ -136,16 +174,12 @@ describe('POST /api/notion/instances', () => {
       completedAt: null,
     };
 
-    vi.mocked(notionLib.createNotionClient).mockReturnValue({} as any);
     vi.mocked(notionLib.getTaskTemplates).mockResolvedValue([mockTemplate]);
     vi.mocked(notionLib.createTaskInstance).mockResolvedValue(mockInstance);
 
     const request = new NextRequest('http://localhost:3000/api/notion/instances', {
       method: 'POST',
       body: JSON.stringify({
-        apiKey: 'test',
-        instanceDbId: 'db3',
-        templateDbId: 'db1',
         templateId: 'template-1',
         date: '2026-01-07',
       }),
@@ -158,15 +192,14 @@ describe('POST /api/notion/instances', () => {
   });
 
   it('should return 404 if template not found', async () => {
-    vi.mocked(notionLib.createNotionClient).mockReturnValue({} as any);
+    process.env.NOTION_INSTANCE_DB_ID = 'instance-db-id';
+    process.env.NOTION_TEMPLATE_DB_ID = 'template-db-id';
+
     vi.mocked(notionLib.getTaskTemplates).mockResolvedValue([]);
 
     const request = new NextRequest('http://localhost:3000/api/notion/instances', {
       method: 'POST',
       body: JSON.stringify({
-        apiKey: 'test',
-        instanceDbId: 'db3',
-        templateDbId: 'db1',
         templateId: 'template-1',
         date: '2026-01-07',
       }),
@@ -179,16 +212,14 @@ describe('POST /api/notion/instances', () => {
   });
 
   it('should return 500 on error', async () => {
-    vi.mocked(notionLib.createNotionClient).mockImplementation(() => {
-      throw new Error('Connection failed');
-    });
+    process.env.NOTION_INSTANCE_DB_ID = 'instance-db-id';
+    process.env.NOTION_TEMPLATE_DB_ID = 'template-db-id';
+
+    vi.mocked(notionLib.getTaskTemplates).mockRejectedValue(new Error('Connection failed'));
 
     const request = new NextRequest('http://localhost:3000/api/notion/instances', {
       method: 'POST',
       body: JSON.stringify({
-        apiKey: 'test',
-        instanceDbId: 'db3',
-        templateDbId: 'db1',
         templateId: 'template-1',
         date: '2026-01-07',
       }),
