@@ -19,6 +19,7 @@ describe('GET /api/notion/instances', () => {
   });
 
   it('should return 500 if environment variables are missing', async () => {
+    delete process.env.NOTION_API_KEY;
     delete process.env.NOTION_INSTANCE_DB_ID;
 
     const request = new NextRequest('http://localhost:3000/api/notion/instances');
@@ -26,10 +27,11 @@ describe('GET /api/notion/instances', () => {
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data.error).toBe('Server configuration error: Missing Notion database IDs');
+    expect(data.error).toBe('Server configuration error: Missing Notion API key or database IDs');
   });
 
   it('should return task instances', async () => {
+    process.env.NOTION_API_KEY = 'test-api-key';
     process.env.NOTION_INSTANCE_DB_ID = 'instance-db-id';
 
     const mockInstances = [
@@ -58,6 +60,7 @@ describe('GET /api/notion/instances', () => {
   });
 
   it('should filter instances by date', async () => {
+    process.env.NOTION_API_KEY = 'test-api-key';
     process.env.NOTION_INSTANCE_DB_ID = 'instance-db-id';
 
     const mockInstances = [
@@ -89,6 +92,7 @@ describe('GET /api/notion/instances', () => {
   });
 
   it('should return 500 on error', async () => {
+    process.env.NOTION_API_KEY = 'test-api-key';
     process.env.NOTION_INSTANCE_DB_ID = 'instance-db-id';
 
     vi.mocked(notionLib.getTaskInstances).mockRejectedValue(new Error('Connection failed'));
@@ -115,6 +119,7 @@ describe('POST /api/notion/instances', () => {
   });
 
   it('should return 500 if environment variables are missing', async () => {
+    delete process.env.NOTION_API_KEY;
     delete process.env.NOTION_INSTANCE_DB_ID;
     delete process.env.NOTION_TEMPLATE_DB_ID;
 
@@ -129,10 +134,11 @@ describe('POST /api/notion/instances', () => {
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data.error).toBe('Server configuration error: Missing Notion database IDs');
+    expect(data.error).toBe('Server configuration error: Missing Notion API key or database IDs');
   });
 
   it('should return 400 if required parameters are missing', async () => {
+    process.env.NOTION_API_KEY = 'test-api-key';
     process.env.NOTION_INSTANCE_DB_ID = 'instance-db-id';
     process.env.NOTION_TEMPLATE_DB_ID = 'template-db-id';
 
@@ -148,6 +154,7 @@ describe('POST /api/notion/instances', () => {
   });
 
   it('should create a task instance', async () => {
+    process.env.NOTION_API_KEY = 'test-api-key';
     process.env.NOTION_INSTANCE_DB_ID = 'instance-db-id';
     process.env.NOTION_TEMPLATE_DB_ID = 'template-db-id';
 
@@ -192,6 +199,7 @@ describe('POST /api/notion/instances', () => {
   });
 
   it('should return 404 if template not found', async () => {
+    process.env.NOTION_API_KEY = 'test-api-key';
     process.env.NOTION_INSTANCE_DB_ID = 'instance-db-id';
     process.env.NOTION_TEMPLATE_DB_ID = 'template-db-id';
 
@@ -212,6 +220,7 @@ describe('POST /api/notion/instances', () => {
   });
 
   it('should return 500 on error', async () => {
+    process.env.NOTION_API_KEY = 'test-api-key';
     process.env.NOTION_INSTANCE_DB_ID = 'instance-db-id';
     process.env.NOTION_TEMPLATE_DB_ID = 'template-db-id';
 

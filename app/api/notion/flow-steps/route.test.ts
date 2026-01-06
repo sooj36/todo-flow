@@ -19,6 +19,7 @@ describe('GET /api/notion/flow-steps', () => {
   });
 
   it('should return 500 if environment variables are missing', async () => {
+    delete process.env.NOTION_API_KEY;
     delete process.env.NOTION_STEP_DB_ID;
 
     const request = new NextRequest('http://localhost:3000/api/notion/flow-steps');
@@ -26,10 +27,11 @@ describe('GET /api/notion/flow-steps', () => {
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data.error).toBe('Server configuration error: Missing Notion database IDs');
+    expect(data.error).toBe('Server configuration error: Missing Notion API key or database IDs');
   });
 
   it('should return flow steps', async () => {
+    process.env.NOTION_API_KEY = 'test-api-key';
     process.env.NOTION_STEP_DB_ID = 'step-db-id';
 
     const mockSteps = [
@@ -59,6 +61,7 @@ describe('GET /api/notion/flow-steps', () => {
   });
 
   it('should filter steps by templateId', async () => {
+    process.env.NOTION_API_KEY = 'test-api-key';
     process.env.NOTION_STEP_DB_ID = 'step-db-id';
 
     const mockSteps = [
@@ -88,6 +91,7 @@ describe('GET /api/notion/flow-steps', () => {
   });
 
   it('should return 500 on error', async () => {
+    process.env.NOTION_API_KEY = 'test-api-key';
     process.env.NOTION_STEP_DB_ID = 'step-db-id';
 
     vi.mocked(notionLib.getFlowSteps).mockRejectedValue(new Error('Connection failed'));

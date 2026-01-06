@@ -18,6 +18,7 @@ describe('GET /api/notion/templates', () => {
   });
 
   it('should return 500 if environment variables are missing', async () => {
+    delete process.env.NOTION_API_KEY;
     delete process.env.NOTION_TEMPLATE_DB_ID;
     delete process.env.NOTION_STEP_DB_ID;
 
@@ -25,10 +26,11 @@ describe('GET /api/notion/templates', () => {
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data.error).toBe('Server configuration error: Missing Notion database IDs');
+    expect(data.error).toBe('Server configuration error: Missing Notion API key or database IDs');
   });
 
   it('should return templates with flow steps', async () => {
+    process.env.NOTION_API_KEY = 'test-api-key';
     process.env.NOTION_TEMPLATE_DB_ID = 'template-db-id';
     process.env.NOTION_STEP_DB_ID = 'step-db-id';
 
@@ -67,6 +69,7 @@ describe('GET /api/notion/templates', () => {
   });
 
   it('should return 500 on error', async () => {
+    process.env.NOTION_API_KEY = 'test-api-key';
     process.env.NOTION_TEMPLATE_DB_ID = 'template-db-id';
     process.env.NOTION_STEP_DB_ID = 'step-db-id';
 

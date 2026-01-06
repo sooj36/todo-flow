@@ -4,13 +4,14 @@ import { notion, getTaskInstances, createTaskInstance, getTaskTemplates } from '
 
 export async function GET(request: NextRequest) {
   try {
+    const apiKey = process.env.NOTION_API_KEY;
     const instanceDbId = process.env.NOTION_INSTANCE_DB_ID;
     const searchParams = request.nextUrl.searchParams;
     const date = searchParams.get('date');
 
-    if (!instanceDbId) {
+    if (!apiKey || !instanceDbId) {
       return NextResponse.json(
-        { error: 'Server configuration error: Missing Notion database IDs' },
+        { error: 'Server configuration error: Missing Notion API key or database IDs' },
         { status: 500 }
       );
     }
@@ -34,12 +35,13 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const apiKey = process.env.NOTION_API_KEY;
     const instanceDbId = process.env.NOTION_INSTANCE_DB_ID;
     const templateDbId = process.env.NOTION_TEMPLATE_DB_ID;
 
-    if (!instanceDbId || !templateDbId) {
+    if (!apiKey || !instanceDbId || !templateDbId) {
       return NextResponse.json(
-        { error: 'Server configuration error: Missing Notion database IDs' },
+        { error: 'Server configuration error: Missing Notion API key or database IDs' },
         { status: 500 }
       );
     }

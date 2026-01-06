@@ -4,12 +4,31 @@ import type { TaskTemplate, FlowStep, TaskInstance, TaskColor, Frequency, TaskSt
 
 // Notion 클라이언트 초기화
 export function createNotionClient(apiKey: string): Client {
+  if (!apiKey) {
+    throw new Error('Notion API key is required');
+  }
   return new Client({ auth: apiKey });
 }
 
 // 기본 클라이언트 (환경 변수 사용)
-export const notion = new Client({
-  auth: process.env.NOTION_API_KEY,
+// Lazy initialization을 위해 getter 사용
+let _notionClient: Client | null = null;
+
+function getNotionClient(): Client {
+  if (!_notionClient) {
+    const apiKey = process.env.NOTION_API_KEY;
+    if (!apiKey) {
+      throw new Error('NOTION_API_KEY environment variable is not set');
+    }
+    _notionClient = new Client({ auth: apiKey });
+  }
+  return _notionClient;
+}
+
+export const notion = new Proxy({} as Client, {
+  get(target, prop) {
+    return (getNotionClient() as any)[prop];
+  },
 });
 
 // ============================================
