@@ -1,21 +1,26 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import { Bell } from "lucide-react";
 import { NotionCalendar } from "@/components/calendar/NotionCalendar";
 import { FlowBoard } from "@/components/flow/FlowBoard";
 import { Sidebar } from "@/components/layout/Sidebar";
+import { NotionConnectionModal } from "@/components/notion/NotionConnectionModal";
 
 export default function Home() {
+  const [isNotionModalOpen, setIsNotionModalOpen] = useState(false);
+
   return (
     <div className="flex h-screen w-full bg-[#f4f5f7] overflow-hidden selection:bg-blue-100">
       <Sidebar />
 
       <main className="flex-1 flex overflow-hidden">
         <div className="w-1/2 h-full border-r border-[#ececeb] flex flex-col bg-white z-10 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
-          <NotionCalendar />
+          <NotionCalendar onConnectClick={() => setIsNotionModalOpen(true)} />
         </div>
 
         <div className="w-1/2 h-full flex flex-col bg-[#f9fafb]">
-          <FlowBoard />
+          <FlowBoard onConnectClick={() => setIsNotionModalOpen(true)} />
         </div>
       </main>
 
@@ -24,6 +29,11 @@ export default function Home() {
           <Bell size={20} className="group-hover:rotate-12 transition-transform" />
         </button>
       </div>
+
+      <NotionConnectionModal
+        isOpen={isNotionModalOpen}
+        onClose={() => setIsNotionModalOpen(false)}
+      />
     </div>
   );
 }

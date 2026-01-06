@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import {
   Play,
   Plus,
@@ -12,32 +12,15 @@ import {
   Briefcase,
   Database,
   CheckCircle2,
-  Loader2,
   ArrowRight,
 } from "lucide-react";
 
-export const FlowBoard: React.FC = () => {
-  const [isExecuting, setIsExecuting] = useState(false);
-  const [syncStates, setSyncStates] = useState<
-    Record<string, "idle" | "loading" | "success">
-  >({
-    work: "idle",
-    routine: "idle",
-    etc: "idle",
-  });
+interface FlowBoardProps {
+  onConnectClick?: () => void;
+}
 
-  const handleExecute = async () => {
-    setIsExecuting(true);
-
-    const nodes = ["work", "routine", "etc"];
-    for (const node of nodes) {
-      setSyncStates((prev) => ({ ...prev, [node]: "loading" }));
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      setSyncStates((prev) => ({ ...prev, [node]: "success" }));
-    }
-
-    setIsExecuting(false);
-  };
+export const FlowBoard: React.FC<FlowBoardProps> = ({ onConnectClick }) => {
+  const isConnected = false;
 
   return (
     <div className="relative flex flex-col h-full dot-grid overflow-hidden">
@@ -51,29 +34,25 @@ export const FlowBoard: React.FC = () => {
               Daily Automation Flow
             </h2>
             <div className="flex items-center gap-2">
-              <span className="flex items-center gap-1 text-[10px] text-green-600 font-bold uppercase tracking-wider">
-                <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
-                Connected to Notion
+              <span className="flex items-center gap-1 text-[10px] text-gray-400 font-bold uppercase tracking-wider">
+                <span className="w-1.5 h-1.5 bg-gray-300 rounded-full"></span>
+                Notion not connected
               </span>
             </div>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={handleExecute}
-            disabled={isExecuting}
+            onClick={onConnectClick}
+            disabled={!onConnectClick || isConnected}
             className={`flex items-center gap-2 px-4 py-2 rounded-md text-xs font-bold transition-all shadow-sm ${
-              isExecuting
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-black text-white hover:bg-[#333]"
+              onConnectClick && !isConnected
+                ? "bg-black text-white hover:bg-[#333]"
+                : "bg-gray-300 text-white cursor-not-allowed"
             }`}
           >
-            {isExecuting ? (
-              <Loader2 size={14} className="animate-spin" />
-            ) : (
-              <Play size={14} fill="currentColor" />
-            )}
-            {isExecuting ? "Syncing..." : "Execute & Save to Notion"}
+            <Play size={14} fill="currentColor" />
+            Connect Notion
           </button>
           <button className="p-2 bg-white border border-[#ececeb] rounded-md text-[#37352f]/60 hover:text-[#37352f] transition-all">
             <Plus size={16} />
@@ -88,55 +67,44 @@ export const FlowBoard: React.FC = () => {
         >
           <path
             d="M 180 150 L 320 150"
-            stroke={isExecuting ? "#3b82f6" : "#e5e7eb"}
+            stroke="#e5e7eb"
             strokeWidth="2"
             fill="none"
-            className={isExecuting ? "animate-[dash_2s_linear_infinite]" : ""}
-            strokeDasharray={isExecuting ? "5,5" : "0"}
           />
           <path
             d="M 480 150 C 550 150, 550 80, 620 80"
-            stroke={syncStates.work !== "idle" ? "#3b82f6" : "#e5e7eb"}
+            stroke="#e5e7eb"
             strokeWidth="2"
             fill="none"
           />
           <path
             d="M 480 150 C 550 150, 550 220, 620 220"
-            stroke={syncStates.etc !== "idle" ? "#3b82f6" : "#e5e7eb"}
+            stroke="#e5e7eb"
             strokeWidth="2"
             fill="none"
           />
           <path
             d="M 480 150 L 620 150"
-            stroke={syncStates.routine !== "idle" ? "#3b82f6" : "#e5e7eb"}
+            stroke="#e5e7eb"
             strokeWidth="2"
             fill="none"
           />
         </svg>
-
-        <style>{`
-          @keyframes dash {
-            to {
-              stroke-dashoffset: -20;
-            }
-          }
-        `}</style>
 
         <div className="relative space-y-12">
           <div className="flex items-center gap-20">
             <FlowNode
               title="Daily Start"
               icon={<Zap className="text-orange-500" size={16} />}
-              status={isExecuting ? "success" : "idle"}
+              status="idle"
               type="Trigger"
             />
 
             <FlowNode
               title="AI Daily Reporter"
               icon={<Cpu className="text-purple-500" size={16} />}
-              status={isExecuting ? "running" : "idle"}
+              status="idle"
               type="AI Agent"
-              description="Summarizing tasks for Notion..."
             />
           </div>
 
@@ -145,49 +113,28 @@ export const FlowBoard: React.FC = () => {
               id="work"
               title="Work Tasks"
               icon={<Briefcase className="text-blue-500" size={16} />}
-              status={
-                syncStates.work === "loading"
-                  ? "running"
-                  : syncStates.work === "success"
-                    ? "success"
-                    : "idle"
-              }
+              status="idle"
               type="Notion DB"
-              tasks={["Email Inbox Zero", "Design Review", "Client Call"]}
               isSyncable
-              syncState={syncStates.work}
+              syncState="idle"
             />
             <FlowNode
               id="routine"
               title="Routine"
               icon={<Coffee className="text-yellow-600" size={16} />}
-              status={
-                syncStates.routine === "loading"
-                  ? "running"
-                  : syncStates.routine === "success"
-                    ? "success"
-                    : "idle"
-              }
+              status="idle"
               type="Notion DB"
-              tasks={["Morning Gym", "Meditation"]}
               isSyncable
-              syncState={syncStates.routine}
+              syncState="idle"
             />
             <FlowNode
               id="etc"
               title="Etc / Other"
               icon={<ListTodo className="text-gray-500" size={16} />}
-              status={
-                syncStates.etc === "loading"
-                  ? "running"
-                  : syncStates.etc === "success"
-                    ? "success"
-                    : "idle"
-              }
+              status="idle"
               type="Notion DB"
-              tasks={["Grocery Shopping", "Pay Utility Bill"]}
               isSyncable
-              syncState={syncStates.etc}
+              syncState="idle"
             />
           </div>
         </div>
@@ -195,12 +142,12 @@ export const FlowBoard: React.FC = () => {
 
       <div className="p-4 border-t border-[#ececeb] bg-white flex items-center justify-between z-20">
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 px-2 py-1 bg-blue-50 text-blue-600 rounded text-[10px] font-bold">
+          <div className="flex items-center gap-2 px-2 py-1 bg-gray-100 text-gray-500 rounded text-[10px] font-bold">
             <Database size={12} />
-            DATABASE ID: 88f2...9a21
+            DATABASE ID: —
           </div>
           <div className="text-[11px] text-gray-400">
-            Auto-save enabled for daily reports
+            Auto-save disabled until connected
           </div>
         </div>
         <div className="flex gap-2">

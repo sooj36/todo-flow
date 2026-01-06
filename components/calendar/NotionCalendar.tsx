@@ -4,22 +4,35 @@ import { ChevronLeft, ChevronRight, Plus, MoreHorizontal, Link2 } from "lucide-r
 const days1To15 = Array.from({ length: 15 }, (_, i) => i + 1);
 const days16To31 = Array.from({ length: 16 }, (_, i) => i + 16);
 
-export const NotionCalendar: React.FC = () => {
+interface NotionCalendarProps {
+  onConnectClick?: () => void;
+}
+
+export const NotionCalendar: React.FC<NotionCalendarProps> = ({ onConnectClick }) => {
+  const now = new Date();
+  const monthLabel = new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    year: "numeric",
+  }).format(now);
+
   return (
     <div className="flex flex-col h-full">
       <div className="px-8 py-6 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-[#37352f] flex items-center gap-3">
-            📅 October 2023
+            📅 {monthLabel}
           </h1>
           <p className="text-sm text-[#37352f]/60 mt-1">
             Split View: Life in Two Acts
           </p>
         </div>
         <div className="flex items-center gap-4">
-          <button className="flex items-center gap-2 text-sm font-medium text-[#37352f]/60 hover:text-[#37352f] transition-colors">
+          <button
+            onClick={onConnectClick}
+            className="flex items-center gap-2 text-sm font-medium text-[#37352f]/60 hover:text-[#37352f] transition-colors"
+          >
             <Link2 size={16} />
-            Notion Connected
+            Notion not connected
           </button>
           <div className="flex items-center bg-[#efefed] rounded-md p-1">
             <button className="p-1 hover:bg-white hover:shadow-sm rounded transition-all">
@@ -78,21 +91,15 @@ interface CalendarDayProps {
 }
 
 const CalendarDay: React.FC<CalendarDayProps> = ({ day }) => {
-  const hasEvent = day % 3 === 0;
-
   return (
     <div
       className={`group min-h-[100px] border border-[#ececeb] rounded-lg p-2 transition-all hover:shadow-md cursor-pointer ${
-        day === 12
-          ? "bg-yellow-50/50 border-yellow-200"
-          : "bg-[#fbfbfa] hover:bg-white"
+        "bg-[#fbfbfa] hover:bg-white"
       }`}
     >
       <div className="flex items-center justify-between mb-2">
         <span
-          className={`text-xs font-bold ${
-            day === 12 ? "text-yellow-700" : "text-[#37352f]/40"
-          }`}
+          className="text-xs font-bold text-[#37352f]/40"
         >
           {day}
         </span>
@@ -100,24 +107,6 @@ const CalendarDay: React.FC<CalendarDayProps> = ({ day }) => {
           <Plus size={14} className="text-[#37352f]/40" />
         </button>
       </div>
-
-      {hasEvent && (
-        <div
-          className={`text-[10px] px-1.5 py-0.5 rounded-sm mb-1 truncate ${
-            day % 2 === 0
-              ? "bg-blue-100 text-blue-700"
-              : "bg-red-100 text-red-700"
-          }`}
-        >
-          {day % 2 === 0 ? "Project Alpha Sync" : "Submit Reports"}
-        </div>
-      )}
-
-      {day === 12 && (
-        <div className="text-[10px] px-1.5 py-0.5 bg-yellow-100 text-yellow-700 rounded-sm truncate">
-          Birthday Party 🎉
-        </div>
-      )}
     </div>
   );
 };
