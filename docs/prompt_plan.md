@@ -19,7 +19,7 @@
 ## Phase 2 Tasks
 
 - [x] Notion 연결 입력 UI/검증 (API 키, DB IDs)
-- [ ] Notion API 클라이언트/라우트 구성
+- [x] Notion API 클라이언트/라우트 구성
 
 ## Phase 3 Tasks
 
