@@ -31,10 +31,9 @@
 
 ## Phase 4 Tasks (Personal Mode)
 - [x] Notion 연결 값 저장 방식 확정 (개인용: localStorage 기반)
-- [ ] NotionConnectionModal onSave 연결 + 저장/불러오기
+- [x] NotionConnectionModal onSave 연결 + 저장/불러오기
 - [ ] 연결 상태 UI 반영 (저장된 값 존재 시 Connected)
 - [ ] 저장값 초기화/재설정 플로우 추가
-- [ ] 관련 테스트 추가 및 로그 업데이트
 
 
 ## Verification Loop

@@ -9,7 +9,9 @@ const STORAGE_KEY = "notion-connection";
 
 const getStorage = (): Storage | null => {
   if (typeof window === "undefined") return null;
-  return window.localStorage;
+  const storage = window.localStorage;
+  if (!storage || typeof storage.getItem !== "function") return null;
+  return storage;
 };
 
 const isValidPayload = (value: unknown): value is NotionConnectionValues => {

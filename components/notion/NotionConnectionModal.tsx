@@ -2,21 +2,16 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { X } from "lucide-react";
-
-export interface NotionConnectionConfig {
-  apiKey: string;
-  templateDbId: string;
-  stepDbId: string;
-  instanceDbId: string;
-}
+import type { NotionConnectionValues } from "@/lib/notionStorage";
 
 interface NotionConnectionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave?: (config: NotionConnectionConfig) => void;
+  onSave?: (config: NotionConnectionValues) => void;
+  initialValues?: NotionConnectionValues | null;
 }
 
-const emptyConfig: NotionConnectionConfig = {
+const emptyConfig: NotionConnectionValues = {
   apiKey: "",
   templateDbId: "",
   stepDbId: "",
@@ -42,15 +37,27 @@ export const NotionConnectionModal: React.FC<NotionConnectionModalProps> = ({
   isOpen,
   onClose,
   onSave,
+  initialValues,
 }) => {
-  const [values, setValues] = useState<NotionConnectionConfig>(emptyConfig);
-  const [touched, setTouched] = useState<Record<keyof NotionConnectionConfig, boolean>>({
+  const [values, setValues] = useState<NotionConnectionValues>(emptyConfig);
+  const [touched, setTouched] = useState<Record<keyof NotionConnectionValues, boolean>>({
     apiKey: false,
     templateDbId: false,
     stepDbId: false,
     instanceDbId: false,
   });
   const firstInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setValues(initialValues ?? emptyConfig);
+    setTouched({
+      apiKey: false,
+      templateDbId: false,
+      stepDbId: false,
+      instanceDbId: false,
+    });
+  }, [initialValues, isOpen]);
 
   const errors = useMemo(() => {
     return {
@@ -80,14 +87,14 @@ export const NotionConnectionModal: React.FC<NotionConnectionModalProps> = ({
   const isFormValid =
     !errors.apiKey && !errors.templateDbId && !errors.stepDbId && !errors.instanceDbId;
 
-  const handleChange = (field: keyof NotionConnectionConfig) => {
+  const handleChange = (field: keyof NotionConnectionValues) => {
     return (event: React.ChangeEvent<HTMLInputElement>) => {
       const value = event.target.value;
       setValues((prev) => ({ ...prev, [field]: value }));
     };
   };
 
-  const handleBlur = (field: keyof NotionConnectionConfig) => {
+  const handleBlur = (field: keyof NotionConnectionValues) => {
     return () => {
       setTouched((prev) => ({ ...prev, [field]: true }));
     };
@@ -146,7 +153,7 @@ export const NotionConnectionModal: React.FC<NotionConnectionModalProps> = ({
   };
 
   const inputFields: Array<{
-    key: keyof NotionConnectionConfig;
+    key: keyof NotionConnectionValues;
     label: string;
     id: string;
     type: string;

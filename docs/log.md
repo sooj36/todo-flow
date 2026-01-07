@@ -11,6 +11,8 @@
 - hooks/useTaskInstances.test.ts: useTaskInstances hook (3 tests) 통과 – 2026-01-07
 - NotionCalendar.test.tsx: 오늘 날짜 테두리 렌더링 통과 – 2026-01-07
 - notionStorage.test.tsx: localStorage 저장/불러오기 통과 – 2026-01-07
+- useNotionConnection.test.ts: 연결값 로드/저장 통과 – 2026-01-07
+- NotionConnectionModal.test.tsx: 초기값 프리필/저장 콜백 통과 – 2026-01-07
 
 ## 작업 방식 기록
 - 병렬 작업 사용: dev 서버 + test watch를 서브프로세스로 분리해 진행 – 2026-01-07

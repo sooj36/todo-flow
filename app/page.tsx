@@ -6,9 +6,11 @@ import { NotionCalendar } from "@/components/calendar/NotionCalendar";
 import { FlowBoard } from "@/components/flow/FlowBoard";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { NotionConnectionModal } from "@/components/notion/NotionConnectionModal";
+import { useNotionConnection } from "@/hooks/useNotionConnection";
 
 export default function Home() {
   const [isNotionModalOpen, setIsNotionModalOpen] = useState(false);
+  const { connection, saveConnection } = useNotionConnection();
 
   return (
     <div className="flex h-screen w-full bg-[#f4f5f7] overflow-hidden selection:bg-blue-100">
@@ -33,6 +35,8 @@ export default function Home() {
       <NotionConnectionModal
         isOpen={isNotionModalOpen}
         onClose={() => setIsNotionModalOpen(false)}
+        onSave={saveConnection}
+        initialValues={connection}
       />
     </div>
   );
