@@ -20,6 +20,20 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Notion Environment Setup (Personal Mode)
+
+Create a `.env.local` file in the project root:
+
+```bash
+NOTION_API_KEY=secret_xxx
+NOTION_TEMPLATE_DB_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+NOTION_STEP_DB_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+NOTION_INSTANCE_DB_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
+- Keep these values server-only; do not commit `.env.local`.
+- The UI assumes Notion is connected when the API calls succeed.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
