@@ -1,6 +1,6 @@
 // app/api/notion/templates/route.ts
 import { NextResponse } from 'next/server';
-import { notion, getTaskTemplates, getFlowSteps } from '@/lib/notion';
+import { createNotionClient, getTaskTemplates, getFlowSteps } from '@/lib/notion';
 
 export async function GET() {
   try {
@@ -19,11 +19,14 @@ export async function GET() {
       );
     }
 
+    // Create Notion client with API key from env
+    const notionClient = createNotionClient(apiKey);
+
     // Get templates
-    const templates = await getTaskTemplates(notion, templateDbId);
+    const templates = await getTaskTemplates(notionClient, templateDbId);
 
     // Get all flow steps
-    const allSteps = await getFlowSteps(notion, stepDbId);
+    const allSteps = await getFlowSteps(notionClient, stepDbId);
 
     // Attach flow steps to each template
     const templatesWithSteps = templates.map(template => ({

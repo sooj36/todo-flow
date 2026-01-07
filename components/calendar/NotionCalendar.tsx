@@ -42,7 +42,7 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({ onConnectClick }
     return dataMap;
   }, [instances, now]);
 
-  const isConnected = !error && instances.length === 0 && !loading;
+  const isConnected = !loading && !error;
 
   return (
     <div className="flex flex-col h-full">
@@ -73,11 +73,16 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({ onConnectClick }
           )}
           {!loading && !error && (
             <button
-              onClick={onConnectClick}
-              className="flex items-center gap-2 text-sm font-medium text-[#37352f]/60 hover:text-[#37352f] transition-colors"
+              disabled={isConnected}
+              onClick={isConnected ? undefined : onConnectClick}
+              className={`flex items-center gap-2 text-xs font-semibold tracking-wide transition-colors ${
+                isConnected
+                  ? "rounded-full bg-green-100 px-3 py-1 text-green-700 cursor-default"
+                  : "text-[#37352f]/60 hover:text-[#37352f]"
+              }`}
             >
               <Link2 size={16} />
-              {isConnected ? 'Connected to Notion' : 'Notion not connected'}
+              {isConnected ? "notion connect success" : "Notion not connected"}
             </button>
           )}
           <div className="flex items-center bg-[#efefed] rounded-md p-1">

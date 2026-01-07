@@ -1,6 +1,6 @@
 // app/api/notion/instances/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { notion, getTaskInstances, createTaskInstance, getTaskTemplates } from '@/lib/notion';
+import { createNotionClient, getTaskInstances, createTaskInstance, getTaskTemplates } from '@/lib/notion';
 
 export async function GET(request: NextRequest) {
   try {
@@ -21,15 +21,18 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Create Notion client
+    const notionClient = createNotionClient(apiKey);
+
     // Get task instances (optionally filtered by date)
     const instances = await getTaskInstances(
-      notion,
+      notionClient,
       instanceDbId,
       date || undefined
     );
 
     // Populate template information
-    const templates = await getTaskTemplates(notion, templateDbId);
+    const templates = await getTaskTemplates(notionClient, templateDbId);
     const templatesMap = new Map(templates.map(t => [t.id, t]));
 
     const instancesWithTemplates = instances.map(instance => ({
@@ -73,6 +76,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Create Notion client
+    const notionClient = createNotionClient(apiKey);
+
     const body = await request.json();
     const { templateId, date } = body;
 
@@ -84,7 +90,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get template to fetch its name
-    const templates = await getTaskTemplates(notion, templateDbId);
+    const templates = await getTaskTemplates(notionClient, templateDbId);
     const template = templates.find(t => t.id === templateId);
 
     if (!template) {
@@ -96,7 +102,7 @@ export async function POST(request: NextRequest) {
 
     // Create task instance
     const instance = await createTaskInstance(
-      notion,
+      notionClient,
       instanceDbId,
       templateId,
       template.name,

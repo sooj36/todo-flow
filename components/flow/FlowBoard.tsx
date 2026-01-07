@@ -66,9 +66,15 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({ onConnectClick }) => {
                 </span>
               )}
               {!loading && !error && (
-                <span className="flex items-center gap-1 text-[10px] text-gray-400 font-bold uppercase tracking-wider">
+                <span
+                  className={`flex items-center gap-1 text-[10px] font-bold tracking-wide ${
+                    isConnected
+                      ? "rounded-full bg-green-100 px-2 py-0.5 text-green-700"
+                      : "text-gray-400"
+                  }`}
+                >
                   <span className={`w-1.5 h-1.5 ${isConnected ? 'bg-green-500' : 'bg-gray-300'} rounded-full`}></span>
-                  {isConnected ? 'Connected to Notion' : 'Notion not connected'}
+                  {isConnected ? 'notion connect success' : 'Notion not connected'}
                 </span>
               )}
             </div>
@@ -79,13 +85,15 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({ onConnectClick }) => {
             onClick={onConnectClick}
             disabled={!onConnectClick || isConnected}
             className={`flex items-center gap-2 px-4 py-2 rounded-md text-xs font-bold transition-all shadow-sm ${
-              onConnectClick && !isConnected
-                ? "bg-black text-white hover:bg-[#333]"
-                : "bg-gray-300 text-white cursor-not-allowed"
+              isConnected
+                ? "bg-green-100 text-green-700 cursor-default shadow-none"
+                : onConnectClick
+                  ? "bg-black text-white hover:bg-[#333]"
+                  : "bg-gray-300 text-white cursor-not-allowed"
             }`}
           >
             <Play size={14} fill="currentColor" />
-            Connect Notion
+            {isConnected ? "notion connect success" : "Connect Notion"}
           </button>
           <button className="p-2 bg-white border border-[#ececeb] rounded-md text-[#37352f]/60 hover:text-[#37352f] transition-all">
             <Plus size={16} />
