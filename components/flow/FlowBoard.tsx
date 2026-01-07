@@ -19,10 +19,6 @@ import {
 import { useTaskInstances } from "@/hooks/useTaskInstances";
 import { useTaskTemplates } from "@/hooks/useTaskTemplates";
 
-interface FlowBoardProps {
-  onConnectClick?: () => void;
-}
-
 // Helper function to get local date in YYYY-MM-DD format
 function getLocalDateString(): string {
   const now = new Date();
@@ -32,7 +28,7 @@ function getLocalDateString(): string {
   return `${year}-${month}-${day}`;
 }
 
-export const FlowBoard: React.FC<FlowBoardProps> = ({ onConnectClick }) => {
+export const FlowBoard: React.FC = () => {
   const today = getLocalDateString();
   const { instances, loading: instancesLoading, error: instancesError } = useTaskInstances(today);
   const { templates, loading: templatesLoading, error: templatesError } = useTaskTemplates();
@@ -81,20 +77,16 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({ onConnectClick }) => {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button
-            onClick={onConnectClick}
-            disabled={!onConnectClick || isConnected}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md text-xs font-bold transition-all shadow-sm ${
+          <div
+            className={`flex items-center gap-2 px-4 py-2 rounded-md text-xs font-bold ${
               isConnected
-                ? "bg-green-100 text-green-700 cursor-default shadow-none"
-                : onConnectClick
-                  ? "bg-black text-white hover:bg-[#333]"
-                  : "bg-gray-300 text-white cursor-not-allowed"
+                ? "bg-green-100 text-green-700"
+                : "bg-gray-200 text-gray-600"
             }`}
           >
             <Play size={14} fill="currentColor" />
-            {isConnected ? "notion connect success" : "Connect Notion"}
-          </button>
+            {isConnected ? "notion connect success" : "Configure .env.local"}
+          </div>
           <button className="p-2 bg-white border border-[#ececeb] rounded-md text-[#37352f]/60 hover:text-[#37352f] transition-all">
             <Plus size={16} />
           </button>
