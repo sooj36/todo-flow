@@ -29,3 +29,9 @@
 - Medium: 빈 템플릿 상태 처리 및 fallback 메시지 추가
 - Low: 타임존 이슈 해결 (getLocalDateString() 사용)
 - 모든 테스트 업데이트 및 통과 확인
+
+## Phase 3 완료: E2E 테스트 구축 (2026-01-07)
+- app/__tests__/page.e2e.test.tsx: Dashboard E2E smoke tests 구현 및 통과 (3 tests) – 2026-01-07
+- 전체 페이지 통합 테스트: Sidebar, Calendar, FlowBoard 렌더링 검증
+- 모든 테스트 통과: 8개 테스트 파일, 26개 테스트 ✓
+- 커밋 ID: f1629f0
