@@ -24,9 +24,9 @@
 ## Phase 3 Tasks
 
 - [x] 캘린더 데이터 로딩/에러/빈 상태
-- [ ] FlowBoard 데이터 로딩/에러/빈 상태
+- [x] FlowBoard 데이터 로딩/에러/빈 상태
 - [x] 캘린더 이벤트 렌더링
-- [ ] FlowBoard 노드/상태 바인딩
+- [x] FlowBoard 노드/상태 바인딩
 - [ ] E2E 테스트 구축 및 유지
 
 

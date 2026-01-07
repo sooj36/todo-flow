@@ -133,33 +133,43 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({ onConnectClick }) => {
           </div>
 
           <div className="flex flex-col gap-8 ml-[620px]">
-            <FlowNode
-              id="work"
-              title="Work Tasks"
-              icon={<Briefcase className="text-blue-500" size={16} />}
-              status="idle"
-              type="Notion DB"
-              isSyncable
-              syncState="idle"
-            />
-            <FlowNode
-              id="routine"
-              title="Routine"
-              icon={<Coffee className="text-yellow-600" size={16} />}
-              status="idle"
-              type="Notion DB"
-              isSyncable
-              syncState="idle"
-            />
-            <FlowNode
-              id="etc"
-              title="Etc / Other"
-              icon={<ListTodo className="text-gray-500" size={16} />}
-              status="idle"
-              type="Notion DB"
-              isSyncable
-              syncState="idle"
-            />
+            {loading ? (
+              <div className="flex items-center justify-center p-8">
+                <Loader2 className="animate-spin text-gray-400" size={32} />
+              </div>
+            ) : error ? (
+              <div className="flex items-center justify-center p-8 text-red-500">
+                <AlertCircle size={20} className="mr-2" />
+                <span className="text-sm">Failed to load tasks</span>
+              </div>
+            ) : instances.length === 0 ? (
+              <div className="flex items-center justify-center p-8 text-gray-400">
+                <span className="text-sm">No tasks for today</span>
+              </div>
+            ) : (
+              templates.map((template) => {
+                const templateInstances = instances.filter(inst => inst.templateId === template.id);
+                if (templateInstances.length === 0) return null;
+
+                const completedCount = templateInstances.filter(inst => inst.status === 'done').length;
+                const syncState = completedCount === templateInstances.length ? 'success' : 'idle';
+                const status = templateInstances.some(inst => inst.status === 'doing') ? 'running' : 'idle';
+
+                return (
+                  <FlowNode
+                    key={template.id}
+                    id={template.id}
+                    title={template.name}
+                    icon={<Briefcase className="text-blue-500" size={16} />}
+                    status={status}
+                    type="Notion DB"
+                    isSyncable
+                    syncState={syncState}
+                    tasks={templateInstances.map(inst => inst.template.name)}
+                  />
+                );
+              })
+            )}
           </div>
         </div>
       </div>
