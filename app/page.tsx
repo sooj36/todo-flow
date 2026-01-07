@@ -1,15 +1,20 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Bell } from "lucide-react";
 import { NotionCalendar } from "@/components/calendar/NotionCalendar";
 import { FlowBoard } from "@/components/flow/FlowBoard";
 import { Sidebar } from "@/components/layout/Sidebar";
 
 export default function Home() {
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
   return (
     <div className="flex h-screen w-full bg-[#f4f5f7] overflow-hidden selection:bg-blue-100">
-      <Sidebar />
+      <Sidebar
+        collapsed={isSidebarCollapsed}
+        onToggle={() => setIsSidebarCollapsed((prev) => !prev)}
+      />
 
       <main className="flex-1 flex overflow-hidden">
         <div className="w-1/2 h-full border-r border-[#ececeb] flex flex-col bg-white z-10 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
