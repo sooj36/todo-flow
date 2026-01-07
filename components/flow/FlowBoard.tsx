@@ -23,14 +23,23 @@ interface FlowBoardProps {
   onConnectClick?: () => void;
 }
 
+// Helper function to get local date in YYYY-MM-DD format
+function getLocalDateString(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 export const FlowBoard: React.FC<FlowBoardProps> = ({ onConnectClick }) => {
-  const today = new Date().toISOString().split('T')[0];
+  const today = getLocalDateString();
   const { instances, loading: instancesLoading, error: instancesError } = useTaskInstances(today);
   const { templates, loading: templatesLoading, error: templatesError } = useTaskTemplates();
 
   const loading = instancesLoading || templatesLoading;
   const error = instancesError || templatesError;
-  const isConnected = !loading && !error && (instances.length > 0 || templates.length > 0);
+  const isConnected = !loading && !error;
 
   return (
     <div className="relative flex flex-col h-full dot-grid overflow-hidden">
@@ -146,29 +155,41 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({ onConnectClick }) => {
               <div className="flex items-center justify-center p-8 text-gray-400">
                 <span className="text-sm">No tasks for today</span>
               </div>
+            ) : templates.length === 0 ? (
+              <div className="flex items-center justify-center p-8 text-gray-400">
+                <span className="text-sm">No templates available</span>
+              </div>
             ) : (
-              templates.map((template) => {
-                const templateInstances = instances.filter(inst => inst.templateId === template.id);
-                if (templateInstances.length === 0) return null;
+              (() => {
+                const nodes = templates.map((template) => {
+                  const templateInstances = instances.filter(inst => inst.templateId === template.id);
+                  if (templateInstances.length === 0) return null;
 
-                const completedCount = templateInstances.filter(inst => inst.status === 'done').length;
-                const syncState = completedCount === templateInstances.length ? 'success' : 'idle';
-                const status = templateInstances.some(inst => inst.status === 'doing') ? 'running' : 'idle';
+                  const completedCount = templateInstances.filter(inst => inst.status === 'done').length;
+                  const syncState = completedCount === templateInstances.length ? 'success' : 'idle';
+                  const status = templateInstances.some(inst => inst.status === 'doing') ? 'running' : 'idle';
 
-                return (
-                  <FlowNode
-                    key={template.id}
-                    id={template.id}
-                    title={template.name}
-                    icon={<Briefcase className="text-blue-500" size={16} />}
-                    status={status}
-                    type="Notion DB"
-                    isSyncable
-                    syncState={syncState}
-                    tasks={templateInstances.map(inst => inst.template.name)}
-                  />
+                  return (
+                    <FlowNode
+                      key={template.id}
+                      id={template.id}
+                      title={template.name}
+                      icon={<Briefcase className="text-blue-500" size={16} />}
+                      status={status}
+                      type="Notion DB"
+                      isSyncable
+                      syncState={syncState}
+                      tasks={templateInstances.map(inst => `${inst.template.name} - ${inst.date}`)}
+                    />
+                  );
+                }).filter(Boolean);
+
+                return nodes.length > 0 ? nodes : (
+                  <div className="flex items-center justify-center p-8 text-gray-400">
+                    <span className="text-sm">No matching tasks for today</span>
+                  </div>
                 );
-              })
+              })()
             )}
           </div>
         </div>

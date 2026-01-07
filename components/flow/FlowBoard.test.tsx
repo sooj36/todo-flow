@@ -25,11 +25,12 @@ describe("FlowBoard", () => {
     vi.clearAllMocks();
   });
 
-  it("renders the disconnected state", () => {
+  it("renders the connected state with no tasks", () => {
     render(<FlowBoard />);
 
     expect(screen.getByText("Daily Automation Flow")).toBeInTheDocument();
-    expect(screen.getByText("Notion not connected")).toBeInTheDocument();
+    expect(screen.getByText("Connected to Notion")).toBeInTheDocument();
+    expect(screen.getByText("No tasks for today")).toBeInTheDocument();
 
     const connectButton = screen.getByRole("button", {
       name: /connect notion/i,

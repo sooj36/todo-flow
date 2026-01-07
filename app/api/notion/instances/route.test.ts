@@ -21,18 +21,33 @@ describe('GET /api/notion/instances', () => {
   it('should return 500 if environment variables are missing', async () => {
     delete process.env.NOTION_API_KEY;
     delete process.env.NOTION_INSTANCE_DB_ID;
+    delete process.env.NOTION_TEMPLATE_DB_ID;
 
     const request = new NextRequest('http://localhost:3000/api/notion/instances');
     const response = await GET(request);
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data.error).toBe('Server configuration error: Missing NOTION_API_KEY, NOTION_INSTANCE_DB_ID');
+    expect(data.error).toBe('Server configuration error: Missing NOTION_API_KEY, NOTION_INSTANCE_DB_ID, NOTION_TEMPLATE_DB_ID');
   });
 
   it('should return task instances', async () => {
     process.env.NOTION_API_KEY = 'test-api-key';
     process.env.NOTION_INSTANCE_DB_ID = 'instance-db-id';
+    process.env.NOTION_TEMPLATE_DB_ID = 'template-db-id';
+
+    const mockTemplates = [
+      {
+        id: 'template-1',
+        name: 'Morning Routine',
+        icon: '☀️',
+        color: 'yellow' as const,
+        isRepeating: true,
+        defaultFrequency: 'daily' as const,
+        active: true,
+        flowSteps: [],
+      },
+    ];
 
     const mockInstances = [
       {
@@ -48,6 +63,7 @@ describe('GET /api/notion/instances', () => {
       },
     ];
 
+    vi.mocked(notionLib.getTaskTemplates).mockResolvedValue(mockTemplates);
     vi.mocked(notionLib.getTaskInstances).mockResolvedValue(mockInstances);
 
     const request = new NextRequest('http://localhost:3000/api/notion/instances');
@@ -57,11 +73,26 @@ describe('GET /api/notion/instances', () => {
     expect(response.status).toBe(200);
     expect(data.instances).toHaveLength(1);
     expect(data.instances[0].date).toBe('2026-01-07');
+    expect(data.instances[0].template.name).toBe('Morning Routine');
   });
 
   it('should filter instances by date', async () => {
     process.env.NOTION_API_KEY = 'test-api-key';
     process.env.NOTION_INSTANCE_DB_ID = 'instance-db-id';
+    process.env.NOTION_TEMPLATE_DB_ID = 'template-db-id';
+
+    const mockTemplates = [
+      {
+        id: 'template-1',
+        name: 'Morning Routine',
+        icon: '☀️',
+        color: 'yellow' as const,
+        isRepeating: true,
+        defaultFrequency: 'daily' as const,
+        active: true,
+        flowSteps: [],
+      },
+    ];
 
     const mockInstances = [
       {
