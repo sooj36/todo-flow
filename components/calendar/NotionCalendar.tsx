@@ -14,6 +14,7 @@ interface NotionCalendarProps {
 
 export const NotionCalendar: React.FC<NotionCalendarProps> = ({ onConnectClick }) => {
   const now = new Date();
+  const today = now.getDate();
   const monthLabel = new Intl.DateTimeFormat("en-US", {
     month: "long",
     year: "numeric",
@@ -110,11 +111,21 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({ onConnectClick }
               const date = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
               const dayData = calendarData.get(date);
               return (
-                <CalendarDay key={day} day={day} data={dayData} loading={loading} />
+                <CalendarDay
+                  key={day}
+                  day={day}
+                  data={dayData}
+                  loading={loading}
+                  isToday={day === today}
+                />
               );
             })}
           </div>
         </section>
+
+        <div className="flex items-center justify-center">
+          <div className="h-1 w-full rounded-full bg-red-500/80"></div>
+        </div>
 
         <section>
           <div className="flex items-center justify-between mb-4 border-b border-[#ececeb] pb-2">
@@ -132,7 +143,14 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({ onConnectClick }
               const date = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
               const dayData = calendarData.get(date);
               return (
-                <CalendarDay key={day} day={day} data={dayData} isSecondPhase loading={loading} />
+                <CalendarDay
+                  key={day}
+                  day={day}
+                  data={dayData}
+                  isSecondPhase
+                  loading={loading}
+                  isToday={day === today}
+                />
               );
             })}
           </div>
@@ -147,9 +165,10 @@ interface CalendarDayProps {
   isSecondPhase?: boolean;
   data?: CalendarDayData;
   loading?: boolean;
+  isToday?: boolean;
 }
 
-const CalendarDay: React.FC<CalendarDayProps> = ({ day, data, loading }) => {
+const CalendarDay: React.FC<CalendarDayProps> = ({ day, data, loading, isToday }) => {
   const completionRate = data && data.totalTasks > 0
     ? data.completedTasks / data.totalTasks
     : 0;
@@ -162,9 +181,15 @@ const CalendarDay: React.FC<CalendarDayProps> = ({ day, data, loading }) => {
     ? "bg-blue-50 border-blue-200"
     : "bg-[#fbfbfa]";
 
+  const todayBorder = isToday ? "border-2 border-black" : "border border-[#ececeb]";
+  const todayBg = isToday ? "bg-green-200/80" : bgColor;
+
   if (loading) {
     return (
-      <div className="group min-h-[100px] border border-[#ececeb] rounded-lg p-2 bg-[#fbfbfa] animate-pulse">
+      <div
+        data-testid={`calendar-day-${day}`}
+        className={`group min-h-[100px] rounded-lg p-2 bg-[#fbfbfa] animate-pulse ${todayBorder}`}
+      >
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs font-bold text-[#37352f]/40">{day}</span>
         </div>
@@ -175,7 +200,8 @@ const CalendarDay: React.FC<CalendarDayProps> = ({ day, data, loading }) => {
 
   return (
     <div
-      className={`group min-h-[100px] border border-[#ececeb] rounded-lg p-2 transition-all hover:shadow-md cursor-pointer ${bgColor} hover:bg-white`}
+      data-testid={`calendar-day-${day}`}
+      className={`group min-h-[100px] rounded-lg p-2 transition-all hover:shadow-md cursor-pointer ${todayBg} ${todayBorder} hover:bg-white`}
     >
       <div className="flex items-center justify-between mb-2">
         <span className="text-xs font-bold text-[#37352f]/40">{day}</span>

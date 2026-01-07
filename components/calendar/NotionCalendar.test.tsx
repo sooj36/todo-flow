@@ -21,6 +21,7 @@ describe("NotionCalendar", () => {
       month: "long",
       year: "numeric",
     }).format(new Date());
+    const today = new Date().getDate();
 
     render(<NotionCalendar />);
 
@@ -30,5 +31,6 @@ describe("NotionCalendar", () => {
     expect(screen.getByText("Phase 02: 16 — 31")).toBeInTheDocument();
     expect(screen.getByText("1")).toBeInTheDocument();
     expect(screen.getByText("31")).toBeInTheDocument();
+    expect(screen.getByTestId(`calendar-day-${today}`)).toHaveClass("border-red-500");
   });
 });
