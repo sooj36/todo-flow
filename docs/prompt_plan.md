@@ -33,3 +33,4 @@
 ## Verification Loop
 - After task: "Keep CI green" – run tests, commit.
 - If error: Analyze, fix, update this file.
+- 단위 작업이 끝나면 반드시 커밋 작업까지 완료할 것 . 완료 후 커밋 아이디 결과 알려줄 것.
