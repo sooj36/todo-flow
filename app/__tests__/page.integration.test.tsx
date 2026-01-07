@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import Home from "../page";
 
@@ -21,7 +21,7 @@ vi.mock("@/hooks/useTaskTemplates", () => ({
   })),
 }));
 
-describe("Dashboard E2E Smoke Tests", () => {
+describe("Dashboard Integration Tests", () => {
   it("should render the main page with all sections", () => {
     render(<Home />);
 
@@ -42,10 +42,15 @@ describe("Dashboard E2E Smoke Tests", () => {
     expect(screen.getByText("No tasks for today")).toBeInTheDocument();
   });
 
-  it("should render calendar day cells", () => {
+  it("should render calendar day cells in both phases", () => {
     render(<Home />);
 
-    // Check that day numbers are rendered (using getAllByText since numbers appear multiple times)
+    // Verify phase headers exist
+    expect(screen.getAllByText("Phase 01: 01 — 15").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Phase 02: 16 — 31").length).toBeGreaterThan(0);
+
+    // Verify that day numbers are rendered (these appear in calendar grid)
+    // Using getAllByText since numbers can appear in multiple contexts
     expect(screen.getAllByText("1").length).toBeGreaterThan(0);
     expect(screen.getAllByText("15").length).toBeGreaterThan(0);
     expect(screen.getAllByText("16").length).toBeGreaterThan(0);

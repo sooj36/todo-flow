@@ -9,7 +9,7 @@
 - Commit rule: Before deleting tests, commit changes.
 - Log rule: Record test results in docs/log.md (e.g., "TaskCard.test.tsx: 진행률 바 렌더링 통과 – 2026-01-07").
 - Tooling: Use Vitest for tests.
-- Phase 2: Keep E2E tests for stability ("Keep CI green").
+- Phase 3: Keep integration tests for stability ("Keep CI green").
 
 ## Doc Reading Guide
 - Default order: prompt_plan.md → spec.md → PRD.md → COMPONENTS.md → DATA_MODEL.md → log.md
@@ -27,7 +27,7 @@
 - [x] FlowBoard 데이터 로딩/에러/빈 상태
 - [x] 캘린더 이벤트 렌더링
 - [x] FlowBoard 노드/상태 바인딩
-- [ ] E2E 테스트 구축 및 유지
+- [x] 통합 테스트 구축 및 유지 (RTL 기반)
 
 
 ## Verification Loop

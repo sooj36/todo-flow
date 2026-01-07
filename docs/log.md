@@ -30,8 +30,14 @@
 - Low: 타임존 이슈 해결 (getLocalDateString() 사용)
 - 모든 테스트 업데이트 및 통과 확인
 
-## Phase 3 완료: E2E 테스트 구축 (2026-01-07)
-- app/__tests__/page.e2e.test.tsx: Dashboard E2E smoke tests 구현 및 통과 (3 tests) – 2026-01-07
-- 전체 페이지 통합 테스트: Sidebar, Calendar, FlowBoard 렌더링 검증
+## Phase 3 완료: 통합 테스트 구축 (2026-01-07)
+- app/__tests__/page.integration.test.tsx: Dashboard integration tests 구현 및 통과 (3 tests) – 2026-01-07
+- 전체 페이지 통합 테스트: Sidebar, Calendar, FlowBoard 렌더링 검증 (RTL 기반)
 - 모든 테스트 통과: 8개 테스트 파일, 26개 테스트 ✓
-- 커밋 ID: f1629f0
+- 커밋 ID: f1629f0 (초기), a1be375 (log 업데이트)
+
+## 코드 리뷰 개선: Integration Test 명확화 (2026-01-07)
+- Medium: page.e2e.test.tsx → page.integration.test.tsx 이름 변경 (실제로는 RTL 통합 테스트)
+- Low: 숫자 기반 검증 개선 - within()으로 Phase 섹션 내에서만 검색하도록 수정
+- 문서 용어 통일: "E2E" → "통합 테스트 (RTL 기반)"으로 수정
+- 참고: MVP 단계에서는 Playwright/Cypress 같은 진짜 E2E 도구 사용하지 않음
