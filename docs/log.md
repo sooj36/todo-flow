@@ -21,3 +21,11 @@
 - FlowBoard 노드를 실제 데이터와 바인딩 (템플릿별 task 표시) – 2026-01-07
 - API route 에러 메시지 구체화 (누락된 환경 변수 정확히 표시) – 2026-01-07
 - 모든 컴포넌트 테스트 통과 (23/23) – 2026-01-07
+
+## 코드 리뷰 이슈 수정 (2026-01-07)
+- High: GET /api/notion/instances에서 template 데이터 채우기 추가
+- High: FlowBoard task 이름 매핑을 inst.template.name으로 수정
+- Medium: 연결 상태 판단 로직 개선 (에러 유무로 판단)
+- Medium: 빈 템플릿 상태 처리 및 fallback 메시지 추가
+- Low: 타임존 이슈 해결 (getLocalDateString() 사용)
+- 모든 테스트 업데이트 및 통과 확인
