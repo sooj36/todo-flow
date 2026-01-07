@@ -9,8 +9,12 @@ export async function GET() {
     const stepDbId = process.env.NOTION_STEP_DB_ID;
 
     if (!apiKey || !templateDbId || !stepDbId) {
+      const missing = [];
+      if (!apiKey) missing.push('NOTION_API_KEY');
+      if (!templateDbId) missing.push('NOTION_TEMPLATE_DB_ID');
+      if (!stepDbId) missing.push('NOTION_STEP_DB_ID');
       return NextResponse.json(
-        { error: 'Server configuration error: Missing Notion API key or database IDs' },
+        { error: `Server configuration error: Missing ${missing.join(', ')}` },
         { status: 500 }
       );
     }

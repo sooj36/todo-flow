@@ -10,8 +10,11 @@ export async function GET(request: NextRequest) {
     const templateId = searchParams.get('templateId');
 
     if (!apiKey || !stepDbId) {
+      const missing = [];
+      if (!apiKey) missing.push('NOTION_API_KEY');
+      if (!stepDbId) missing.push('NOTION_STEP_DB_ID');
       return NextResponse.json(
-        { error: 'Server configuration error: Missing Notion API key or database IDs' },
+        { error: `Server configuration error: Missing ${missing.join(', ')}` },
         { status: 500 }
       );
     }
