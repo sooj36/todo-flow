@@ -38,6 +38,11 @@
 
 ## 코드 리뷰 개선: Integration Test 명확화 (2026-01-07)
 - Medium: page.e2e.test.tsx → page.integration.test.tsx 이름 변경 (실제로는 RTL 통합 테스트)
-- Low: 숫자 기반 검증 개선 - within()으로 Phase 섹션 내에서만 검색하도록 수정
+- Low: 숫자 기반 검증에 주석 추가 - 통합 테스트에서는 전체 렌더링 검증이 목적임을 명확화
 - 문서 용어 통일: "E2E" → "통합 테스트 (RTL 기반)"으로 수정
 - 참고: MVP 단계에서는 Playwright/Cypress 같은 진짜 E2E 도구 사용하지 않음
+- 커밋 ID: a55afd8
+
+## 코드 리뷰 후속: 불필요한 import 제거 (2026-01-07)
+- Low: within import 제거 - 실제로 사용하지 않는 import 정리
+- Low: log.md 내용 수정 - within() 사용 관련 오기 수정
