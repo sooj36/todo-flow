@@ -179,7 +179,7 @@ export const FlowBoard: React.FC = () => {
                       type="Notion DB"
                       isSyncable
                       syncState={syncState}
-                      tasks={templateInstances.map(inst => `${inst.template.name} - ${inst.date}`)}
+                      tasks={template.flowSteps.map(step => step.name)}
                     />
                   );
                 }).filter(Boolean);
