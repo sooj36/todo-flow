@@ -6,13 +6,15 @@ export async function GET(request: NextRequest) {
   try {
     const apiKey = process.env.NOTION_API_KEY;
     const instanceDbId = process.env.NOTION_INSTANCE_DB_ID;
+    const templateDbId = process.env.NOTION_TEMPLATE_DB_ID;
     const searchParams = request.nextUrl.searchParams;
     const date = searchParams.get('date');
 
-    if (!apiKey || !instanceDbId) {
+    if (!apiKey || !instanceDbId || !templateDbId) {
       const missing = [];
       if (!apiKey) missing.push('NOTION_API_KEY');
       if (!instanceDbId) missing.push('NOTION_INSTANCE_DB_ID');
+      if (!templateDbId) missing.push('NOTION_TEMPLATE_DB_ID');
       return NextResponse.json(
         { error: `Server configuration error: Missing ${missing.join(', ')}` },
         { status: 500 }
@@ -26,7 +28,25 @@ export async function GET(request: NextRequest) {
       date || undefined
     );
 
-    return NextResponse.json({ instances });
+    // Populate template information
+    const templates = await getTaskTemplates(notion, templateDbId);
+    const templatesMap = new Map(templates.map(t => [t.id, t]));
+
+    const instancesWithTemplates = instances.map(instance => ({
+      ...instance,
+      template: templatesMap.get(instance.templateId) || {
+        id: instance.templateId,
+        name: 'Unknown Template',
+        icon: '📋',
+        color: 'gray' as const,
+        isRepeating: false,
+        defaultFrequency: 'daily' as const,
+        active: false,
+        flowSteps: [],
+      },
+    }));
+
+    return NextResponse.json({ instances: instancesWithTemplates });
   } catch (error) {
     console.error('Error fetching instances:', error);
     return NextResponse.json(
