@@ -14,7 +14,7 @@ export function createNotionClient(apiKey: string): Client {
 // Lazy initialization을 위해 getter 사용
 let _notionClient: Client | null = null;
 
-function getNotionClient(): Client {
+export function getNotionClient(): Client {
   if (!_notionClient) {
     const apiKey = process.env.NOTION_API_KEY;
     if (!apiKey) {
@@ -24,12 +24,6 @@ function getNotionClient(): Client {
   }
   return _notionClient;
 }
-
-export const notion = new Proxy({} as Client, {
-  get(target, prop) {
-    return (getNotionClient() as any)[prop];
-  },
-});
 
 // ============================================
 // Task Templates

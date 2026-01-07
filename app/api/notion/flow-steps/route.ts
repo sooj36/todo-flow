@@ -1,6 +1,6 @@
 // app/api/notion/flow-steps/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { notion, getFlowSteps } from '@/lib/notion';
+import { createNotionClient, getFlowSteps } from '@/lib/notion';
 
 export async function GET(request: NextRequest) {
   try {
@@ -19,9 +19,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Create Notion client
+    const notionClient = createNotionClient(apiKey);
+
     // Get flow steps (optionally filtered by templateId)
     const steps = await getFlowSteps(
-      notion,
+      notionClient,
       stepDbId,
       templateId || undefined
     );

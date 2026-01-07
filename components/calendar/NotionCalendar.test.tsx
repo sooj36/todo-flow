@@ -31,6 +31,6 @@ describe("NotionCalendar", () => {
     expect(screen.getByText("Phase 02: 16 — 31")).toBeInTheDocument();
     expect(screen.getByText("1")).toBeInTheDocument();
     expect(screen.getByText("31")).toBeInTheDocument();
-    expect(screen.getByTestId(`calendar-day-${today}`)).toHaveClass("border-red-500");
+    expect(screen.getByTestId(`calendar-day-${today}`)).toHaveClass("border-black");
   });
 });

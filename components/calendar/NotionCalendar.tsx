@@ -8,11 +8,7 @@ import { CalendarDayData } from "@/types";
 const days1To15 = Array.from({ length: 15 }, (_, i) => i + 1);
 const days16To31 = Array.from({ length: 16 }, (_, i) => i + 16);
 
-interface NotionCalendarProps {
-  onConnectClick?: () => void;
-}
-
-export const NotionCalendar: React.FC<NotionCalendarProps> = ({ onConnectClick }) => {
+export const NotionCalendar: React.FC = () => {
   const now = new Date();
   const today = now.getDate();
   const monthLabel = new Intl.DateTimeFormat("en-US", {
@@ -42,7 +38,7 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({ onConnectClick }
     return dataMap;
   }, [instances, now]);
 
-  const isConnected = !error && instances.length === 0 && !loading;
+  const isConnected = !loading && !error;
 
   return (
     <div className="flex flex-col h-full">
@@ -63,22 +59,22 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({ onConnectClick }
             </div>
           )}
           {error && (
-            <button
-              onClick={onConnectClick}
-              className="flex items-center gap-2 text-sm font-medium text-red-500 hover:text-red-600 transition-colors"
-            >
+            <div className="flex items-center gap-2 text-sm font-medium text-red-500">
               <AlertCircle size={16} />
-              Connection error
-            </button>
+              <span>Connection error — Check .env.local</span>
+            </div>
           )}
           {!loading && !error && (
-            <button
-              onClick={onConnectClick}
-              className="flex items-center gap-2 text-sm font-medium text-[#37352f]/60 hover:text-[#37352f] transition-colors"
+            <div
+              className={`flex items-center gap-2 text-xs font-semibold tracking-wide ${
+                isConnected
+                  ? "rounded-full bg-green-100 px-3 py-1 text-green-700"
+                  : "text-[#37352f]/60"
+              }`}
             >
               <Link2 size={16} />
-              {isConnected ? 'Connected to Notion' : 'Notion not connected'}
-            </button>
+              {isConnected ? "notion connect success" : "Notion not connected"}
+            </div>
           )}
           <div className="flex items-center bg-[#efefed] rounded-md p-1">
             <button className="p-1 hover:bg-white hover:shadow-sm rounded transition-all">

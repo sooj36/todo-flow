@@ -11,7 +11,7 @@
     "test:run": "vitest run"
   },
   "dependencies": {
-    "@notionhq/client": "^5.6.0",
+    "@notionhq/client": "^2.3.0",
     "lucide-react": "^0.562.0",
     "next": "14.2.16",
     "react": "18.2.0",

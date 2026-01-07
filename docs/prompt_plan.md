@@ -29,8 +29,28 @@
 - [x] FlowBoard 노드/상태 바인딩
 - [x] 통합 테스트 구축 및 유지 (RTL 기반)
 
+## Phase 4 Tasks (Personal Mode)
+- [x] Notion 연결 값 저장 방식 확정 (개인용: .env 환경변수 기반)
+- [x] 클라이언트 저장/입력 제거 (보안 우선)
+- [x] 연결 상태 UI 반영 (API 성공 시 notion connect success)
+
+## Future Extension: Agentic AI (Auto Triage)
+- 목표: 캘린더/인스턴스 데이터를 보고 일정 충돌/미완료를 자동 조정
+- 계획: 우선순위 재배치/연기/분할 계획 생성
+- 도구 실행: Notion DB 업데이트
+- 검증: 업데이트 결과 요약/재시도
+- UI: "자동 정리(Agent)" 버튼 + 실행 로그 패널
+
+## Future Extension Prerequisites
+- 데이터 정합성: Instance에 priority/estimate 같은 판단 기준 확정
+- Notion 업데이트 API: 일정/상태 변경 PATCH 라우트 준비
+- 규칙 정의: "충돌"과 "미완료" 기준 문서화
+- 실행 로그 구조: 단계별 결과/에러 기록 방식 결정
+- 안전장치: 드라이런/되돌리기/재시도 정책
+
 
 ## Verification Loop
 - After task: "Keep CI green" – run tests, commit.
 - If error: Analyze, fix, update this file.
+- 커밋 메시지에 bold처리 (****), 이모지 기입하지 말것.
 - 단위 작업이 끝나면 반드시 커밋 작업까지 완료할 것 . 완료 후 커밋 아이디 결과 알려줄 것.
