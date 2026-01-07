@@ -17,4 +17,7 @@
 - useTaskTemplates, useTaskInstances hooks 구현 (TDD 방식) – 2026-01-07
 - NotionCalendar에 데이터 로딩/에러/빈 상태 추가 – 2026-01-07
 - NotionCalendar에 실제 데이터 렌더링 (진행률 바, 완료율 표시) – 2026-01-07
+- FlowBoard에 데이터 로딩/에러/빈 상태 추가 – 2026-01-07
+- FlowBoard 노드를 실제 데이터와 바인딩 (템플릿별 task 표시) – 2026-01-07
 - API route 에러 메시지 구체화 (누락된 환경 변수 정확히 표시) – 2026-01-07
+- 모든 컴포넌트 테스트 통과 (23/23) – 2026-01-07
