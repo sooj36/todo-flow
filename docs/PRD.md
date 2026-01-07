@@ -1,4 +1,6 @@
 # PRD: Flow Planner
+//제품 비전과 사용자 흐름 – 기획/디자인 측면
+
 
 ## 제품 개요
 
@@ -91,6 +93,23 @@
 - 다중 사용자 OAuth
 - 고급 AI 추천 로직
 - 과거/미래 날짜 대량 편집
+
+## Phase 1 범위
+
+- UI/빈 상태 중심 (Notion API 연동 전)
+
+## Phase 2 범위
+
+- Notion 연결 입력 UI/검증 (API 키, DB IDs)
+- Notion API 클라이언트/라우트 구성
+
+## Phase 3 범위
+
+- 캘린더 데이터 로딩/에러/빈 상태
+- FlowBoard 데이터 로딩/에러/빈 상태
+- 캘린더 이벤트 렌더링
+- FlowBoard 노드/상태 바인딩
+- E2E 테스트 구축 및 유지
 
 ---
 

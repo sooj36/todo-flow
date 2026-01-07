@@ -10,8 +10,11 @@ export async function GET(request: NextRequest) {
     const date = searchParams.get('date');
 
     if (!apiKey || !instanceDbId) {
+      const missing = [];
+      if (!apiKey) missing.push('NOTION_API_KEY');
+      if (!instanceDbId) missing.push('NOTION_INSTANCE_DB_ID');
       return NextResponse.json(
-        { error: 'Server configuration error: Missing Notion API key or database IDs' },
+        { error: `Server configuration error: Missing ${missing.join(', ')}` },
         { status: 500 }
       );
     }
@@ -40,8 +43,12 @@ export async function POST(request: NextRequest) {
     const templateDbId = process.env.NOTION_TEMPLATE_DB_ID;
 
     if (!apiKey || !instanceDbId || !templateDbId) {
+      const missing = [];
+      if (!apiKey) missing.push('NOTION_API_KEY');
+      if (!instanceDbId) missing.push('NOTION_INSTANCE_DB_ID');
+      if (!templateDbId) missing.push('NOTION_TEMPLATE_DB_ID');
       return NextResponse.json(
-        { error: 'Server configuration error: Missing Notion API key or database IDs' },
+        { error: `Server configuration error: Missing ${missing.join(', ')}` },
         { status: 500 }
       );
     }

@@ -14,14 +14,23 @@ import {
   CheckCircle2,
   ArrowRight,
   Loader2,
+  AlertCircle,
 } from "lucide-react";
+import { useTaskInstances } from "@/hooks/useTaskInstances";
+import { useTaskTemplates } from "@/hooks/useTaskTemplates";
 
 interface FlowBoardProps {
   onConnectClick?: () => void;
 }
 
 export const FlowBoard: React.FC<FlowBoardProps> = ({ onConnectClick }) => {
-  const isConnected = false;
+  const today = new Date().toISOString().split('T')[0];
+  const { instances, loading: instancesLoading, error: instancesError } = useTaskInstances(today);
+  const { templates, loading: templatesLoading, error: templatesError } = useTaskTemplates();
+
+  const loading = instancesLoading || templatesLoading;
+  const error = instancesError || templatesError;
+  const isConnected = !loading && !error && (instances.length > 0 || templates.length > 0);
 
   return (
     <div className="relative flex flex-col h-full dot-grid overflow-hidden">
@@ -35,10 +44,24 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({ onConnectClick }) => {
               Daily Automation Flow
             </h2>
             <div className="flex items-center gap-2">
-              <span className="flex items-center gap-1 text-[10px] text-gray-400 font-bold uppercase tracking-wider">
-                <span className="w-1.5 h-1.5 bg-gray-300 rounded-full"></span>
-                Notion not connected
-              </span>
+              {loading && (
+                <span className="flex items-center gap-1 text-[10px] text-gray-400 font-bold uppercase tracking-wider">
+                  <Loader2 size={12} className="animate-spin" />
+                  Loading...
+                </span>
+              )}
+              {error && (
+                <span className="flex items-center gap-1 text-[10px] text-red-500 font-bold uppercase tracking-wider">
+                  <AlertCircle size={12} />
+                  Connection error
+                </span>
+              )}
+              {!loading && !error && (
+                <span className="flex items-center gap-1 text-[10px] text-gray-400 font-bold uppercase tracking-wider">
+                  <span className={`w-1.5 h-1.5 ${isConnected ? 'bg-green-500' : 'bg-gray-300'} rounded-full`}></span>
+                  {isConnected ? 'Connected to Notion' : 'Notion not connected'}
+                </span>
+              )}
             </div>
           </div>
         </div>

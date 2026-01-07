@@ -26,7 +26,7 @@ describe('GET /api/notion/templates', () => {
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data.error).toBe('Server configuration error: Missing Notion API key or database IDs');
+    expect(data.error).toBe('Server configuration error: Missing NOTION_API_KEY, NOTION_TEMPLATE_DB_ID, NOTION_STEP_DB_ID');
   });
 
   it('should return templates with flow steps', async () => {
