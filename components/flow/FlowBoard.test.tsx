@@ -2,6 +2,16 @@ import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { FlowBoard } from "./FlowBoard";
 
+vi.mock("reactflow", () => ({
+  default: ({ children }: { children: React.ReactNode }) => <div data-testid="react-flow">{children}</div>,
+  Controls: () => <div data-testid="react-flow-controls" />,
+  Background: () => <div data-testid="react-flow-background" />,
+  MiniMap: () => <div data-testid="react-flow-minimap" />,
+  useNodesState: (initialNodes: unknown[]) => [initialNodes, vi.fn(), vi.fn()],
+  useEdgesState: (initialEdges: unknown[]) => [initialEdges, vi.fn(), vi.fn()],
+  BackgroundVariant: { Dots: "dots" },
+}));
+
 vi.mock("@/hooks/useTaskInstances", () => ({
   useTaskInstances: vi.fn(() => ({
     instances: [],
@@ -29,13 +39,13 @@ describe("FlowBoard", () => {
     render(<FlowBoard />);
 
     expect(screen.getByText("Daily Automation Flow")).toBeInTheDocument();
-    expect(screen.getByText("Connected to Notion")).toBeInTheDocument();
-    expect(screen.getByText("No tasks for today")).toBeInTheDocument();
+    expect(screen.getAllByText("notion connect success").length).toBeGreaterThan(0);
 
-    const connectButton = screen.getByRole("button", {
-      name: /connect notion/i,
-    });
-    expect(connectButton).toBeDisabled();
+    // React Flow components should be rendered
+    expect(screen.getByTestId("react-flow")).toBeInTheDocument();
+    expect(screen.getByTestId("react-flow-controls")).toBeInTheDocument();
+    expect(screen.getByTestId("react-flow-background")).toBeInTheDocument();
+    expect(screen.getByTestId("react-flow-minimap")).toBeInTheDocument();
 
     expect(screen.getByText("DATABASE ID: —")).toBeInTheDocument();
     expect(screen.getByText("Auto-save disabled until connected")).toBeInTheDocument();

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import {
   Play,
   Plus,
@@ -16,6 +16,18 @@ import {
   Loader2,
   AlertCircle,
 } from "lucide-react";
+import ReactFlow, {
+  Node,
+  Edge,
+  Controls,
+  Background,
+  BackgroundVariant,
+  MiniMap,
+  useNodesState,
+  useEdgesState,
+  NodeTypes,
+} from "reactflow";
+import "reactflow/dist/style.css";
 import { useTaskInstances } from "@/hooks/useTaskInstances";
 import { useTaskTemplates } from "@/hooks/useTaskTemplates";
 
@@ -37,8 +49,103 @@ export const FlowBoard: React.FC = () => {
   const error = instancesError || templatesError;
   const isConnected = !loading && !error;
 
+  // Create nodes and edges for React Flow
+  const { nodes: initialNodes, edges: initialEdges } = useMemo(() => {
+    const nodes: Node[] = [
+      {
+        id: "daily-start",
+        type: "customNode",
+        position: { x: 50, y: 100 },
+        data: {
+          title: "Daily Start",
+          icon: <Zap className="text-orange-500" size={16} />,
+          status: "idle",
+          type: "Trigger",
+        },
+      },
+      {
+        id: "ai-reporter",
+        type: "customNode",
+        position: { x: 350, y: 100 },
+        data: {
+          title: "AI Daily Reporter",
+          icon: <Cpu className="text-purple-500" size={16} />,
+          status: "idle",
+          type: "AI Agent",
+        },
+      },
+    ];
+
+    const edges: Edge[] = [
+      {
+        id: "e-start-reporter",
+        source: "daily-start",
+        target: "ai-reporter",
+        type: "smoothstep",
+        animated: false,
+      },
+    ];
+
+    // Add Notion DB nodes dynamically
+    if (!loading && !error && instances.length > 0 && templates.length > 0) {
+      let yOffset = 50;
+      templates.forEach((template, idx) => {
+        const templateInstances = instances.filter(inst => inst.templateId === template.id);
+        if (templateInstances.length === 0) return;
+
+        const completedCount = templateInstances.filter(inst => inst.status === 'done').length;
+        const syncState = completedCount === templateInstances.length ? 'success' : 'idle';
+        const status = templateInstances.some(inst => inst.status === 'doing') ? 'running' : 'idle';
+
+        const nodeId = `notion-${template.id}`;
+        nodes.push({
+          id: nodeId,
+          type: "customNode",
+          position: { x: 700, y: yOffset },
+          data: {
+            title: template.name,
+            icon: <Briefcase className="text-blue-500" size={16} />,
+            status,
+            type: "Notion DB",
+            isSyncable: true,
+            syncState,
+            tasks: template.flowSteps.map(step => step.name),
+          },
+        });
+
+        edges.push({
+          id: `e-reporter-${nodeId}`,
+          source: "ai-reporter",
+          target: nodeId,
+          type: "smoothstep",
+          animated: false,
+        });
+
+        yOffset += 250;
+      });
+    }
+
+    return { nodes, edges };
+  }, [loading, error, instances, templates]);
+
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
+  // Update nodes when data changes
+  React.useEffect(() => {
+    setNodes(initialNodes);
+    setEdges(initialEdges);
+  }, [initialNodes, initialEdges, setNodes, setEdges]);
+
+  const nodeTypes: NodeTypes = useMemo(
+    () => ({
+      customNode: CustomFlowNode,
+    }),
+    []
+  );
+
   return (
-    <div className="relative flex flex-col h-full dot-grid overflow-hidden">
+    <div className="relative flex flex-col h-full overflow-hidden">
       <div className="p-4 flex items-center justify-between bg-white/80 backdrop-blur-sm border-b border-[#ececeb] z-20">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-orange-100 text-orange-600 rounded flex items-center justify-center">
@@ -93,106 +200,34 @@ export const FlowBoard: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex-1 relative overflow-auto custom-scrollbar p-12">
-        <svg
-          className="absolute inset-0 w-full h-full pointer-events-none"
-          style={{ minWidth: "1000px", minHeight: "1000px" }}
+      <div className="flex-1 relative">
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          nodeTypes={nodeTypes}
+          fitView
+          minZoom={0.5}
+          maxZoom={1.5}
+          defaultViewport={{ x: 0, y: 0, zoom: 1 }}
         >
-          <path
-            d="M 180 150 L 320 150"
-            stroke="#e5e7eb"
-            strokeWidth="2"
-            fill="none"
+          <Background variant={BackgroundVariant.Dots} gap={16} size={1} color="#e5e7eb" />
+          <Controls showInteractive={false} />
+          <MiniMap
+            nodeColor={(node) => {
+              if (node.data.status === "running") return "#3b82f6";
+              if (node.data.status === "success") return "#10b981";
+              if (node.data.status === "error") return "#ef4444";
+              return "#9ca3af";
+            }}
+            maskColor="rgba(0, 0, 0, 0.05)"
+            style={{
+              backgroundColor: "white",
+              border: "1px solid #ececeb",
+            }}
           />
-          <path
-            d="M 480 150 C 550 150, 550 80, 620 80"
-            stroke="#e5e7eb"
-            strokeWidth="2"
-            fill="none"
-          />
-          <path
-            d="M 480 150 C 550 150, 550 220, 620 220"
-            stroke="#e5e7eb"
-            strokeWidth="2"
-            fill="none"
-          />
-          <path
-            d="M 480 150 L 620 150"
-            stroke="#e5e7eb"
-            strokeWidth="2"
-            fill="none"
-          />
-        </svg>
-
-        <div className="relative space-y-12">
-          <div className="flex items-center gap-20">
-            <FlowNode
-              title="Daily Start"
-              icon={<Zap className="text-orange-500" size={16} />}
-              status="idle"
-              type="Trigger"
-            />
-
-            <FlowNode
-              title="AI Daily Reporter"
-              icon={<Cpu className="text-purple-500" size={16} />}
-              status="idle"
-              type="AI Agent"
-            />
-          </div>
-
-          <div className="flex flex-col gap-8 ml-[620px]">
-            {loading ? (
-              <div className="flex items-center justify-center p-8">
-                <Loader2 className="animate-spin text-gray-400" size={32} />
-              </div>
-            ) : error ? (
-              <div className="flex items-center justify-center p-8 text-red-500">
-                <AlertCircle size={20} className="mr-2" />
-                <span className="text-sm">Failed to load tasks</span>
-              </div>
-            ) : instances.length === 0 ? (
-              <div className="flex items-center justify-center p-8 text-gray-400">
-                <span className="text-sm">No tasks for today</span>
-              </div>
-            ) : templates.length === 0 ? (
-              <div className="flex items-center justify-center p-8 text-gray-400">
-                <span className="text-sm">No templates available</span>
-              </div>
-            ) : (
-              (() => {
-                const nodes = templates.map((template) => {
-                  const templateInstances = instances.filter(inst => inst.templateId === template.id);
-                  if (templateInstances.length === 0) return null;
-
-                  const completedCount = templateInstances.filter(inst => inst.status === 'done').length;
-                  const syncState = completedCount === templateInstances.length ? 'success' : 'idle';
-                  const status = templateInstances.some(inst => inst.status === 'doing') ? 'running' : 'idle';
-
-                  return (
-                    <FlowNode
-                      key={template.id}
-                      id={template.id}
-                      title={template.name}
-                      icon={<Briefcase className="text-blue-500" size={16} />}
-                      status={status}
-                      type="Notion DB"
-                      isSyncable
-                      syncState={syncState}
-                      tasks={template.flowSteps.map(step => step.name)}
-                    />
-                  );
-                }).filter(Boolean);
-
-                return nodes.length > 0 ? nodes : (
-                  <div className="flex items-center justify-center p-8 text-gray-400">
-                    <span className="text-sm">No matching tasks for today</span>
-                  </div>
-                );
-              })()
-            )}
-          </div>
-        </div>
+        </ReactFlow>
       </div>
 
       <div className="p-4 border-t border-[#ececeb] bg-white flex items-center justify-between z-20">
@@ -215,8 +250,8 @@ export const FlowBoard: React.FC = () => {
   );
 };
 
-interface FlowNodeProps {
-  id?: string;
+// Custom Node Component for React Flow
+interface CustomNodeData {
   title: string;
   icon: React.ReactNode;
   status: "idle" | "running" | "success" | "error";
@@ -227,16 +262,18 @@ interface FlowNodeProps {
   syncState?: "idle" | "loading" | "success";
 }
 
-const FlowNode: React.FC<FlowNodeProps> = ({
-  title,
-  icon,
-  status,
-  type,
-  description,
-  tasks,
-  isSyncable,
-  syncState,
-}) => {
+const CustomFlowNode: React.FC<{ data: CustomNodeData }> = ({ data }) => {
+  const {
+    title,
+    icon,
+    status,
+    type,
+    description,
+    tasks,
+    isSyncable,
+    syncState,
+  } = data;
+
   const statusColors = {
     idle: "bg-gray-100 border-gray-200",
     running: "bg-blue-50 border-blue-200 shadow-[0_0_15px_rgba(59,130,246,0.2)]",
@@ -293,7 +330,7 @@ const FlowNode: React.FC<FlowNodeProps> = ({
           </p>
         )}
 
-        {tasks && (
+        {tasks && tasks.length > 0 && (
           <div className="space-y-1.5 mt-2">
             {tasks.map((task) => (
               <div key={task} className="flex items-start gap-2 group cursor-pointer">
@@ -315,15 +352,6 @@ const FlowNode: React.FC<FlowNodeProps> = ({
             {syncState === "success" && (
               <ArrowRight size={10} className="text-gray-300" />
             )}
-          </div>
-        )}
-      </div>
-
-      <div className="relative">
-        <div className="absolute left-[-6px] top-[-50px] w-3 h-3 bg-white border border-gray-300 rounded-full z-10 shadow-sm"></div>
-        {type !== "Trigger" && type !== "AI Agent" && (
-          <div className="absolute right-[-6px] top-[-50px] w-3 h-3 bg-white border border-gray-300 rounded-full z-10 shadow-sm flex items-center justify-center">
-            <div className="w-1 h-1 bg-blue-400 rounded-full"></div>
           </div>
         )}
       </div>
