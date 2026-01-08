@@ -54,6 +54,12 @@
 
 ### 7.0 리팩토링 순서 체크리스트
 - [ ] 현재 브랜치/변경사항 확인 (git status)
+- [ ] 테스트 환경 수정 (리팩토링 시작 전 필수)
+  - [ ] vitest.setup.ts에 ResizeObserver mock 추가
+  - [ ] localStorage mock 함수 수정 (getItem is not a function 해결)
+  - [ ] 통합 테스트 3건 수정 (page.integration.test.tsx)
+  - [ ] API 테스트 3건 수정 (filter 로직 검증)
+  - [ ] pnpm test:run 전체 통과 확인
 - [ ] FlowBoard.tsx 현재 라인 기준 주석 또는 메모 확보
 - [ ] 분리 대상 의존성 정리 (React Flow, Notion hooks, UI 상태)
 - [ ] 기존 테스트/핵심 인터랙션 테스트 확인 (노드 토글, 동기화 버튼)
