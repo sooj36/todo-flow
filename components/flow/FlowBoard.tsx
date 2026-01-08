@@ -33,6 +33,7 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 import { useTaskInstances } from "@/hooks/useTaskInstances";
 import { useTaskTemplates } from "@/hooks/useTaskTemplates";
+import { loadNodePositions, saveNodePositions } from "@/utils/nodePositions";
 
 // Helper function to get local date in YYYY-MM-DD format
 function getLocalDateString(): string {
@@ -41,30 +42,6 @@ function getLocalDateString(): string {
   const month = String(now.getMonth() + 1).padStart(2, '0');
   const day = String(now.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
-}
-
-// LocalStorage key for node positions
-const NODE_POSITIONS_KEY = 'flowboard-node-positions';
-
-// Load node positions from localStorage
-function loadNodePositions(): Record<string, { x: number; y: number }> {
-  if (typeof window === 'undefined') return {};
-  try {
-    const stored = localStorage.getItem(NODE_POSITIONS_KEY);
-    return stored ? JSON.parse(stored) : {};
-  } catch {
-    return {};
-  }
-}
-
-// Save node positions to localStorage
-function saveNodePositions(positions: Record<string, { x: number; y: number }>) {
-  if (typeof window === 'undefined') return;
-  try {
-    localStorage.setItem(NODE_POSITIONS_KEY, JSON.stringify(positions));
-  } catch {
-    // Ignore localStorage errors
-  }
 }
 
 export const FlowBoard: React.FC = () => {
