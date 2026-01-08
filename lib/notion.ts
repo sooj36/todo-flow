@@ -148,15 +148,41 @@ export async function getFlowSteps(client: Client, databaseId: string, templateI
       ? parentProperty.relation[0].id
       : '';
 
+    // Done (Checkbox)
+    const doneProperty = properties['done'];
+    const done = doneProperty?.type === 'checkbox' && typeof doneProperty.checkbox === 'boolean'
+      ? doneProperty.checkbox
+      : false;
+
     steps.push({
       id: page.id,
       name,
       order,
       parentTemplateId,
+      done,
     });
   }
 
   return steps;
+}
+
+// ============================================
+// Update Flow Step
+// ============================================
+
+export async function updateFlowStepDone(
+  client: Client,
+  stepId: string,
+  done: boolean
+): Promise<void> {
+  await client.pages.update({
+    page_id: stepId,
+    properties: {
+      done: {
+        checkbox: done,
+      },
+    },
+  });
 }
 
 // ============================================

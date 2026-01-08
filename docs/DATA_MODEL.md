@@ -32,6 +32,7 @@ export interface FlowStep {
   name: string;
   order: number;
   parentTemplateId: string;
+  done?: boolean;
 }
 
 // ============================================
@@ -98,6 +99,7 @@ export interface CreateTaskModalState {
 | Step Name | Title | 단계 이름 |
 | Order | Number | 순서 (1, 2, 3...) |
 | Parent Template | Relation | → Task Template DB |
+| done | Checkbox | 완료 여부 |
 
 ### Task Instance DB
 
