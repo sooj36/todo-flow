@@ -34,6 +34,14 @@
 - [x] 클라이언트 저장/입력 제거 (보안 우선)
 - [x] 연결 상태 UI 반영 (API 성공 시 notion connect success)
 
+## Phase 5 Tasks (Manual Sync)
+- [x] FlowBoard 동기화 버튼 추가 (refetch 호출)
+- [x] 캘린더 동기화 버튼 추가 (refetch 호출)
+- [x] 동기화 로딩/성공 상태 UI 반영
+- Note: 수동 동기화는 Notion 재조회만 수행 (쓰기 없음)
+- Note: 자동/폴링 없이 버튼 클릭으로만 갱신
+- Note: 로딩/성공/에러 상태 표시 기준 정의
+
 ## Future Extension: Agentic AI (Auto Triage)
 - 목표: 캘린더/인스턴스 데이터를 보고 일정 충돌/미완료를 자동 조정
 - 계획: 우선순위 재배치/연기/분할 계획 생성

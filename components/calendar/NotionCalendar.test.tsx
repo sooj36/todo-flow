@@ -26,7 +26,7 @@ describe("NotionCalendar", () => {
     render(<NotionCalendar />);
 
     expect(screen.getByText(`📅 ${monthLabel}`)).toBeInTheDocument();
-    expect(screen.getByText("Connected to Notion")).toBeInTheDocument();
+    expect(screen.getByText("notion connect success")).toBeInTheDocument();
     expect(screen.getByText("Phase 01: 01 — 15")).toBeInTheDocument();
     expect(screen.getByText("Phase 02: 16 — 31")).toBeInTheDocument();
     expect(screen.getByText("1")).toBeInTheDocument();

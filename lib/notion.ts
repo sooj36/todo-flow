@@ -49,37 +49,37 @@ export async function getTaskTemplates(client: Client, databaseId: string): Prom
 
     // Name (Title)
     const nameProperty = properties['Name'];
-    const name = nameProperty?.type === 'title' && nameProperty.title.length > 0
+    const name = nameProperty?.type === 'title' && Array.isArray(nameProperty.title) && nameProperty.title.length > 0
       ? nameProperty.title[0].plain_text
       : '';
 
     // Icon (Rich Text)
     const iconProperty = properties['Icon'];
-    const icon = iconProperty?.type === 'rich_text' && iconProperty.rich_text.length > 0
+    const icon = iconProperty?.type === 'rich_text' && Array.isArray(iconProperty.rich_text) && iconProperty.rich_text.length > 0
       ? iconProperty.rich_text[0].plain_text
       : '📋';
 
     // Color (Select)
     const colorProperty = properties['Color'];
-    const color = colorProperty?.type === 'select' && colorProperty.select
+    const color = colorProperty?.type === 'select' && colorProperty.select && 'name' in colorProperty.select
       ? (colorProperty.select.name as TaskColor)
       : 'gray';
 
     // Is Repeating (Checkbox)
     const isRepeatingProperty = properties['Is Repeating'];
-    const isRepeating = isRepeatingProperty?.type === 'checkbox'
+    const isRepeating = isRepeatingProperty?.type === 'checkbox' && typeof isRepeatingProperty.checkbox === 'boolean'
       ? isRepeatingProperty.checkbox
       : false;
 
     // Default Frequency (Select)
     const frequencyProperty = properties['Default Frequency'];
-    const defaultFrequency = frequencyProperty?.type === 'select' && frequencyProperty.select
+    const defaultFrequency = frequencyProperty?.type === 'select' && frequencyProperty.select && 'name' in frequencyProperty.select
       ? (frequencyProperty.select.name as Frequency)
       : 'daily';
 
     // Active (Checkbox)
     const activeProperty = properties['Active'];
-    const active = activeProperty?.type === 'checkbox'
+    const active = activeProperty?.type === 'checkbox' && typeof activeProperty.checkbox === 'boolean'
       ? activeProperty.checkbox
       : true;
 
@@ -132,19 +132,19 @@ export async function getFlowSteps(client: Client, databaseId: string, templateI
 
     // Step Name (Title)
     const stepNameProperty = properties['Step Name'];
-    const name = stepNameProperty?.type === 'title' && stepNameProperty.title.length > 0
+    const name = stepNameProperty?.type === 'title' && Array.isArray(stepNameProperty.title) && stepNameProperty.title.length > 0
       ? stepNameProperty.title[0].plain_text
       : '';
 
     // Order (Number)
     const orderProperty = properties['Order'];
-    const order = orderProperty?.type === 'number' && orderProperty.number !== null
+    const order = orderProperty?.type === 'number' && typeof orderProperty.number === 'number'
       ? orderProperty.number
       : 0;
 
     // Parent Template (Relation)
     const parentProperty = properties['Parent Template'];
-    const parentTemplateId = parentProperty?.type === 'relation' && parentProperty.relation.length > 0
+    const parentTemplateId = parentProperty?.type === 'relation' && Array.isArray(parentProperty.relation) && parentProperty.relation.length > 0
       ? parentProperty.relation[0].id
       : '';
 
@@ -191,13 +191,13 @@ export async function getTaskInstances(
 
     // Name (Title)
     const nameProperty = properties['Name'];
-    const name = nameProperty?.type === 'title' && nameProperty.title.length > 0
+    const name = nameProperty?.type === 'title' && Array.isArray(nameProperty.title) && nameProperty.title.length > 0
       ? nameProperty.title[0].plain_text
       : '';
 
     // Template (Relation)
     const templateProperty = properties['Template'];
-    const templateId = templateProperty?.type === 'relation' && templateProperty.relation.length > 0
+    const templateId = templateProperty?.type === 'relation' && Array.isArray(templateProperty.relation) && templateProperty.relation.length > 0
       ? templateProperty.relation[0].id
       : '';
 
@@ -209,19 +209,19 @@ export async function getTaskInstances(
 
     // Status (Select)
     const statusProperty = properties['Status'];
-    const status = statusProperty?.type === 'select' && statusProperty.select
+    const status = statusProperty?.type === 'select' && statusProperty.select && 'name' in statusProperty.select
       ? (statusProperty.select.name as TaskStatus)
       : 'todo';
 
     // Current Step (Relation)
     const currentStepProperty = properties['Current Step'];
-    const currentStepId = currentStepProperty?.type === 'relation' && currentStepProperty.relation.length > 0
+    const currentStepId = currentStepProperty?.type === 'relation' && Array.isArray(currentStepProperty.relation) && currentStepProperty.relation.length > 0
       ? currentStepProperty.relation[0].id
       : null;
 
     // Completed Steps (Relation - Multi)
     const completedStepsProperty = properties['Completed Steps'];
-    const completedStepIds = completedStepsProperty?.type === 'relation'
+    const completedStepIds = completedStepsProperty?.type === 'relation' && Array.isArray(completedStepsProperty.relation)
       ? completedStepsProperty.relation.map(rel => rel.id)
       : [];
 

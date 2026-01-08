@@ -50,3 +50,55 @@
 ## 코드 리뷰 후속: 불필요한 import 제거 (2026-01-07)
 - Low: within import 제거 - 실제로 사용하지 않는 import 정리
 - Low: log.md 내용 수정 - within() 사용 관련 오기 수정
+
+## Phase 5 작업 기록: 수동 동기화 구현 (2026-01-08)
+- FlowBoard에 동기화 버튼 추가 (refetch 호출) – 2026-01-08
+- NotionCalendar에 동기화 버튼 추가 (refetch 호출) – 2026-01-08
+- 동기화 로딩/성공 상태 UI 반영 (애니메이션 + 배경색 변경) – 2026-01-08
+- RefreshCw 아이콘 회전 애니메이션 추가 – 2026-01-08
+- 동기화 성공 시 2초간 초록색 배경 표시 – 2026-01-08
+- NotionCalendar.test.tsx: 텍스트 수정 통과 (Connected to Notion → notion connect success) – 2026-01-08
+- FlowBoard.test.tsx: 3개 테스트 통과 – 2026-01-08
+
+## 코드 리뷰 수정: 동기화 에러 처리 및 메모리 누수 방지 (2026-01-08)
+- High: refetch 실패 감지 추가 - error 상태 확인하여 syncSuccess/syncError 분기 – 2026-01-08
+- High: 동기화 실패 시 빨간 배경 2초간 표시 (syncError 상태 추가) – 2026-01-08
+- Medium: setTimeout cleanup 구현 - useRef + useEffect로 언마운트 시 타이머 정리 – 2026-01-08
+- Medium: 동기화 재시도 시 이전 타이머 취소 (중복 타이머 방지) – 2026-01-08
+- NotionCalendar.test.tsx: 1개 테스트 통과 – 2026-01-08
+- FlowBoard.test.tsx: 3개 테스트 통과 – 2026-01-08
+
+## 코드 리뷰 후속: 레이스 컨디션 해결 (2026-01-08)
+- High: refetch 함수가 Promise<{ success: boolean }> 반환하도록 훅 API 수정 – 2026-01-08
+- High: 레이스 컨디션 제거 - refetch 반환값으로 성공/실패 판정 – 2026-01-08
+- Medium: handleSync deps에서 error 제거 - 불필요한 함수 재생성 방지 – 2026-01-08
+- useTaskInstances: refetch가 { success: boolean } 반환 – 2026-01-08
+- useTaskTemplates: refetch가 { success: boolean } 반환 – 2026-01-08
+- FlowBoard/NotionCalendar: refetch 결과로 즉시 성공/실패 판정 – 2026-01-08
+- hooks/useTaskInstances.test.ts: 3개 테스트 통과 – 2026-01-08
+- hooks/useTaskTemplates.test.ts: 2개 테스트 통과 – 2026-01-08
+- NotionCalendar.test.tsx: 1개 테스트 통과 – 2026-01-08
+- FlowBoard.test.tsx: 3개 테스트 통과 – 2026-01-08
+
+## 코드 리뷰 후속: 에러 메시지 반환 추가 (2026-01-08)
+- Medium: refetch가 { success: boolean, error?: string } 반환하도록 수정 – 2026-01-08
+- Medium: 동기화 실패 시 구체적인 에러 메시지 버튼 title로 표시 – 2026-01-08
+- syncErrorMessage 상태 추가하여 에러 메시지 관리 – 2026-01-08
+- 버튼 호버 시 "Sync failed: {error message}" 툴팁 표시 – 2026-01-08
+- useTaskInstances: 실패 시 error 메시지 반환 – 2026-01-08
+- useTaskTemplates: 실패 시 error 메시지 반환 – 2026-01-08
+- FlowBoard/NotionCalendar: 에러 메시지를 title 속성으로 표시 – 2026-01-08
+- hooks/useTaskInstances.test.ts: 3개 테스트 통과 – 2026-01-08
+- hooks/useTaskTemplates.test.ts: 2개 테스트 통과 – 2026-01-08
+- NotionCalendar.test.tsx: 1개 테스트 통과 – 2026-01-08
+- FlowBoard.test.tsx: 3개 테스트 통과 – 2026-01-08
+
+## 접근성 개선: 에러 메시지 표시 강화 (2026-01-08)
+- Low: 에러 메시지를 화면에 가시적으로 표시 - 버튼 옆에 텍스트로 노출 – 2026-01-08
+- Low: aria-live 영역 추가 - 스크린 리더 접근성 향상 (role="status", aria-live="polite") – 2026-01-08
+- Low: 타임아웃 연장 - 2초 → 5초로 변경하여 충분한 읽기 시간 확보 – 2026-01-08
+- sr-only CSS 클래스 추가 - 시각적으로 숨기되 스크린 리더에서 접근 가능 – 2026-01-08
+- 버튼에 aria-label 추가 - 에러 메시지를 스크린 리더에 전달 – 2026-01-08
+- FlowBoard/NotionCalendar 모두 적용 – 2026-01-08
+- FlowBoard.test.tsx: 3개 테스트 통과 – 2026-01-08
+- 커밋 ID: 62608fb – 2026-01-08
