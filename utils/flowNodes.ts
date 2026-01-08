@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Node, Edge } from "reactflow";
 import { TaskInstance, TaskTemplate } from "@/types";
 import { loadNodePositions } from "./nodePositions";
@@ -12,9 +13,9 @@ export interface CreateFlowNodesProps {
   isConnected: boolean;
   handleToggleFlowStep: (stepId: string, nextDone: boolean, previousDone: boolean) => void;
   icons: {
-    trigger: React.ReactNode;
-    aiAgent: React.ReactNode;
-    notionDb: React.ReactNode;
+    trigger: ReactNode;
+    aiAgent: ReactNode;
+    notionDb: ReactNode;
   };
 }
 

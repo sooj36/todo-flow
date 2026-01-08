@@ -1,9 +1,10 @@
 import { useState, useRef, useCallback, useEffect } from "react";
+import type { MutableRefObject } from "react";
 import { TaskTemplate } from "@/types";
 
 interface UseFlowStepsProps {
   templates: TaskTemplate[];
-  syncTimeoutRef: React.MutableRefObject<NodeJS.Timeout | null>;
+  syncTimeoutRef: MutableRefObject<NodeJS.Timeout | null>;
   setSyncError: (value: boolean) => void;
   setSyncSuccess: (value: boolean) => void;
   setSyncErrorMessage: (value: string) => void;

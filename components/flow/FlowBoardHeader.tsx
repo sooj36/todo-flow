@@ -16,7 +16,7 @@ interface FlowBoardHeaderProps {
   syncSuccess: boolean;
   syncError: boolean;
   syncErrorMessage: string;
-  handleSync: () => void;
+  handleSync: () => Promise<void>;
 }
 
 export const FlowBoardHeader: React.FC<FlowBoardHeaderProps> = ({
