@@ -140,8 +140,8 @@
   - 요구사항: React Flow가 사용하는 ResizeObserver API를 jsdom 환경에서 mock
   - 구현 예시:
     ```typescript
-    // jsdom 환경에서 global과 window는 동일 객체를 참조
-    global.ResizeObserver = class ResizeObserver {
+    // globalThis 사용 권장: Node/브라우저 환경 모두 일관성 보장 (ES2020)
+    globalThis.ResizeObserver = class ResizeObserver {
       observe() {}
       unobserve() {}
       disconnect() {}
@@ -163,7 +163,8 @@
       removeItem: vi.fn((key: string) => { delete storage[key]; }),
       clear: vi.fn(() => { Object.keys(storage).forEach(key => delete storage[key]); })
     };
-    global.localStorage = localStorageMock as any;
+    // globalThis 사용으로 window.localStorage와 일관성 보장
+    globalThis.localStorage = localStorageMock as any;
     ```
   - 또는 jsdom 기본 localStorage 활성화 방법 검토
   - 영향: app/page.tsx, components/flow/FlowBoard.tsx의 localStorage 호출 정상 동작
