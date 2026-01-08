@@ -77,6 +77,8 @@ export const FlowBoard: React.FC = () => {
   const [syncError, setSyncError] = useState(false);
   const [syncErrorMessage, setSyncErrorMessage] = useState<string>("");
   const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [stepOverrides, setStepOverrides] = useState<Record<string, boolean>>({});
+  const [stepUpdating, setStepUpdating] = useState<Record<string, boolean>>({});
 
   const loading = instancesLoading || templatesLoading;
   const error = instancesError || templatesError;
@@ -115,6 +117,50 @@ export const FlowBoard: React.FC = () => {
     }
   }, [refetchInstances, refetchTemplates]);
 
+  const handleToggleFlowStep = useCallback(async (
+    stepId: string,
+    nextDone: boolean,
+    previousDone: boolean
+  ) => {
+    if (stepUpdating[stepId]) return;
+
+    if (syncTimeoutRef.current) {
+      clearTimeout(syncTimeoutRef.current);
+      syncTimeoutRef.current = null;
+    }
+
+    setStepUpdating((prev) => ({ ...prev, [stepId]: true }));
+    setStepOverrides((prev) => ({ ...prev, [stepId]: nextDone }));
+
+    try {
+      const response = await fetch(`/api/notion/flow-steps/${stepId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ done: nextDone }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to sync flow step");
+      }
+    } catch (err) {
+      setStepOverrides((prev) => ({ ...prev, [stepId]: previousDone }));
+      setSyncError(true);
+      setSyncSuccess(false);
+      setSyncErrorMessage(
+        err instanceof Error ? err.message : "Failed to sync flow step"
+      );
+      syncTimeoutRef.current = setTimeout(() => {
+        setSyncError(false);
+        setSyncErrorMessage("");
+      }, 5000);
+    } finally {
+      setStepUpdating((prev) => ({ ...prev, [stepId]: false }));
+    }
+  }, [stepUpdating]);
+
   useEffect(() => {
     return () => {
       if (syncTimeoutRef.current) {
@@ -122,6 +168,11 @@ export const FlowBoard: React.FC = () => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    setStepOverrides({});
+    setStepUpdating({});
+  }, [templates]);
 
   // Create nodes and edges for React Flow
   const { nodes: initialNodes, edges: initialEdges } = useMemo(() => {
@@ -174,6 +225,16 @@ export const FlowBoard: React.FC = () => {
         const status = templateInstances.some(inst => inst.status === 'doing') ? 'running' : 'idle';
 
         const nodeId = `notion-${template.id}`;
+        const tasks = template.flowSteps.map((step) => {
+          const done = stepOverrides[step.id] ?? step.done ?? false;
+          return {
+            id: step.id,
+            name: step.name,
+            done,
+            isUpdating: Boolean(stepUpdating[step.id]),
+          };
+        });
+
         nodes.push({
           id: nodeId,
           type: "customNode",
@@ -185,7 +246,8 @@ export const FlowBoard: React.FC = () => {
             type: "Notion DB",
             isSyncable: true,
             syncState,
-            tasks: template.flowSteps.map(step => step.name),
+            tasks,
+            onToggleFlowStep: isConnected ? handleToggleFlowStep : undefined,
           },
         });
 
@@ -202,7 +264,7 @@ export const FlowBoard: React.FC = () => {
     }
 
     return { nodes, edges };
-  }, [loading, error, instances, templates]);
+  }, [loading, error, instances, templates, stepOverrides, stepUpdating, isConnected, handleToggleFlowStep]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -395,9 +457,15 @@ interface CustomNodeData {
   status: "idle" | "running" | "success" | "error";
   type: string;
   description?: string;
-  tasks?: string[];
+  tasks?: Array<{
+    id: string;
+    name: string;
+    done: boolean;
+    isUpdating?: boolean;
+  }>;
   isSyncable?: boolean;
   syncState?: "idle" | "loading" | "success";
+  onToggleFlowStep?: (stepId: string, nextDone: boolean, previousDone: boolean) => void;
 }
 
 const CustomFlowNode: React.FC<{ data: CustomNodeData }> = ({ data }) => {
@@ -410,6 +478,7 @@ const CustomFlowNode: React.FC<{ data: CustomNodeData }> = ({ data }) => {
     tasks,
     isSyncable,
     syncState,
+    onToggleFlowStep,
   } = data;
 
   const statusColors = {
@@ -483,14 +552,27 @@ const CustomFlowNode: React.FC<{ data: CustomNodeData }> = ({ data }) => {
 
         {tasks && tasks.length > 0 && (
           <div className="space-y-1.5 mt-2">
-            {tasks.map((task) => (
-              <div key={task} className="flex items-start gap-2 group cursor-pointer">
-                <div className="w-3 h-3 mt-0.5 border border-gray-300 rounded-sm group-hover:border-blue-400 transition-colors bg-white"></div>
-                <span className="text-[10px] text-gray-500 leading-tight">
-                  {task}
-                </span>
-              </div>
-            ))}
+            {tasks.map((task) => {
+              const isDisabled = !onToggleFlowStep || task.isUpdating;
+              return (
+                <label key={task.id} className="flex items-start gap-2 group cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="mt-0.5 h-3 w-3 rounded-sm border border-gray-300 text-blue-600 focus:ring-0 group-hover:border-blue-400"
+                    checked={task.done}
+                    onChange={() => onToggleFlowStep?.(task.id, !task.done, task.done)}
+                    disabled={isDisabled}
+                    aria-label={`${task.name} 완료`}
+                  />
+                  <span
+                    className={`text-[10px] leading-tight ${task.done ? "text-gray-400 line-through" : "text-gray-500"
+                      }`}
+                  >
+                    {task.name}
+                  </span>
+                </label>
+              );
+            })}
           </div>
         )}
 
