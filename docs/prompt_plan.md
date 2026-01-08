@@ -140,6 +140,7 @@
   - 요구사항: React Flow가 사용하는 ResizeObserver API를 jsdom 환경에서 mock
   - 구현 예시:
     ```typescript
+    // jsdom 환경에서 global과 window는 동일 객체를 참조
     global.ResizeObserver = class ResizeObserver {
       observe() {}
       unobserve() {}
@@ -154,16 +155,18 @@
   - 현재 문제: window.localStorage.getItem is not a function
   - 구현 예시:
     ```typescript
+    // In-memory storage as backing store
+    const storage: Record<string, string> = {};
     const localStorageMock = {
-      getItem: vi.fn((key: string) => localStorage[key] || null),
-      setItem: vi.fn((key: string, value: string) => { localStorage[key] = value; }),
-      removeItem: vi.fn((key: string) => { delete localStorage[key]; }),
-      clear: vi.fn(() => { Object.keys(localStorage).forEach(key => delete localStorage[key]); })
+      getItem: vi.fn((key: string) => storage[key] || null),
+      setItem: vi.fn((key: string, value: string) => { storage[key] = value; }),
+      removeItem: vi.fn((key: string) => { delete storage[key]; }),
+      clear: vi.fn(() => { Object.keys(storage).forEach(key => delete storage[key]); })
     };
     global.localStorage = localStorageMock as any;
     ```
   - 또는 jsdom 기본 localStorage 활성화 방법 검토
-  - 영향: app/page.tsx:38, FlowBoard.tsx의 localStorage 호출 정상 동작
+  - 영향: app/page.tsx, components/flow/FlowBoard.tsx의 localStorage 호출 정상 동작
 
 - [ ] 검증: pnpm test:run 실행, 환경 에러만 해결되었는지 확인
   - 성공 기준: ResizeObserver/localStorage 에러 사라짐
@@ -187,7 +190,7 @@
 - [ ] app/__tests__/page.integration.test.tsx 수정
   - 실패 케이스: 3건 (main page, calendar cells, FlowBoard elements)
   - 원인: ResizeObserver + localStorage 환경 문제
-  - Note: 7+.1 완료 후 자동 해결 예상, 여전히 실패 시 테스트 로직 검토
+  - Note: 7+.1 완료 후 재실행 필요. 여전히 실패 시 테스트 로직 검토
 - [ ] 최종 검증: pnpm test:run 전체 통과 확인
 
 ## Future Extension: Agentic AI (Auto Triage)
