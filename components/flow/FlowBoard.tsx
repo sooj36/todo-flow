@@ -36,6 +36,7 @@ import { useTaskTemplates } from "@/hooks/useTaskTemplates";
 import { loadNodePositions, saveNodePositions } from "@/utils/nodePositions";
 import { createFlowNodes } from "@/utils/flowNodes";
 import { useFlowSync } from "@/hooks/useFlowSync";
+import { useFlowSteps } from "@/hooks/useFlowSteps";
 
 // Helper function to get local date in YYYY-MM-DD format
 function getLocalDateString(): string {
@@ -51,72 +52,32 @@ export const FlowBoard: React.FC = () => {
   const { instances, loading: instancesLoading, error: instancesError, refetch: refetchInstances } = useTaskInstances(today);
   const { templates, loading: templatesLoading, error: templatesError, refetch: refetchTemplates } = useTaskTemplates();
 
-  const { isSyncing, syncSuccess, syncError, syncErrorMessage, handleSync, syncTimeoutRef } = useFlowSync({
+  const {
+    isSyncing,
+    syncSuccess,
+    syncError,
+    syncErrorMessage,
+    handleSync,
+    syncTimeoutRef,
+    setSyncError,
+    setSyncSuccess,
+    setSyncErrorMessage,
+  } = useFlowSync({
     refetchInstances,
     refetchTemplates,
   });
 
-  const [stepOverrides, setStepOverrides] = useState<Record<string, boolean>>({});
-  const [stepUpdating, setStepUpdating] = useState<Record<string, boolean>>({});
-  const stepUpdatingRef = useRef<Record<string, boolean>>({});
+  const { stepOverrides, stepUpdating, handleToggleFlowStep } = useFlowSteps({
+    templates,
+    syncTimeoutRef,
+    setSyncError,
+    setSyncSuccess,
+    setSyncErrorMessage,
+  });
 
   const loading = instancesLoading || templatesLoading;
   const error = instancesError || templatesError;
   const isConnected = !loading && !error;
-
-  const handleToggleFlowStep = useCallback(async (
-    stepId: string,
-    nextDone: boolean,
-    previousDone: boolean
-  ) => {
-    // Use ref to avoid stale closure while keeping empty deps
-    if (stepUpdatingRef.current[stepId]) return;
-
-    if (syncTimeoutRef.current) {
-      clearTimeout(syncTimeoutRef.current);
-      syncTimeoutRef.current = null;
-    }
-
-    // Update both ref and state
-    stepUpdatingRef.current[stepId] = true;
-    setStepUpdating((prev) => ({ ...prev, [stepId]: true }));
-    setStepOverrides((prev) => ({ ...prev, [stepId]: nextDone }));
-
-    try {
-      const response = await fetch(`/api/notion/flow-steps/${stepId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ done: nextDone }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
-        throw new Error(data.error || "Failed to sync flow step");
-      }
-    } catch (err) {
-      setStepOverrides((prev) => ({ ...prev, [stepId]: previousDone }));
-      setSyncError(true);
-      setSyncSuccess(false);
-      setSyncErrorMessage(
-        err instanceof Error ? err.message : "Failed to sync flow step"
-      );
-      syncTimeoutRef.current = setTimeout(() => {
-        setSyncError(false);
-        setSyncErrorMessage("");
-      }, 5000);
-    } finally {
-      stepUpdatingRef.current[stepId] = false;
-      setStepUpdating((prev) => ({ ...prev, [stepId]: false }));
-    }
-  }, []);
-
-  useEffect(() => {
-    setStepOverrides({});
-    setStepUpdating({});
-    stepUpdatingRef.current = {};
-  }, [templates]);
 
   // Create nodes and edges for React Flow
   const { nodes: initialNodes, edges: initialEdges } = useMemo(() => {

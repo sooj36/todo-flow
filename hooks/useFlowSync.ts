@@ -63,5 +63,8 @@ export function useFlowSync({ refetchInstances, refetchTemplates }: UseFlowSyncP
     syncErrorMessage,
     handleSync,
     syncTimeoutRef,
+    setSyncError,
+    setSyncSuccess,
+    setSyncErrorMessage,
   };
 }
