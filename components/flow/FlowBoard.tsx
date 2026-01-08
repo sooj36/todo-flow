@@ -35,6 +35,7 @@ import { useTaskInstances } from "@/hooks/useTaskInstances";
 import { useTaskTemplates } from "@/hooks/useTaskTemplates";
 import { loadNodePositions, saveNodePositions } from "@/utils/nodePositions";
 import { createFlowNodes } from "@/utils/flowNodes";
+import { useFlowSync } from "@/hooks/useFlowSync";
 
 // Helper function to get local date in YYYY-MM-DD format
 function getLocalDateString(): string {
@@ -50,11 +51,11 @@ export const FlowBoard: React.FC = () => {
   const { instances, loading: instancesLoading, error: instancesError, refetch: refetchInstances } = useTaskInstances(today);
   const { templates, loading: templatesLoading, error: templatesError, refetch: refetchTemplates } = useTaskTemplates();
 
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [syncSuccess, setSyncSuccess] = useState(false);
-  const [syncError, setSyncError] = useState(false);
-  const [syncErrorMessage, setSyncErrorMessage] = useState<string>("");
-  const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const { isSyncing, syncSuccess, syncError, syncErrorMessage, handleSync, syncTimeoutRef } = useFlowSync({
+    refetchInstances,
+    refetchTemplates,
+  });
+
   const [stepOverrides, setStepOverrides] = useState<Record<string, boolean>>({});
   const [stepUpdating, setStepUpdating] = useState<Record<string, boolean>>({});
   const stepUpdatingRef = useRef<Record<string, boolean>>({});
@@ -62,39 +63,6 @@ export const FlowBoard: React.FC = () => {
   const loading = instancesLoading || templatesLoading;
   const error = instancesError || templatesError;
   const isConnected = !loading && !error;
-
-  const handleSync = useCallback(async () => {
-    if (syncTimeoutRef.current) {
-      clearTimeout(syncTimeoutRef.current);
-      syncTimeoutRef.current = null;
-    }
-
-    setIsSyncing(true);
-    setSyncSuccess(false);
-    setSyncError(false);
-    setSyncErrorMessage("");
-
-    const [instancesResult, templatesResult] = await Promise.all([
-      refetchInstances(),
-      refetchTemplates(),
-    ]);
-
-    setIsSyncing(false);
-
-    const hasError = !instancesResult.success || !templatesResult.success;
-    if (hasError) {
-      const errorMsg = instancesResult.error || templatesResult.error || "Sync failed";
-      setSyncError(true);
-      setSyncErrorMessage(errorMsg);
-      syncTimeoutRef.current = setTimeout(() => {
-        setSyncError(false);
-        setSyncErrorMessage("");
-      }, 5000);
-    } else {
-      setSyncSuccess(true);
-      syncTimeoutRef.current = setTimeout(() => setSyncSuccess(false), 5000);
-    }
-  }, [refetchInstances, refetchTemplates]);
 
   const handleToggleFlowStep = useCallback(async (
     stepId: string,
@@ -142,14 +110,6 @@ export const FlowBoard: React.FC = () => {
       stepUpdatingRef.current[stepId] = false;
       setStepUpdating((prev) => ({ ...prev, [stepId]: false }));
     }
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      if (syncTimeoutRef.current) {
-        clearTimeout(syncTimeoutRef.current);
-      }
-    };
   }, []);
 
   useEffect(() => {
