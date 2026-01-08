@@ -6,7 +6,7 @@ interface UseTaskInstancesReturn {
   instances: TaskInstance[];
   loading: boolean;
   error: string | null;
-  refetch: () => Promise<{ success: boolean }>;
+  refetch: () => Promise<{ success: boolean; error?: string }>;
 }
 
 export const useTaskInstances = (date?: string): UseTaskInstancesReturn => {
@@ -14,7 +14,7 @@ export const useTaskInstances = (date?: string): UseTaskInstancesReturn => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchInstances = async (): Promise<{ success: boolean }> => {
+  const fetchInstances = async (): Promise<{ success: boolean; error?: string }> => {
     try {
       setLoading(true);
       setError(null);
@@ -31,9 +31,10 @@ export const useTaskInstances = (date?: string): UseTaskInstancesReturn => {
       setInstances(data.instances || []);
       return { success: true };
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch instances');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch instances';
+      setError(errorMessage);
       setInstances([]);
-      return { success: false };
+      return { success: false, error: errorMessage };
     } finally {
       setLoading(false);
     }

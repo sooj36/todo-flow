@@ -79,3 +79,16 @@
 - hooks/useTaskTemplates.test.ts: 2개 테스트 통과 – 2026-01-08
 - NotionCalendar.test.tsx: 1개 테스트 통과 – 2026-01-08
 - FlowBoard.test.tsx: 3개 테스트 통과 – 2026-01-08
+
+## 코드 리뷰 후속: 에러 메시지 반환 추가 (2026-01-08)
+- Medium: refetch가 { success: boolean, error?: string } 반환하도록 수정 – 2026-01-08
+- Medium: 동기화 실패 시 구체적인 에러 메시지 버튼 title로 표시 – 2026-01-08
+- syncErrorMessage 상태 추가하여 에러 메시지 관리 – 2026-01-08
+- 버튼 호버 시 "Sync failed: {error message}" 툴팁 표시 – 2026-01-08
+- useTaskInstances: 실패 시 error 메시지 반환 – 2026-01-08
+- useTaskTemplates: 실패 시 error 메시지 반환 – 2026-01-08
+- FlowBoard/NotionCalendar: 에러 메시지를 title 속성으로 표시 – 2026-01-08
+- hooks/useTaskInstances.test.ts: 3개 테스트 통과 – 2026-01-08
+- hooks/useTaskTemplates.test.ts: 2개 테스트 통과 – 2026-01-08
+- NotionCalendar.test.tsx: 1개 테스트 통과 – 2026-01-08
+- FlowBoard.test.tsx: 3개 테스트 통과 – 2026-01-08

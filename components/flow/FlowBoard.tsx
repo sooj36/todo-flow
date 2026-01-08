@@ -75,6 +75,7 @@ export const FlowBoard: React.FC = () => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncSuccess, setSyncSuccess] = useState(false);
   const [syncError, setSyncError] = useState(false);
+  const [syncErrorMessage, setSyncErrorMessage] = useState<string>("");
   const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const loading = instancesLoading || templatesLoading;
@@ -90,6 +91,7 @@ export const FlowBoard: React.FC = () => {
     setIsSyncing(true);
     setSyncSuccess(false);
     setSyncError(false);
+    setSyncErrorMessage("");
 
     const [instancesResult, templatesResult] = await Promise.all([
       refetchInstances(),
@@ -100,8 +102,13 @@ export const FlowBoard: React.FC = () => {
 
     const hasError = !instancesResult.success || !templatesResult.success;
     if (hasError) {
+      const errorMsg = instancesResult.error || templatesResult.error || "Sync failed";
       setSyncError(true);
-      syncTimeoutRef.current = setTimeout(() => setSyncError(false), 2000);
+      setSyncErrorMessage(errorMsg);
+      syncTimeoutRef.current = setTimeout(() => {
+        setSyncError(false);
+        setSyncErrorMessage("");
+      }, 2000);
     } else {
       setSyncSuccess(true);
       syncTimeoutRef.current = setTimeout(() => setSyncSuccess(false), 2000);
@@ -305,7 +312,7 @@ export const FlowBoard: React.FC = () => {
                 ? "bg-red-100 text-red-600"
                 : "bg-white text-[#37352f]/60 hover:text-[#37352f]"
             } disabled:opacity-50 disabled:cursor-not-allowed`}
-            title="Sync with Notion"
+            title={syncError && syncErrorMessage ? `Sync failed: ${syncErrorMessage}` : "Sync with Notion"}
           >
             <RefreshCw size={16} className={isSyncing ? "animate-spin" : ""} />
           </button>

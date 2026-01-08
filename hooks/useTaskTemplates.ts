@@ -6,7 +6,7 @@ interface UseTaskTemplatesReturn {
   templates: TaskTemplate[];
   loading: boolean;
   error: string | null;
-  refetch: () => Promise<{ success: boolean }>;
+  refetch: () => Promise<{ success: boolean; error?: string }>;
 }
 
 export const useTaskTemplates = (): UseTaskTemplatesReturn => {
@@ -14,7 +14,7 @@ export const useTaskTemplates = (): UseTaskTemplatesReturn => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchTemplates = async (): Promise<{ success: boolean }> => {
+  const fetchTemplates = async (): Promise<{ success: boolean; error?: string }> => {
     try {
       setLoading(true);
       setError(null);
@@ -28,9 +28,10 @@ export const useTaskTemplates = (): UseTaskTemplatesReturn => {
       setTemplates(data.templates || []);
       return { success: true };
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch templates');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch templates';
+      setError(errorMessage);
       setTemplates([]);
-      return { success: false };
+      return { success: false, error: errorMessage };
     } finally {
       setLoading(false);
     }
