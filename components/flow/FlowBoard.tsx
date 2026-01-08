@@ -79,6 +79,7 @@ export const FlowBoard: React.FC = () => {
   const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [stepOverrides, setStepOverrides] = useState<Record<string, boolean>>({});
   const [stepUpdating, setStepUpdating] = useState<Record<string, boolean>>({});
+  const stepUpdatingRef = useRef<Record<string, boolean>>({});
 
   const loading = instancesLoading || templatesLoading;
   const error = instancesError || templatesError;
@@ -122,13 +123,16 @@ export const FlowBoard: React.FC = () => {
     nextDone: boolean,
     previousDone: boolean
   ) => {
-    if (stepUpdating[stepId]) return;
+    // Use ref to avoid stale closure while keeping empty deps
+    if (stepUpdatingRef.current[stepId]) return;
 
     if (syncTimeoutRef.current) {
       clearTimeout(syncTimeoutRef.current);
       syncTimeoutRef.current = null;
     }
 
+    // Update both ref and state
+    stepUpdatingRef.current = { ...stepUpdatingRef.current, [stepId]: true };
     setStepUpdating((prev) => ({ ...prev, [stepId]: true }));
     setStepOverrides((prev) => ({ ...prev, [stepId]: nextDone }));
 
@@ -157,6 +161,7 @@ export const FlowBoard: React.FC = () => {
         setSyncErrorMessage("");
       }, 5000);
     } finally {
+      stepUpdatingRef.current = { ...stepUpdatingRef.current, [stepId]: false };
       setStepUpdating((prev) => ({ ...prev, [stepId]: false }));
     }
   }, []);
@@ -172,6 +177,7 @@ export const FlowBoard: React.FC = () => {
   useEffect(() => {
     setStepOverrides({});
     setStepUpdating({});
+    stepUpdatingRef.current = {};
   }, [templates]);
 
   // Create nodes and edges for React Flow
@@ -264,7 +270,7 @@ export const FlowBoard: React.FC = () => {
     }
 
     return { nodes, edges };
-  }, [loading, error, instances, templates, stepOverrides, isConnected, handleToggleFlowStep]);
+  }, [loading, error, instances, templates, stepOverrides, stepUpdating, isConnected, handleToggleFlowStep]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);

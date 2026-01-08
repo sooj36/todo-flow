@@ -58,36 +58,18 @@ Props: { day, date, tasks, isToday? }
 
 ```
 위치: components/flow/FlowBoard.tsx
-역할: 오늘의 Task Instance 관리
-Props: { instances, onStatusChange, onStepComplete }
+역할: React Flow 기반 자동화 플로우 시각화
 ```
 
 **레이아웃:**
-- 헤더: 오늘 날짜 + "오늘 Task 생성" 버튼
-- 본문: TaskCard 리스트 (Todo → Doing → Done 순)
-- 완료된 Task는 하단 별도 섹션
+- 헤더: Daily Automation Flow + Notion 연결 상태
+- 본문: React Flow 캔버스 with nodes & edges
+- MiniMap, Controls, Background
 
-### TaskCard
-
-```
-위치: components/flow/TaskCard.tsx
-Props: { instance, onStepComplete, onStatusChange }
-```
-
-**구성:**
-- 헤더: 아이콘 + Task명 + 상태 뱃지
-- 본문: SubFlowChecklist
-- 푸터: 진행률 바
-
-### SubFlowChecklist
-
-```
-위치: components/flow/SubFlowChecklist.tsx
-Props: { steps, completedStepIds, onStepToggle }
-```
-
-- 체크박스 리스트
-- 완료된 스텝은 strikethrough + muted color
+**기능:**
+- Notion DB와 연동된 템플릿/인스턴스 표시
+- Flow Step 체크박스로 Notion 동기화
+- 노드 위치 localStorage 저장
 
 ---
 
