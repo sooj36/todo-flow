@@ -46,10 +46,10 @@ export const NotionCalendar: React.FC = () => {
       syncTimeoutRef.current = setTimeout(() => {
         setSyncError(false);
         setSyncErrorMessage("");
-      }, 2000);
+      }, 5000);
     } else {
       setSyncSuccess(true);
-      syncTimeoutRef.current = setTimeout(() => setSyncSuccess(false), 2000);
+      syncTimeoutRef.current = setTimeout(() => setSyncSuccess(false), 5000);
     }
   }, [refetch]);
 
@@ -95,6 +95,18 @@ export const NotionCalendar: React.FC = () => {
           </p>
         </div>
         <div className="flex items-center gap-4">
+          {/* Aria-live region for screen readers */}
+          <div
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+            className="sr-only"
+          >
+            {isSyncing && "Syncing with Notion..."}
+            {syncSuccess && "Sync completed successfully"}
+            {syncError && syncErrorMessage && `Sync failed: ${syncErrorMessage}`}
+          </div>
+
           {loading && (
             <div className="flex items-center gap-2 text-sm font-medium text-[#37352f]/60">
               <Loader2 size={16} className="animate-spin" />
@@ -109,30 +121,35 @@ export const NotionCalendar: React.FC = () => {
           )}
           {!loading && !error && (
             <div
-              className={`flex items-center gap-2 text-xs font-semibold tracking-wide ${
-                isConnected
+              className={`flex items-center gap-2 text-xs font-semibold tracking-wide ${isConnected
                   ? "rounded-full bg-green-100 px-3 py-1 text-green-700"
                   : "text-[#37352f]/60"
-              }`}
+                }`}
             >
               <Link2 size={16} />
               {isConnected ? "notion connect success" : "Notion not connected"}
             </div>
           )}
-          <button
-            onClick={handleSync}
-            disabled={!isConnected || isSyncing}
-            className={`p-2 border border-[#ececeb] rounded-md transition-all ${
-              syncSuccess
-                ? "bg-green-100 text-green-600"
-                : syncError
-                ? "bg-red-100 text-red-600"
-                : "bg-white text-[#37352f]/60 hover:text-[#37352f]"
-            } disabled:opacity-50 disabled:cursor-not-allowed`}
-            title={syncError && syncErrorMessage ? `Sync failed: ${syncErrorMessage}` : "Sync with Notion"}
-          >
-            <RefreshCw size={16} className={isSyncing ? "animate-spin" : ""} />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleSync}
+              disabled={!isConnected || isSyncing}
+              className={`p-2 border border-[#ececeb] rounded-md transition-all ${syncSuccess
+                  ? "bg-green-100 text-green-600"
+                  : syncError
+                    ? "bg-red-100 text-red-600"
+                    : "bg-white text-[#37352f]/60 hover:text-[#37352f]"
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
+              aria-label={syncError && syncErrorMessage ? `Sync failed: ${syncErrorMessage}` : "Sync with Notion"}
+            >
+              <RefreshCw size={16} className={isSyncing ? "animate-spin" : ""} />
+            </button>
+            {syncError && syncErrorMessage && (
+              <span className="text-xs text-red-600 font-medium max-w-xs truncate" title={syncErrorMessage}>
+                {syncErrorMessage}
+              </span>
+            )}
+          </div>
           <div className="flex items-center bg-[#efefed] rounded-md p-1">
             <button className="p-1 hover:bg-white hover:shadow-sm rounded transition-all">
               <ChevronLeft size={16} />
@@ -229,10 +246,10 @@ const CalendarDay: React.FC<CalendarDayProps> = ({ day, data, loading, isToday }
   const bgColor = completionRate >= 0.8
     ? "bg-green-50 border-green-200"
     : completionRate >= 0.5
-    ? "bg-yellow-50 border-yellow-200"
-    : completionRate > 0
-    ? "bg-blue-50 border-blue-200"
-    : "bg-[#fbfbfa]";
+      ? "bg-yellow-50 border-yellow-200"
+      : completionRate > 0
+        ? "bg-blue-50 border-blue-200"
+        : "bg-[#fbfbfa]";
 
   const todayBorder = isToday ? "border-2 border-black" : "border border-[#ececeb]";
   const todayBg = isToday ? "bg-green-200/80" : bgColor;
@@ -271,13 +288,12 @@ const CalendarDay: React.FC<CalendarDayProps> = ({ day, data, loading, isToday }
           </div>
           <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
             <div
-              className={`h-full transition-all ${
-                completionRate >= 0.8
+              className={`h-full transition-all ${completionRate >= 0.8
                   ? "bg-green-500"
                   : completionRate >= 0.5
-                  ? "bg-yellow-500"
-                  : "bg-blue-500"
-              }`}
+                    ? "bg-yellow-500"
+                    : "bg-blue-500"
+                }`}
               style={{ width: `${completionRate * 100}%` }}
             ></div>
           </div>
