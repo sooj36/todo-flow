@@ -10,6 +10,8 @@
 - Log rule: Record test results in docs/log.md (e.g., "TaskCard.test.tsx: 진행률 바 렌더링 통과 – 2026-01-07").
 - Tooling: Use Vitest for tests.
 - Phase 3: Keep integration tests for stability ("Keep CI green").
+- 테스트 정합성: 리팩토링 작업에서는 임시 테스트 삭제 금지. 필요한 경우 별도 파일로 격리 후 유지.
+- 리팩토링 검증: 분리 단계마다 기존 테스트 + 핵심 인터랙션 1건 이상 유지 (노드 토글, 동기화 버튼 등).
 
 ## Doc Reading Guide
 - Default order: prompt_plan.md → spec.md → PRD.md → COMPONENTS.md → DATA_MODEL.md → log.md
@@ -50,37 +52,72 @@
 - 원칙: 각 단계마다 기존 테스트 통과 확인 → 커밋
 - 브랜치: refactor/flowboard-decomposition (feature/layout-resize 완료 후 생성)
 
-### 7.1 컴포넌트 분리
-- [ ] components/flow/CustomFlowNode.tsx 분리 (477-602줄)
-  - CustomNodeData interface 포함
-  - 기존 FlowBoard에서 import로 전환
-  - 검증: FlowBoard 렌더링 및 노드 인터랙션 정상 작동
+### 7.0 리팩토링 순서 체크리스트
+- [ ] 현재 브랜치/변경사항 확인 (git status)
+- [ ] FlowBoard.tsx 현재 라인 기준 주석 또는 메모 확보
+- [ ] 분리 대상 의존성 정리 (React Flow, Notion hooks, UI 상태)
+- [ ] 기존 테스트/핵심 인터랙션 테스트 확인 (노드 토글, 동기화 버튼)
+- [ ] 각 단계 완료 후: 타입 체크 + 테스트 실행 + 커밋
+- [ ] 단계별 수행: 유틸 → 훅 → 컴포넌트 → 최종 검증 순서 준수 (의존성 역순)
+- [ ] 단계별 전환 시 FlowBoard.tsx 역할 재정의 (렌더/상태/효과/핸들러 구분)
+- [ ] 분리 후 불필요한 import/중복 타입 제거
+- [ ] 상태/핸들러 이름 일관성 재점검 (isSyncing, syncSuccess 등)
 
-- [ ] components/flow/FlowBoardHeader.tsx 분리 (325-407줄)
-  - Props: { loading, error, isConnected, isSyncing, syncSuccess, syncError, syncErrorMessage, handleSync }
-  - 검증: 헤더 UI 및 sync 버튼 동작 정상
+### 7.0.a 실행 순서 템플릿 (log.md 기록용)
+```
+- [ ] 단계: 7.x (예: 7.1 nodePositions 유틸 분리)
+- [ ] 변경 요약:
+- [ ] 검증: pnpm lint / pnpm test (결과, 시간)
+- [ ] 커밋: <commit hash> (message)
+```
 
-### 7.2 유틸리티 분리
+### 7.0.b 커밋 메시지 규칙 예시
+- 리팩토링: refactor: extract CustomFlowNode component
+- 유틸: refactor: move node position utils
+- 훅: refactor: add useFlowSteps hook
+- 검증/정리: chore: verify flowboard refactor step
+
+### 7.1 유틸리티 분리
 - [ ] utils/nodePositions.ts 생성
-  - loadNodePositions, saveNodePositions 함수 이동
+  - loadNodePositions, saveNodePositions 함수 이동 (47-68줄)
   - NODE_POSITIONS_KEY 상수 포함
   - 검증: 노드 드래그 후 새로고침 시 위치 유지
 
 - [ ] utils/flowNodes.ts 생성
-  - createFlowNodes 함수 (184-272줄 로직)
+  - createFlowNodes 함수 (184-273줄 로직)
   - Props: { loading, error, instances, templates, stepOverrides, stepUpdating, isConnected, handleToggleFlowStep }
+  - savedPositions 처리: 함수 내부에서 loadNodePositions() 직접 호출 (부작용 최소화)
+  - 반환 타입: { nodes: Node[], edges: Edge[] }
+  - 순수 함수 유지: React Flow instance 접근 금지
+  - edges 생성 포함 여부 명시
   - 검증: 노드/엣지 생성 로직 정상
 
-### 7.3 커스텀 훅 분리
+### 7.2 커스텀 훅 분리
 - [ ] hooks/useFlowSync.ts 생성
   - handleSync 로직 (88-119줄)
   - 상태: isSyncing, syncSuccess, syncError, syncErrorMessage
+  - syncTimeoutRef 관리 포함
+  - success/error 상태 reset 타이밍 명시 (예: 2–3s 후 초기화)
   - 검증: 동기화 버튼 클릭 시 Notion refetch 및 UI 상태 업데이트
 
 - [ ] hooks/useFlowSteps.ts 생성
   - handleToggleFlowStep 로직 (121-167줄)
   - 상태: stepOverrides, stepUpdating, stepUpdatingRef
+  - templates 변경 시 초기화 로직 포함 (177-181줄 useEffect)
+  - 경쟁 상태 방지 규칙 명시 (중복 토글 차단, 실패 시 rollback)
   - 검증: 체크박스 토글 시 Notion 업데이트 및 낙관적 UI 업데이트
+
+### 7.3 컴포넌트 분리
+- [ ] components/flow/CustomFlowNode.tsx 분리 (477-602줄)
+  - CustomNodeData interface 포함
+  - 기존 FlowBoard에서 import로 전환
+  - 의존성 명시: React Flow NodeProps만 입력으로 받고, 외부 훅/컨텍스트 직접 접근 금지 (필요 시 props로 주입)
+  - 검증: FlowBoard 렌더링 및 노드 인터랙션 정상 작동
+
+- [ ] components/flow/FlowBoardHeader.tsx 분리 (325-407줄)
+  - Props: { loading, error, isConnected, isSyncing, syncSuccess, syncError, syncErrorMessage, handleSync }
+  - FlowBoardHeader는 UI 전용 컴포넌트로 유지; 네트워크/비즈니스 로직은 훅에서 처리
+  - 검증: 헤더 UI 및 sync 버튼 동작 정상
 
 ### 7.4 최종 검증
 - [ ] FlowBoard.tsx 최종 라인 수 200줄 이하 확인
