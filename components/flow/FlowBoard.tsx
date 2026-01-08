@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState, useEffect, useRef } from "react";
 import {
   Play,
   Plus,
@@ -74,19 +74,42 @@ export const FlowBoard: React.FC = () => {
 
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncSuccess, setSyncSuccess] = useState(false);
+  const [syncError, setSyncError] = useState(false);
+  const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const loading = instancesLoading || templatesLoading;
   const error = instancesError || templatesError;
   const isConnected = !loading && !error;
 
   const handleSync = useCallback(async () => {
+    if (syncTimeoutRef.current) {
+      clearTimeout(syncTimeoutRef.current);
+      syncTimeoutRef.current = null;
+    }
+
     setIsSyncing(true);
     setSyncSuccess(false);
+    setSyncError(false);
     await Promise.all([refetchInstances(), refetchTemplates()]);
     setIsSyncing(false);
-    setSyncSuccess(true);
-    setTimeout(() => setSyncSuccess(false), 2000);
-  }, [refetchInstances, refetchTemplates]);
+
+    const hasError = instancesError || templatesError;
+    if (hasError) {
+      setSyncError(true);
+      syncTimeoutRef.current = setTimeout(() => setSyncError(false), 2000);
+    } else {
+      setSyncSuccess(true);
+      syncTimeoutRef.current = setTimeout(() => setSyncSuccess(false), 2000);
+    }
+  }, [refetchInstances, refetchTemplates, instancesError, templatesError]);
+
+  useEffect(() => {
+    return () => {
+      if (syncTimeoutRef.current) {
+        clearTimeout(syncTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Create nodes and edges for React Flow
   const { nodes: initialNodes, edges: initialEdges } = useMemo(() => {
@@ -273,6 +296,8 @@ export const FlowBoard: React.FC = () => {
             className={`p-2 border border-[#ececeb] rounded-md transition-all ${
               syncSuccess
                 ? "bg-green-100 text-green-600"
+                : syncError
+                ? "bg-red-100 text-red-600"
                 : "bg-white text-[#37352f]/60 hover:text-[#37352f]"
             } disabled:opacity-50 disabled:cursor-not-allowed`}
             title="Sync with Notion"

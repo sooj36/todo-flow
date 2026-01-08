@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState, useCallback } from "react";
+import React, { useMemo, useState, useCallback, useEffect, useRef } from "react";
 import { ChevronLeft, ChevronRight, Plus, MoreHorizontal, Link2, Loader2, AlertCircle, RefreshCw } from "lucide-react";
 import { useTaskInstances } from "@/hooks/useTaskInstances";
 import { CalendarDayData } from "@/types";
@@ -20,15 +20,37 @@ export const NotionCalendar: React.FC = () => {
 
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncSuccess, setSyncSuccess] = useState(false);
+  const [syncError, setSyncError] = useState(false);
+  const syncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleSync = useCallback(async () => {
+    if (syncTimeoutRef.current) {
+      clearTimeout(syncTimeoutRef.current);
+      syncTimeoutRef.current = null;
+    }
+
     setIsSyncing(true);
     setSyncSuccess(false);
+    setSyncError(false);
     await refetch();
     setIsSyncing(false);
-    setSyncSuccess(true);
-    setTimeout(() => setSyncSuccess(false), 2000);
-  }, [refetch]);
+
+    if (error) {
+      setSyncError(true);
+      syncTimeoutRef.current = setTimeout(() => setSyncError(false), 2000);
+    } else {
+      setSyncSuccess(true);
+      syncTimeoutRef.current = setTimeout(() => setSyncSuccess(false), 2000);
+    }
+  }, [refetch, error]);
+
+  useEffect(() => {
+    return () => {
+      if (syncTimeoutRef.current) {
+        clearTimeout(syncTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const calendarData = useMemo(() => {
     const year = now.getFullYear();
@@ -94,6 +116,8 @@ export const NotionCalendar: React.FC = () => {
             className={`p-2 border border-[#ececeb] rounded-md transition-all ${
               syncSuccess
                 ? "bg-green-100 text-green-600"
+                : syncError
+                ? "bg-red-100 text-red-600"
                 : "bg-white text-[#37352f]/60 hover:text-[#37352f]"
             } disabled:opacity-50 disabled:cursor-not-allowed`}
             title="Sync with Notion"

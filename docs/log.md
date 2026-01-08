@@ -59,3 +59,11 @@
 - 동기화 성공 시 2초간 초록색 배경 표시 – 2026-01-08
 - NotionCalendar.test.tsx: 텍스트 수정 통과 (Connected to Notion → notion connect success) – 2026-01-08
 - FlowBoard.test.tsx: 3개 테스트 통과 – 2026-01-08
+
+## 코드 리뷰 수정: 동기화 에러 처리 및 메모리 누수 방지 (2026-01-08)
+- High: refetch 실패 감지 추가 - error 상태 확인하여 syncSuccess/syncError 분기 – 2026-01-08
+- High: 동기화 실패 시 빨간 배경 2초간 표시 (syncError 상태 추가) – 2026-01-08
+- Medium: setTimeout cleanup 구현 - useRef + useEffect로 언마운트 시 타이머 정리 – 2026-01-08
+- Medium: 동기화 재시도 시 이전 타이머 취소 (중복 타이머 방지) – 2026-01-08
+- NotionCalendar.test.tsx: 1개 테스트 통과 – 2026-01-08
+- FlowBoard.test.tsx: 3개 테스트 통과 – 2026-01-08
