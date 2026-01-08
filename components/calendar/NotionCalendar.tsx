@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useMemo } from "react";
-import { ChevronLeft, ChevronRight, Plus, MoreHorizontal, Link2, Loader2, AlertCircle } from "lucide-react";
+import React, { useMemo, useState, useCallback } from "react";
+import { ChevronLeft, ChevronRight, Plus, MoreHorizontal, Link2, Loader2, AlertCircle, RefreshCw } from "lucide-react";
 import { useTaskInstances } from "@/hooks/useTaskInstances";
 import { CalendarDayData } from "@/types";
 
@@ -16,7 +16,19 @@ export const NotionCalendar: React.FC = () => {
     year: "numeric",
   }).format(now);
 
-  const { instances, loading, error } = useTaskInstances();
+  const { instances, loading, error, refetch } = useTaskInstances();
+
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncSuccess, setSyncSuccess] = useState(false);
+
+  const handleSync = useCallback(async () => {
+    setIsSyncing(true);
+    setSyncSuccess(false);
+    await refetch();
+    setIsSyncing(false);
+    setSyncSuccess(true);
+    setTimeout(() => setSyncSuccess(false), 2000);
+  }, [refetch]);
 
   const calendarData = useMemo(() => {
     const year = now.getFullYear();
@@ -76,6 +88,18 @@ export const NotionCalendar: React.FC = () => {
               {isConnected ? "notion connect success" : "Notion not connected"}
             </div>
           )}
+          <button
+            onClick={handleSync}
+            disabled={!isConnected || isSyncing}
+            className={`p-2 border border-[#ececeb] rounded-md transition-all ${
+              syncSuccess
+                ? "bg-green-100 text-green-600"
+                : "bg-white text-[#37352f]/60 hover:text-[#37352f]"
+            } disabled:opacity-50 disabled:cursor-not-allowed`}
+            title="Sync with Notion"
+          >
+            <RefreshCw size={16} className={isSyncing ? "animate-spin" : ""} />
+          </button>
           <div className="flex items-center bg-[#efefed] rounded-md p-1">
             <button className="p-1 hover:bg-white hover:shadow-sm rounded transition-all">
               <ChevronLeft size={16} />

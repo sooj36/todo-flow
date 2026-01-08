@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   Play,
   Plus,
@@ -15,6 +15,7 @@ import {
   ArrowRight,
   Loader2,
   AlertCircle,
+  RefreshCw,
 } from "lucide-react";
 import ReactFlow, {
   Node,
@@ -68,12 +69,24 @@ function saveNodePositions(positions: Record<string, { x: number; y: number }>) 
 
 export const FlowBoard: React.FC = () => {
   const today = getLocalDateString();
-  const { instances, loading: instancesLoading, error: instancesError } = useTaskInstances(today);
-  const { templates, loading: templatesLoading, error: templatesError } = useTaskTemplates();
+  const { instances, loading: instancesLoading, error: instancesError, refetch: refetchInstances } = useTaskInstances(today);
+  const { templates, loading: templatesLoading, error: templatesError, refetch: refetchTemplates } = useTaskTemplates();
+
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncSuccess, setSyncSuccess] = useState(false);
 
   const loading = instancesLoading || templatesLoading;
   const error = instancesError || templatesError;
   const isConnected = !loading && !error;
+
+  const handleSync = useCallback(async () => {
+    setIsSyncing(true);
+    setSyncSuccess(false);
+    await Promise.all([refetchInstances(), refetchTemplates()]);
+    setIsSyncing(false);
+    setSyncSuccess(true);
+    setTimeout(() => setSyncSuccess(false), 2000);
+  }, [refetchInstances, refetchTemplates]);
 
   // Create nodes and edges for React Flow
   const { nodes: initialNodes, edges: initialEdges } = useMemo(() => {
@@ -254,6 +267,18 @@ export const FlowBoard: React.FC = () => {
             <Play size={14} fill="currentColor" />
             {isConnected ? "notion connect success" : "Configure .env.local"}
           </div>
+          <button
+            onClick={handleSync}
+            disabled={!isConnected || isSyncing}
+            className={`p-2 border border-[#ececeb] rounded-md transition-all ${
+              syncSuccess
+                ? "bg-green-100 text-green-600"
+                : "bg-white text-[#37352f]/60 hover:text-[#37352f]"
+            } disabled:opacity-50 disabled:cursor-not-allowed`}
+            title="Sync with Notion"
+          >
+            <RefreshCw size={16} className={isSyncing ? "animate-spin" : ""} />
+          </button>
           <button className="p-2 bg-white border border-[#ececeb] rounded-md text-[#37352f]/60 hover:text-[#37352f] transition-all">
             <Plus size={16} />
           </button>

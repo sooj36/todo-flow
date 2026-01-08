@@ -50,3 +50,12 @@
 ## 코드 리뷰 후속: 불필요한 import 제거 (2026-01-07)
 - Low: within import 제거 - 실제로 사용하지 않는 import 정리
 - Low: log.md 내용 수정 - within() 사용 관련 오기 수정
+
+## Phase 5 작업 기록: 수동 동기화 구현 (2026-01-08)
+- FlowBoard에 동기화 버튼 추가 (refetch 호출) – 2026-01-08
+- NotionCalendar에 동기화 버튼 추가 (refetch 호출) – 2026-01-08
+- 동기화 로딩/성공 상태 UI 반영 (애니메이션 + 배경색 변경) – 2026-01-08
+- RefreshCw 아이콘 회전 애니메이션 추가 – 2026-01-08
+- 동기화 성공 시 2초간 초록색 배경 표시 – 2026-01-08
+- NotionCalendar.test.tsx: 텍스트 수정 통과 (Connected to Notion → notion connect success) – 2026-01-08
+- FlowBoard.test.tsx: 3개 테스트 통과 – 2026-01-08
