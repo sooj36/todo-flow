@@ -54,12 +54,11 @@
 
 ### 7.0 리팩토링 순서 체크리스트
 - [ ] 현재 브랜치/변경사항 확인 (git status)
-- [ ] 테스트 환경 수정 (리팩토링 시작 전 필수)
+- [ ] 테스트 환경 최소 수정 (리팩토링 시작 전 필수)
   - [ ] vitest.setup.ts에 ResizeObserver mock 추가
-  - [ ] localStorage mock 함수 수정 (getItem is not a function 해결)
-  - [ ] 통합 테스트 3건 수정 (page.integration.test.tsx)
-  - [ ] API 테스트 3건 수정 (filter 로직 검증)
-  - [ ] pnpm test:run 전체 통과 확인
+  - [ ] vitest.setup.ts에 localStorage mock 수정 (getItem is not a function)
+  - [ ] pnpm test:run 실행해서 환경 문제만 해결되었는지 확인
+  - Note: 테스트 로직 실패(filter, 통합 테스트)는 별도 이슈로 추적, 리팩토링 블로킹 아님
 - [ ] FlowBoard.tsx 현재 라인 기준 주석 또는 메모 확보
 - [ ] 분리 대상 의존성 정리 (React Flow, Notion hooks, UI 상태)
 - [ ] 기존 테스트/핵심 인터랙션 테스트 확인 (노드 토글, 동기화 버튼)
@@ -130,6 +129,66 @@
 - [ ] 기존 모든 기능 정상 작동 (수동 테스트)
 - [ ] pnpm lint, pnpm test 통과
 - [ ] 리팩토링 전후 비교 문서 작성 (docs/log.md)
+
+## Phase 7+ Tasks (Test Debt Resolution)
+- 목표: 기존 테스트 실패 해결 (리팩토링과 독립적)
+- 우선순위: Medium (리팩토링 블로킹 아님, 병행 또는 이후 처리 가능)
+- 영향도: 통합 테스트 안정성 향상, CI/CD 준비
+
+### 7+.1 테스트 환경 Mock 추가 (High Priority)
+- [ ] vitest.setup.ts에 ResizeObserver mock 추가
+  - 요구사항: React Flow가 사용하는 ResizeObserver API를 jsdom 환경에서 mock
+  - 구현 예시:
+    ```typescript
+    global.ResizeObserver = class ResizeObserver {
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    };
+    ```
+  - 참고: vitest.setup.ts 현재 8줄, 환경변수 설정만 존재
+  - 영향: 통합 테스트 3건 (page.integration.test.tsx) ResizeObserver 에러 해결
+
+- [ ] vitest.setup.ts에 localStorage mock 수정
+  - 요구사항: getItem/setItem/removeItem/clear 함수가 실제 동작하도록 수정
+  - 현재 문제: window.localStorage.getItem is not a function
+  - 구현 예시:
+    ```typescript
+    const localStorageMock = {
+      getItem: vi.fn((key: string) => localStorage[key] || null),
+      setItem: vi.fn((key: string, value: string) => { localStorage[key] = value; }),
+      removeItem: vi.fn((key: string) => { delete localStorage[key]; }),
+      clear: vi.fn(() => { Object.keys(localStorage).forEach(key => delete localStorage[key]); })
+    };
+    global.localStorage = localStorageMock as any;
+    ```
+  - 또는 jsdom 기본 localStorage 활성화 방법 검토
+  - 영향: app/page.tsx:38, FlowBoard.tsx의 localStorage 호출 정상 동작
+
+- [ ] 검증: pnpm test:run 실행, 환경 에러만 해결되었는지 확인
+  - 성공 기준: ResizeObserver/localStorage 에러 사라짐
+  - 테스트 로직 실패는 여전히 존재 가능 (7+.2, 7+.3에서 처리)
+
+### 7+.2 API 테스트 로직 수정 (Medium Priority)
+- [ ] app/api/notion/instances/route.test.ts 수정
+  - 실패 케이스: should filter instances by date
+  - 원인: 날짜 필터링 로직 또는 mock 데이터 불일치
+  - 예상 작업: 테스트 데이터 또는 필터 assertion 수정
+- [ ] app/api/notion/flow-steps/route.test.ts 수정
+  - 실패 케이스: should filter steps by templateId
+  - 원인: templateId 필터링 로직 또는 mock 데이터 불일치
+  - 예상 작업: 테스트 데이터 또는 필터 assertion 수정
+- [ ] app/api/notion/flow-steps/[stepId]/route.test.ts 수정
+  - 실패 케이스: should update flow step done
+  - 원인: PATCH 요청 처리 또는 mock 응답 불일치
+  - 예상 작업: API 응답 mock 또는 assertion 수정
+
+### 7+.3 통합 테스트 수정 (Low Priority)
+- [ ] app/__tests__/page.integration.test.tsx 수정
+  - 실패 케이스: 3건 (main page, calendar cells, FlowBoard elements)
+  - 원인: ResizeObserver + localStorage 환경 문제
+  - Note: 7+.1 완료 후 자동 해결 예상, 여전히 실패 시 테스트 로직 검토
+- [ ] 최종 검증: pnpm test:run 전체 통과 확인
 
 ## Future Extension: Agentic AI (Auto Triage)
 - 목표: 캘린더/인스턴스 데이터를 보고 일정 충돌/미완료를 자동 조정
