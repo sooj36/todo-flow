@@ -7,9 +7,13 @@ vi.mock("reactflow", () => ({
   Controls: () => <div data-testid="react-flow-controls" />,
   Background: () => <div data-testid="react-flow-background" />,
   MiniMap: () => <div data-testid="react-flow-minimap" />,
+  Handle: ({ type, position }: { type: string; position: string }) => (
+    <div data-testid={`react-flow-handle-${type}-${position}`} />
+  ),
   useNodesState: (initialNodes: unknown[]) => [initialNodes, vi.fn(), vi.fn()],
   useEdgesState: (initialEdges: unknown[]) => [initialEdges, vi.fn(), vi.fn()],
   BackgroundVariant: { Dots: "dots" },
+  Position: { Left: "left", Right: "right", Top: "top", Bottom: "bottom" },
 }));
 
 vi.mock("@/hooks/useTaskInstances", () => ({
@@ -35,7 +39,7 @@ describe("FlowBoard", () => {
     vi.clearAllMocks();
   });
 
-  it("renders the connected state with no tasks", () => {
+  it("renders the connected state with React Flow", () => {
     render(<FlowBoard />);
 
     expect(screen.getByText("Daily Automation Flow")).toBeInTheDocument();

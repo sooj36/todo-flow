@@ -26,6 +26,8 @@ import ReactFlow, {
   useNodesState,
   useEdgesState,
   NodeTypes,
+  Handle,
+  Position,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { useTaskInstances } from "@/hooks/useTaskInstances";
@@ -40,6 +42,30 @@ function getLocalDateString(): string {
   return `${year}-${month}-${day}`;
 }
 
+// LocalStorage key for node positions
+const NODE_POSITIONS_KEY = 'flowboard-node-positions';
+
+// Load node positions from localStorage
+function loadNodePositions(): Record<string, { x: number; y: number }> {
+  if (typeof window === 'undefined') return {};
+  try {
+    const stored = localStorage.getItem(NODE_POSITIONS_KEY);
+    return stored ? JSON.parse(stored) : {};
+  } catch {
+    return {};
+  }
+}
+
+// Save node positions to localStorage
+function saveNodePositions(positions: Record<string, { x: number; y: number }>) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(NODE_POSITIONS_KEY, JSON.stringify(positions));
+  } catch {
+    // Ignore localStorage errors
+  }
+}
+
 export const FlowBoard: React.FC = () => {
   const today = getLocalDateString();
   const { instances, loading: instancesLoading, error: instancesError } = useTaskInstances(today);
@@ -51,11 +77,13 @@ export const FlowBoard: React.FC = () => {
 
   // Create nodes and edges for React Flow
   const { nodes: initialNodes, edges: initialEdges } = useMemo(() => {
+    const savedPositions = loadNodePositions();
+
     const nodes: Node[] = [
       {
         id: "daily-start",
         type: "customNode",
-        position: { x: 50, y: 100 },
+        position: savedPositions["daily-start"] || { x: 50, y: 100 },
         data: {
           title: "Daily Start",
           icon: <Zap className="text-orange-500" size={16} />,
@@ -66,7 +94,7 @@ export const FlowBoard: React.FC = () => {
       {
         id: "ai-reporter",
         type: "customNode",
-        position: { x: 350, y: 100 },
+        position: savedPositions["ai-reporter"] || { x: 350, y: 100 },
         data: {
           title: "AI Daily Reporter",
           icon: <Cpu className="text-purple-500" size={16} />,
@@ -101,7 +129,7 @@ export const FlowBoard: React.FC = () => {
         nodes.push({
           id: nodeId,
           type: "customNode",
-          position: { x: 700, y: yOffset },
+          position: savedPositions[nodeId] || { x: 700, y: yOffset },
           data: {
             title: template.name,
             icon: <Briefcase className="text-blue-500" size={16} />,
@@ -131,11 +159,43 @@ export const FlowBoard: React.FC = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
-  // Update nodes when data changes
+  // Update nodes when data changes, preserving user-dragged positions
   React.useEffect(() => {
-    setNodes(initialNodes);
+    setNodes((currentNodes) => {
+      const nodeMap = new Map(currentNodes.map(n => [n.id, n]));
+
+      return initialNodes.map(newNode => {
+        const existingNode = nodeMap.get(newNode.id);
+        // Keep existing position if node already exists (user may have dragged it)
+        if (existingNode) {
+          return {
+            ...newNode,
+            position: existingNode.position,
+          };
+        }
+        return newNode;
+      });
+    });
     setEdges(initialEdges);
   }, [initialNodes, initialEdges, setNodes, setEdges]);
+
+  // Save node positions to localStorage when they change
+  const handleNodesChange = useCallback((changes: any) => {
+    onNodesChange(changes);
+
+    // Extract position changes and save to localStorage
+    const positionChanges = changes.filter((c: any) => c.type === 'position' && c.dragging === false);
+    if (positionChanges.length > 0) {
+      setNodes((nds) => {
+        const positions = nds.reduce((acc, node) => {
+          acc[node.id] = node.position;
+          return acc;
+        }, {} as Record<string, { x: number; y: number }>);
+        saveNodePositions(positions);
+        return nds;
+      });
+    }
+  }, [onNodesChange, setNodes]);
 
   const nodeTypes: NodeTypes = useMemo(
     () => ({
@@ -204,7 +264,7 @@ export const FlowBoard: React.FC = () => {
         <ReactFlow
           nodes={nodes}
           edges={edges}
-          onNodesChange={onNodesChange}
+          onNodesChange={handleNodesChange}
           onEdgesChange={onEdgesChange}
           nodeTypes={nodeTypes}
           fitView
@@ -294,6 +354,20 @@ const CustomFlowNode: React.FC<{ data: CustomNodeData }> = ({ data }) => {
         statusColors[status]
       }`}
     >
+      {/* Source handle (left side) for incoming connections */}
+      <Handle
+        type="target"
+        position={Position.Left}
+        style={{ background: '#3b82f6' }}
+      />
+
+      {/* Target handle (right side) for outgoing connections */}
+      <Handle
+        type="source"
+        position={Position.Right}
+        style={{ background: '#3b82f6' }}
+      />
+
       <div className="p-2 border-b flex items-center justify-between bg-white/50">
         <div className="flex items-center gap-2">
           <span
