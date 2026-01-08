@@ -132,7 +132,7 @@ export const FlowBoard: React.FC = () => {
     }
 
     // Update both ref and state
-    stepUpdatingRef.current = { ...stepUpdatingRef.current, [stepId]: true };
+    stepUpdatingRef.current[stepId] = true;
     setStepUpdating((prev) => ({ ...prev, [stepId]: true }));
     setStepOverrides((prev) => ({ ...prev, [stepId]: nextDone }));
 
@@ -161,7 +161,7 @@ export const FlowBoard: React.FC = () => {
         setSyncErrorMessage("");
       }, 5000);
     } finally {
-      stepUpdatingRef.current = { ...stepUpdatingRef.current, [stepId]: false };
+      stepUpdatingRef.current[stepId] = false;
       setStepUpdating((prev) => ({ ...prev, [stepId]: false }));
     }
   }, []);

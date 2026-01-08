@@ -102,3 +102,11 @@
 - FlowBoard/NotionCalendar 모두 적용 – 2026-01-08
 - FlowBoard.test.tsx: 3개 테스트 통과 – 2026-01-08
 - 커밋 ID: 62608fb – 2026-01-08
+
+## 성능 최적화: stepUpdatingRef 직접 mutation (2026-01-08)
+- Low: stepUpdatingRef 업데이트 시 객체 스프레드 제거 → 직접 mutation으로 변경 – 2026-01-08
+- 불필요한 객체 복사 제거로 메모리 효율성 향상 – 2026-01-08
+- 빠른 토글 시 race condition 방지 (동일 객체 참조 유지) – 2026-01-08
+- 변경: `stepUpdatingRef.current = { ...stepUpdatingRef.current, [stepId]: true }` → `stepUpdatingRef.current[stepId] = true` – 2026-01-08
+- components/flow/FlowBoard.tsx line 135, 164 수정 – 2026-01-08
+- FlowBoard.test.tsx: 3개 테스트 통과 – 2026-01-08
