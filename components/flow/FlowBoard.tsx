@@ -90,10 +90,15 @@ export const FlowBoard: React.FC = () => {
     setIsSyncing(true);
     setSyncSuccess(false);
     setSyncError(false);
-    await Promise.all([refetchInstances(), refetchTemplates()]);
+
+    const [instancesResult, templatesResult] = await Promise.all([
+      refetchInstances(),
+      refetchTemplates(),
+    ]);
+
     setIsSyncing(false);
 
-    const hasError = instancesError || templatesError;
+    const hasError = !instancesResult.success || !templatesResult.success;
     if (hasError) {
       setSyncError(true);
       syncTimeoutRef.current = setTimeout(() => setSyncError(false), 2000);
@@ -101,7 +106,7 @@ export const FlowBoard: React.FC = () => {
       setSyncSuccess(true);
       syncTimeoutRef.current = setTimeout(() => setSyncSuccess(false), 2000);
     }
-  }, [refetchInstances, refetchTemplates, instancesError, templatesError]);
+  }, [refetchInstances, refetchTemplates]);
 
   useEffect(() => {
     return () => {

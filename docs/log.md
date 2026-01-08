@@ -67,3 +67,15 @@
 - Medium: 동기화 재시도 시 이전 타이머 취소 (중복 타이머 방지) – 2026-01-08
 - NotionCalendar.test.tsx: 1개 테스트 통과 – 2026-01-08
 - FlowBoard.test.tsx: 3개 테스트 통과 – 2026-01-08
+
+## 코드 리뷰 후속: 레이스 컨디션 해결 (2026-01-08)
+- High: refetch 함수가 Promise<{ success: boolean }> 반환하도록 훅 API 수정 – 2026-01-08
+- High: 레이스 컨디션 제거 - refetch 반환값으로 성공/실패 판정 – 2026-01-08
+- Medium: handleSync deps에서 error 제거 - 불필요한 함수 재생성 방지 – 2026-01-08
+- useTaskInstances: refetch가 { success: boolean } 반환 – 2026-01-08
+- useTaskTemplates: refetch가 { success: boolean } 반환 – 2026-01-08
+- FlowBoard/NotionCalendar: refetch 결과로 즉시 성공/실패 판정 – 2026-01-08
+- hooks/useTaskInstances.test.ts: 3개 테스트 통과 – 2026-01-08
+- hooks/useTaskTemplates.test.ts: 2개 테스트 통과 – 2026-01-08
+- NotionCalendar.test.tsx: 1개 테스트 통과 – 2026-01-08
+- FlowBoard.test.tsx: 3개 테스트 통과 – 2026-01-08

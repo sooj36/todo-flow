@@ -32,17 +32,19 @@ export const NotionCalendar: React.FC = () => {
     setIsSyncing(true);
     setSyncSuccess(false);
     setSyncError(false);
-    await refetch();
+
+    const result = await refetch();
+
     setIsSyncing(false);
 
-    if (error) {
+    if (!result.success) {
       setSyncError(true);
       syncTimeoutRef.current = setTimeout(() => setSyncError(false), 2000);
     } else {
       setSyncSuccess(true);
       syncTimeoutRef.current = setTimeout(() => setSyncSuccess(false), 2000);
     }
-  }, [refetch, error]);
+  }, [refetch]);
 
   useEffect(() => {
     return () => {
