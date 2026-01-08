@@ -92,3 +92,13 @@
 - hooks/useTaskTemplates.test.ts: 2개 테스트 통과 – 2026-01-08
 - NotionCalendar.test.tsx: 1개 테스트 통과 – 2026-01-08
 - FlowBoard.test.tsx: 3개 테스트 통과 – 2026-01-08
+
+## 접근성 개선: 에러 메시지 표시 강화 (2026-01-08)
+- Low: 에러 메시지를 화면에 가시적으로 표시 - 버튼 옆에 텍스트로 노출 – 2026-01-08
+- Low: aria-live 영역 추가 - 스크린 리더 접근성 향상 (role="status", aria-live="polite") – 2026-01-08
+- Low: 타임아웃 연장 - 2초 → 5초로 변경하여 충분한 읽기 시간 확보 – 2026-01-08
+- sr-only CSS 클래스 추가 - 시각적으로 숨기되 스크린 리더에서 접근 가능 – 2026-01-08
+- 버튼에 aria-label 추가 - 에러 메시지를 스크린 리더에 전달 – 2026-01-08
+- FlowBoard/NotionCalendar 모두 적용 – 2026-01-08
+- FlowBoard.test.tsx: 3개 테스트 통과 – 2026-01-08
+- 커밋 ID: 62608fb – 2026-01-08
