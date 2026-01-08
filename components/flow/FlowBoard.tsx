@@ -354,14 +354,14 @@ const CustomFlowNode: React.FC<{ data: CustomNodeData }> = ({ data }) => {
         statusColors[status]
       }`}
     >
-      {/* Source handle (left side) for incoming connections */}
+      {/* Target handle (left side) for incoming connections */}
       <Handle
         type="target"
         position={Position.Left}
         style={{ background: '#3b82f6' }}
       />
 
-      {/* Target handle (right side) for outgoing connections */}
+      {/* Source handle (right side) for outgoing connections */}
       <Handle
         type="source"
         position={Position.Right}

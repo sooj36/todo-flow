@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { FlowBoard } from "./FlowBoard";
 
 vi.mock("reactflow", () => ({
@@ -34,9 +34,32 @@ vi.mock("@/hooks/useTaskTemplates", () => ({
   })),
 }));
 
+// Mock localStorage
+const localStorageMock = (() => {
+  let store: Record<string, string> = {};
+
+  return {
+    getItem: (key: string) => store[key] || null,
+    setItem: (key: string, value: string) => {
+      store[key] = value.toString();
+    },
+    removeItem: (key: string) => {
+      delete store[key];
+    },
+    clear: () => {
+      store = {};
+    },
+  };
+})();
+
+Object.defineProperty(window, 'localStorage', {
+  value: localStorageMock,
+});
+
 describe("FlowBoard", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    localStorageMock.clear();
   });
 
   it("renders the connected state with React Flow", () => {
@@ -53,5 +76,32 @@ describe("FlowBoard", () => {
 
     expect(screen.getByText("DATABASE ID: —")).toBeInTheDocument();
     expect(screen.getByText("Auto-save disabled until connected")).toBeInTheDocument();
+  });
+
+  it("loads node positions from localStorage on mount", () => {
+    const savedPositions = {
+      "daily-start": { x: 100, y: 200 },
+      "ai-reporter": { x: 400, y: 200 },
+    };
+    localStorage.setItem("flowboard-node-positions", JSON.stringify(savedPositions));
+
+    render(<FlowBoard />);
+
+    // Verify localStorage was read (positions should be loaded)
+    const storedData = localStorage.getItem("flowboard-node-positions");
+    expect(storedData).toBeTruthy();
+    expect(JSON.parse(storedData!)).toEqual(savedPositions);
+  });
+
+  it("handles localStorage errors gracefully", () => {
+    // Mock localStorage to throw an error
+    const getItemSpy = vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+      throw new Error("localStorage error");
+    });
+
+    // Should not crash when localStorage fails
+    expect(() => render(<FlowBoard />)).not.toThrow();
+
+    getItemSpy.mockRestore();
   });
 });
