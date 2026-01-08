@@ -159,7 +159,7 @@ export const FlowBoard: React.FC = () => {
     } finally {
       setStepUpdating((prev) => ({ ...prev, [stepId]: false }));
     }
-  }, [stepUpdating]);
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -226,7 +226,7 @@ export const FlowBoard: React.FC = () => {
 
         const nodeId = `notion-${template.id}`;
         const tasks = template.flowSteps.map((step) => {
-          const done = stepOverrides[step.id] ?? step.done ?? false;
+          const done = stepOverrides[step.id] ?? step.done;
           return {
             id: step.id,
             name: step.name,
@@ -264,7 +264,7 @@ export const FlowBoard: React.FC = () => {
     }
 
     return { nodes, edges };
-  }, [loading, error, instances, templates, stepOverrides, stepUpdating, isConnected, handleToggleFlowStep]);
+  }, [loading, error, instances, templates, stepOverrides, isConnected, handleToggleFlowStep]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -341,8 +341,8 @@ export const FlowBoard: React.FC = () => {
               {!loading && !error && (
                 <span
                   className={`flex items-center gap-1 text-[10px] font-bold tracking-wide ${isConnected
-                      ? "rounded-full bg-green-100 px-2 py-0.5 text-green-700"
-                      : "text-gray-400"
+                    ? "rounded-full bg-green-100 px-2 py-0.5 text-green-700"
+                    : "text-gray-400"
                     }`}
                 >
                   <span className={`w-1.5 h-1.5 ${isConnected ? 'bg-green-500' : 'bg-gray-300'} rounded-full`}></span>
@@ -367,8 +367,8 @@ export const FlowBoard: React.FC = () => {
 
           <div
             className={`flex items-center gap-2 px-4 py-2 rounded-md text-xs font-bold ${isConnected
-                ? "bg-green-100 text-green-700"
-                : "bg-gray-200 text-gray-600"
+              ? "bg-green-100 text-green-700"
+              : "bg-gray-200 text-gray-600"
               }`}
           >
             <Play size={14} fill="currentColor" />
@@ -379,10 +379,10 @@ export const FlowBoard: React.FC = () => {
               onClick={handleSync}
               disabled={!isConnected || isSyncing}
               className={`p-2 border border-[#ececeb] rounded-md transition-all ${syncSuccess
-                  ? "bg-green-100 text-green-600"
-                  : syncError
-                    ? "bg-red-100 text-red-600"
-                    : "bg-white text-[#37352f]/60 hover:text-[#37352f]"
+                ? "bg-green-100 text-green-600"
+                : syncError
+                  ? "bg-red-100 text-red-600"
+                  : "bg-white text-[#37352f]/60 hover:text-[#37352f]"
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
               aria-label={syncError && syncErrorMessage ? `Sync failed: ${syncErrorMessage}` : "Sync with Notion"}
             >
@@ -565,11 +565,14 @@ const CustomFlowNode: React.FC<{ data: CustomNodeData }> = ({ data }) => {
                     aria-label={`${task.name} 완료`}
                   />
                   <span
-                    className={`text-[10px] leading-tight ${task.done ? "text-gray-400 line-through" : "text-gray-500"
+                    className={`text-[10px] leading-tight flex-1 ${task.done ? "text-gray-400 line-through" : "text-gray-500"
                       }`}
                   >
                     {task.name}
                   </span>
+                  {task.isUpdating && (
+                    <Loader2 size={10} className="text-blue-500 animate-spin mt-0.5" />
+                  )}
                 </label>
               );
             })}

@@ -25,7 +25,7 @@ export interface FlowStep {
   name: string;
   order: number;
   parentTemplateId: string;
-  done?: boolean;
+  done: boolean;
 }
 
 // ============================================
