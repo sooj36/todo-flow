@@ -110,3 +110,64 @@
 - 변경: `stepUpdatingRef.current = { ...stepUpdatingRef.current, [stepId]: true }` → `stepUpdatingRef.current[stepId] = true` – 2026-01-08
 - components/flow/FlowBoard.tsx line 135, 164 수정 – 2026-01-08
 - FlowBoard.test.tsx: 3개 테스트 통과 – 2026-01-08
+## Phase 7 작업 기록: FlowBoard 리팩토링 (2026-01-09)
+- 목표: FlowBoard.tsx 602줄 → 200줄 이하로 분리
+- 원칙: 각 단계마다 기존 테스트 통과 확인 → 커밋
+
+### 7.0 사전 준비
+- vitest.setup.ts에 ResizeObserver mock 추가 – 2026-01-09
+- vitest.setup.ts에 localStorage mock 추가 (in-memory storage 방식) – 2026-01-09
+- 커밋 ID: c008a68 – 2026-01-09
+
+### 7.1 유틸리티 분리
+- utils/nodePositions.ts 생성 (loadNodePositions, saveNodePositions) – 2026-01-09
+- 커밋 ID: 4522df7 – 2026-01-09
+- utils/flowNodes.ts 생성 (createFlowNodes 함수, 노드/엣지 생성 로직) – 2026-01-09
+- FlowBoard.tsx: 602줄 → 507줄 (95줄 감소) – 2026-01-09
+- 커밋 ID: 582ea26 – 2026-01-09
+
+### 7.2 커스텀 훅 분리
+- hooks/useFlowSync.ts 생성 (handleSync, isSyncing, syncSuccess, syncError 상태 관리) – 2026-01-09
+- syncTimeoutRef 관리 포함, 5초 후 상태 자동 초기화 – 2026-01-09
+- 커밋 ID: 4730481 – 2026-01-09
+- hooks/useFlowSteps.ts 생성 (handleToggleFlowStep, stepOverrides, stepUpdating 상태 관리) – 2026-01-09
+- 경쟁 상태 방지 (stepUpdatingRef 사용), 실패 시 rollback 구현 – 2026-01-09
+- templates 변경 시 자동 초기화 로직 포함 – 2026-01-09
+- FlowBoard.tsx: 507줄 → 428줄 (79줄 감소) – 2026-01-09
+- 커밋 ID: 04eb8de – 2026-01-09
+
+### 7.3 컴포넌트 분리
+- components/flow/CustomFlowNode.tsx 분리 (CustomNodeData interface 포함) – 2026-01-09
+- React Flow NodeProps만 입력으로 받도록 설계 (외부 훅/컨텍스트 직접 접근 금지) – 2026-01-09
+- FlowBoard.tsx: 428줄 → 274줄 (154줄 감소) – 2026-01-09
+- 커밋 ID: b213d01 – 2026-01-09
+- components/flow/FlowBoardHeader.tsx 분리 (UI 전용 컴포넌트) – 2026-01-09
+- Props: loading, error, isConnected, isSyncing, syncSuccess, syncError, syncErrorMessage, handleSync – 2026-01-09
+- FlowBoard.tsx: 274줄 → 198줄 (76줄 감소) – 2026-01-09
+- 커밋 ID: 6196f9c – 2026-01-09
+
+### 7.4 최종 검증
+- FlowBoard.tsx 최종 라인 수: 198줄 (목표 200줄 이하 달성 ✓) – 2026-01-09
+- 전체 감소량: 602줄 → 198줄 (404줄, 67% 감소) – 2026-01-09
+- pnpm lint 통과 ✓ – 2026-01-09
+- pnpm build 통과 ✓ – 2026-01-09
+
+### 리팩토링 전후 비교
+**Before (602줄)**
+- FlowBoard.tsx에 모든 로직 집중
+- 유틸리티, 훅, 컴포넌트 모두 단일 파일에 포함
+
+**After (198줄 + 분리된 파일들)**
+- utils/nodePositions.ts (23줄): localStorage 관련 유틸리티
+- utils/flowNodes.ts (119줄): 노드/엣지 생성 로직
+- hooks/useFlowSync.ts (70줄): 동기화 상태 관리
+- hooks/useFlowSteps.ts (82줄): 플로우 스텝 상태 관리
+- components/flow/CustomFlowNode.tsx (156줄): 커스텀 노드 UI
+- components/flow/FlowBoardHeader.tsx (115줄): 헤더 UI
+- components/flow/FlowBoard.tsx (198줄): 메인 컴포넌트 (조율 역할)
+
+**개선 효과**
+- 유지보수성 향상: 각 파일이 단일 책임 원칙(SRP)을 따름
+- 재사용성 향상: 유틸리티, 훅, 컴포넌트를 다른 곳에서도 사용 가능
+- 테스트 용이성: 각 모듈을 독립적으로 테스트 가능
+- 코드 가독성: FlowBoard.tsx가 orchestration 역할만 수행
