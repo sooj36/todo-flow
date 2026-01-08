@@ -171,3 +171,16 @@
 - 재사용성 향상: 유틸리티, 훅, 컴포넌트를 다른 곳에서도 사용 가능
 - 테스트 용이성: 각 모듈을 독립적으로 테스트 가능
 - 코드 가독성: FlowBoard.tsx가 orchestration 역할만 수행
+
+## 코드 리뷰 후속: 타입 오류 수정 (2026-01-09)
+- High: utils/flowNodes.ts에 ReactNode import 추가 – 2026-01-09
+  - React.ReactNode → ReactNode로 변경
+  - import type { ReactNode } from "react" 추가
+- High: hooks/useFlowSteps.ts에 MutableRefObject import 추가 – 2026-01-09
+  - React.MutableRefObject → MutableRefObject로 변경
+  - import type { MutableRefObject } from "react" 추가
+- High: components/flow/FlowBoardHeader.tsx의 handleSync 타입 수정 – 2026-01-09
+  - () => void → () => Promise<void>로 변경 (async 함수와 타입 일치)
+- pnpm lint 통과 ✓ – 2026-01-09
+- pnpm build 통과 ✓ – 2026-01-09
+- 커밋 ID: 61a34d8 – 2026-01-09
