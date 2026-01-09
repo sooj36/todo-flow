@@ -79,51 +79,51 @@
   - [x] 커밋: Phase 8.0에서 완료 (4f06ab2)
 
 ### 8.3 Task Templates 모듈 분리
-- [ ] lib/notion/templates.ts 생성
+- [x] lib/notion/templates.ts 생성
   - getTaskTemplates 함수 (lines 32-99)
   - parsers.ts의 파싱 함수 활용으로 코드 간소화
   - Client import 및 타입 import
   - 검증: app/api/notion/templates/route.ts 정상 작동
   - 검증: pnpm test templates/route.test.ts 통과
-  - 커밋: refactor: extract notion templates module
+  - [x] 커밋: refactor: extract notion templates module
 
 ### 8.4 Flow Steps 모듈 분리
-- [ ] lib/notion/flowSteps.ts 생성
+- [x] lib/notion/flowSteps.ts 생성
   - getFlowSteps 함수 (lines 105-167)
   - updateFlowStepDone 함수 (lines 173-186)
   - parsers.ts의 파싱 함수 활용으로 코드 간소화
   - Client import 및 타입 import
   - 검증: app/api/notion/flow-steps/route.ts 정상 작동
   - 검증: pnpm test flow-steps/route.test.ts 통과
-  - 커밋: refactor: extract notion flow steps module
+  - [x] 커밋: refactor: extract notion flow steps module
 
 ### 8.5 Task Instances 모듈 분리
-- [ ] lib/notion/instances.ts 생성
+- [x] lib/notion/instances.ts 생성
   - getTaskInstances 함수 (lines 192-277)
   - createTaskInstance 함수 (lines 283-329)
   - parsers.ts의 파싱 함수 활용으로 코드 간소화
   - Client import 및 타입 import
   - 검증: app/api/notion/instances/route.ts 정상 작동
   - 검증: pnpm test instances/route.test.ts 통과
-  - 커밋: refactor: extract notion instances module
+  - [x] 커밋: refactor: extract notion instances module
 
 ### 8.6 lib/notion.ts 정리 및 re-export
-- [ ] lib/notion/index.ts 생성 (또는 기존 lib/notion.ts를 index.ts로 변경)
+- [x] lib/notion/index.ts 생성 (또는 기존 lib/notion.ts를 index.ts로 변경)
   - client, templates, flowSteps, instances 모듈에서 re-export
   - 기존 import 경로 유지를 위한 호환성 레이어
   - 예: `export * from './client'`, `export * from './templates'` 등
   - 검증: 모든 API 라우트에서 import 정상 작동
-  - 커밋: refactor: consolidate notion lib exports
+  - [x] 커밋: refactor: consolidate notion lib exports
 
 ### 8.7 최종 검증
-- [ ] lib/notion/ 폴더 구조 확인
+- [x] lib/notion/ 폴더 구조 확인
   - client.ts, templates.ts, flowSteps.ts, instances.ts, parsers.ts, index.ts
-- [ ] 모든 API 라우트 정상 작동 (수동 테스트)
-- [ ] pnpm lint, pnpm test 통과
-- [ ] 파싱 함수 재사용으로 코드 라인 수 감소 확인
-- [ ] 리팩토링 전후 비교 문서 작성 (docs/log.md)
-- [ ] 타입 오류/import 경로 오류 없음 확인
-- 커밋: docs: update Phase 8 refactoring log
+- [x] 모든 API 라우트 정상 작동 (수동 테스트)
+- [x] pnpm lint, pnpm test 통과
+- [x] 파싱 함수 재사용으로 코드 라인 수 감소 확인
+- [x] 리팩토링 전후 비교 문서 작성 (docs/log.md)
+- [x] 타입 오류/import 경로 오류 없음 확인
+  - [x] 커밋: docs: update Phase 8 refactoring log
 
 ## Future Extension: Agentic AI (Auto Triage)
 - 목표: 캘린더/인스턴스 데이터를 보고 일정 충돌/미완료를 자동 조정
