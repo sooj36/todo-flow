@@ -8,9 +8,16 @@ import { CalendarDayData } from "@/types";
 const days1To15 = Array.from({ length: 15 }, (_, i) => i + 1);
 const days16To31 = Array.from({ length: 16 }, (_, i) => i + 16);
 
-export const NotionCalendar: React.FC = () => {
+interface NotionCalendarProps {
+  selectedDate: Date;
+  onDateChange: (date: Date) => void;
+}
+
+export const NotionCalendar: React.FC<NotionCalendarProps> = ({
+  selectedDate,
+  onDateChange
+}) => {
   const now = new Date(); // Actual current date for "today" highlighting
-  const [selectedDate, setSelectedDate] = useState(new Date()); // Viewed/focused date
 
   const today = now.getDate();
   const monthLabel = new Intl.DateTimeFormat("en-US", {
@@ -56,24 +63,20 @@ export const NotionCalendar: React.FC = () => {
   }, [refetch]);
 
   const handlePreviousDay = useCallback(() => {
-    setSelectedDate(prev => {
-      const newDate = new Date(prev);
-      newDate.setDate(newDate.getDate() - 1);
-      return newDate;
-    });
-  }, []);
+    const newDate = new Date(selectedDate);
+    newDate.setDate(newDate.getDate() - 1);
+    onDateChange(newDate);
+  }, [selectedDate, onDateChange]);
 
   const handleNextDay = useCallback(() => {
-    setSelectedDate(prev => {
-      const newDate = new Date(prev);
-      newDate.setDate(newDate.getDate() + 1);
-      return newDate;
-    });
-  }, []);
+    const newDate = new Date(selectedDate);
+    newDate.setDate(newDate.getDate() + 1);
+    onDateChange(newDate);
+  }, [selectedDate, onDateChange]);
 
   const handleToday = useCallback(() => {
-    setSelectedDate(new Date());
-  }, []);
+    onDateChange(new Date());
+  }, [onDateChange]);
 
   useEffect(() => {
     return () => {
