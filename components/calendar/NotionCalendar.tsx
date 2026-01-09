@@ -183,6 +183,7 @@ export const NotionCalendar: React.FC = () => {
             <button
               onClick={handleToday}
               className="px-3 text-xs font-bold uppercase tracking-tight hover:bg-white rounded transition-all"
+              aria-label="Go to today"
             >
               {selectedDate.toDateString() === now.toDateString()
                 ? 'Today'
@@ -211,17 +212,19 @@ export const NotionCalendar: React.FC = () => {
           </div>
           <div className="grid grid-cols-5 gap-3">
             {days1To15.map((day) => {
-              const year = now.getFullYear();
-              const month = now.getMonth();
+              const year = selectedDate.getFullYear();
+              const month = selectedDate.getMonth();
               const date = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
               const dayData = calendarData.get(date);
+              const cellDate = new Date(year, month, day);
+              const isToday = cellDate.toDateString() === now.toDateString();
               return (
                 <CalendarDay
                   key={day}
                   day={day}
                   data={dayData}
                   loading={loading}
-                  isToday={day === today}
+                  isToday={isToday}
                 />
               );
             })}
@@ -243,10 +246,12 @@ export const NotionCalendar: React.FC = () => {
           </div>
           <div className="grid grid-cols-5 gap-3">
             {days16To31.map((day) => {
-              const year = now.getFullYear();
-              const month = now.getMonth();
+              const year = selectedDate.getFullYear();
+              const month = selectedDate.getMonth();
               const date = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
               const dayData = calendarData.get(date);
+              const cellDate = new Date(year, month, day);
+              const isToday = cellDate.toDateString() === now.toDateString();
               return (
                 <CalendarDay
                   key={day}
@@ -254,7 +259,7 @@ export const NotionCalendar: React.FC = () => {
                   data={dayData}
                   isSecondPhase
                   loading={loading}
-                  isToday={day === today}
+                  isToday={isToday}
                 />
               );
             })}
