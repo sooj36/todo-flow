@@ -57,13 +57,13 @@
 ### 9.5 Testing & Edge Cases
 - [x] 월 경계 테스트 (1/1 ← → 12/31) - JavaScript Date 자동 처리
 - [x] 연도 경계 테스트 (2025 ↔ 2026) - JavaScript Date 자동 처리
-- [x] 선택 날짜 하이라이팅 시각적 확인 - 수동 테스트 필요
-- [x] 자동화 테스트 작성 (NotionCalendar.test.tsx) - 기존 테스트 통과
-  - [x] previous day navigation - useCallback으로 구현됨
-  - [x] next day navigation - useCallback으로 구현됨
-  - [x] reset to today - useCallback으로 구현됨
-  - [x] month boundary handling - Date 객체가 자동 처리
-- [x] 커밋: (수정사항은 이전 커밋들에 포함)
+- [x] 선택 날짜 하이라이팅 시각적 확인 - 수동 테스트로 검증
+- [x] 자동화 테스트 작성 (NotionCalendar.test.tsx) - 5 tests added
+  - [x] previous day navigation - fireEvent.click 사용
+  - [x] next day navigation - 텍스트 변경 검증
+  - [x] reset to today - 왕복 네비게이션 테스트
+  - [x] month boundary handling - 40일 이동 crash 테스트
+- [x] 커밋: test: add navigation tests for calendar date controls
 
 ### 9.6 Final Verification
 - [x] 전체 날짜 탐색 플로우 수동 테스트 - dev 서버로 테스트 가능
