@@ -9,12 +9,14 @@ const days1To15 = Array.from({ length: 15 }, (_, i) => i + 1);
 const days16To31 = Array.from({ length: 16 }, (_, i) => i + 16);
 
 export const NotionCalendar: React.FC = () => {
-  const now = new Date();
+  const now = new Date(); // Actual current date for "today" highlighting
+  const [selectedDate, setSelectedDate] = useState(new Date()); // Viewed/focused date
+
   const today = now.getDate();
   const monthLabel = new Intl.DateTimeFormat("en-US", {
     month: "long",
     year: "numeric",
-  }).format(now);
+  }).format(selectedDate); // Use selectedDate for display
 
   const { instances, loading, error, refetch } = useTaskInstances();
 
@@ -62,8 +64,8 @@ export const NotionCalendar: React.FC = () => {
   }, []);
 
   const calendarData = useMemo(() => {
-    const year = now.getFullYear();
-    const month = now.getMonth();
+    const year = selectedDate.getFullYear();
+    const month = selectedDate.getMonth();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const dataMap = new Map<string, CalendarDayData>();
 
@@ -79,7 +81,7 @@ export const NotionCalendar: React.FC = () => {
     }
 
     return dataMap;
-  }, [instances, now]);
+  }, [instances, selectedDate]); // Changed: now -> selectedDate
 
   const isConnected = !loading && !error;
 
@@ -122,8 +124,8 @@ export const NotionCalendar: React.FC = () => {
           {!loading && !error && (
             <div
               className={`flex items-center gap-2 text-xs font-semibold tracking-wide ${isConnected
-                  ? "rounded-full bg-green-100 px-3 py-1 text-green-700"
-                  : "text-[#37352f]/60"
+                ? "rounded-full bg-green-100 px-3 py-1 text-green-700"
+                : "text-[#37352f]/60"
                 }`}
             >
               <Link2 size={16} />
@@ -135,10 +137,10 @@ export const NotionCalendar: React.FC = () => {
               onClick={handleSync}
               disabled={!isConnected || isSyncing}
               className={`p-2 border border-[#ececeb] rounded-md transition-all ${syncSuccess
-                  ? "bg-green-100 text-green-600"
-                  : syncError
-                    ? "bg-red-100 text-red-600"
-                    : "bg-white text-[#37352f]/60 hover:text-[#37352f]"
+                ? "bg-green-100 text-green-600"
+                : syncError
+                  ? "bg-red-100 text-red-600"
+                  : "bg-white text-[#37352f]/60 hover:text-[#37352f]"
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
               aria-label={syncError && syncErrorMessage ? `Sync failed: ${syncErrorMessage}` : "Sync with Notion"}
             >
@@ -289,10 +291,10 @@ const CalendarDay: React.FC<CalendarDayProps> = ({ day, data, loading, isToday }
           <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
             <div
               className={`h-full transition-all ${completionRate >= 0.8
-                  ? "bg-green-500"
-                  : completionRate >= 0.5
-                    ? "bg-yellow-500"
-                    : "bg-blue-500"
+                ? "bg-green-500"
+                : completionRate >= 0.5
+                  ? "bg-yellow-500"
+                  : "bg-blue-500"
                 }`}
               style={{ width: `${completionRate * 100}%` }}
             ></div>
