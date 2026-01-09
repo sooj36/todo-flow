@@ -5,7 +5,7 @@
 - Execute tasks sequentially. After each, verify with tests (pnpm lint, pnpm test).
 - If unclear, ask questions in [ ] format.
 - Mark done with [x], update this file.
-- TDD: Write test → implement → pass → delete test. Core components (e.g., NotionCalendar, FlowBoard) keep tests.
+- TDD: Write test → implement → pass. Phase 8 리팩토링에서는 테스트 삭제 금지 (임시 테스트는 별도 파일로 격리 후 유지).
 - Commit rule: Before deleting tests, commit changes.
 - Log rule: Record test results in docs/log.md (e.g., "TaskCard.test.tsx: 진행률 바 렌더링 통과 – 2026-01-07").
 - Tooling: Use Vitest for tests.
@@ -25,20 +25,22 @@
 
 ### 8.0 리팩토링 순서 체크리스트
 - [ ] 현재 브랜치/변경사항 확인 (git status)
+- [ ] 브랜치 생성 가능 여부 확인 (git checkout -b 시도 or .git/refs/heads 쓰기 권한 확인)
 - [ ] lib/notion.ts 현재 구조 분석 및 의존성 파악
-  - [ ] 클라이언트 관리 (lines 5-26)
-  - [ ] Task Templates (lines 32-99)
-  - [ ] Flow Steps (lines 105-186)
-  - [ ] Task Instances (lines 192-329)
+  - [ ] 클라이언트 관리 (line 기준은 참고용, 함수명 기준으로 확인)
+  - [ ] Task Templates (line 기준은 참고용, 함수명 기준으로 확인)
+  - [ ] Flow Steps (line 기준은 참고용, 함수명 기준으로 확인)
+  - [ ] Task Instances (line 기준은 참고용, 함수명 기준으로 확인)
 - [ ] API 라우트 의존성 확인
   - [ ] app/api/notion/templates/route.ts
   - [ ] app/api/notion/flow-steps/route.ts
   - [ ] app/api/notion/instances/route.ts
-- [ ] 기존 API 테스트 실행 확인 (pnpm test:run)
-- [ ] 각 단계 완료 후: 타입 체크 + API 테스트(pnpm test:run) + 커밋
+- [ ] 기존 API 테스트 실행 확인 (pnpm test:run app/api/notion)
+- [ ] 각 단계 완료 후: 타입 체크 + API 테스트(pnpm test:run app/api/notion) + 커밋
 - [ ] 단계별 수행: parsers → client → 각 도메인 모듈 순서 (의존성 역순)
+- [ ] import 경로 정책 결정 (기존 `lib/notion` 유지 vs `lib/notion/*`로 일괄 변경)
 - [ ] 분리 후 기존 lib/notion.ts 삭제 또는 re-export 파일로 전환
-- [ ] API 라우트 import 경로 수정 확인 (기존 `lib/notion` 경로 유지 or 신규 경로로 일괄 변경)
+- [ ] API 라우트 import 경로 수정 확인 (선택한 정책에 맞게 일괄 적용)
 
 ### 8.0.a 실행 순서 템플릿 (log.md 기록용)
 ```
@@ -140,6 +142,7 @@
 
 ## Verification Loop
 - After task: "Keep CI green" – run tests, commit. (TDD: 테스트 작성 → 실행 → 통과 확인 후에만 commit.)
+- Phase 8: 전체 테스트 대신 API 테스트만 실행 (pnpm test:run app/api/notion)
 - If error: Analyze, fix, update this file. (Codex로 commit 평가 후, 수정 사항 적용.)
 - 코드 작성 전 브랜치명을 확인해서 (feature, test, design) 구분해서 할 것  
     ex)feature/layout-resize
