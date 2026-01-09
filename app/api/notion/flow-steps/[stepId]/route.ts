@@ -4,11 +4,11 @@ import { createNotionClient, updateFlowStepDone } from '@/lib/notion';
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { stepId: string } }
+  { params }: { params: Promise<{ stepId: string }> }
 ) {
   try {
     const apiKey = process.env.NOTION_API_KEY;
-    const stepId = params.stepId;
+    const { stepId } = await params;
 
     if (!apiKey) {
       return NextResponse.json(

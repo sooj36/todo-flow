@@ -63,6 +63,7 @@ describe('GET /api/notion/instances', () => {
       },
     ];
 
+    vi.mocked(notionLib.createNotionClient).mockReturnValue({} as any);
     vi.mocked(notionLib.getTaskTemplates).mockResolvedValue(mockTemplates);
     vi.mocked(notionLib.getTaskInstances).mockResolvedValue(mockInstances);
 
@@ -108,6 +109,9 @@ describe('GET /api/notion/instances', () => {
       },
     ];
 
+    const mockClient = {} as any;
+    vi.mocked(notionLib.createNotionClient).mockReturnValue(mockClient);
+    vi.mocked(notionLib.getTaskTemplates).mockResolvedValue(mockTemplates);
     vi.mocked(notionLib.getTaskInstances).mockResolvedValue(mockInstances);
 
     const request = new NextRequest(
@@ -116,7 +120,7 @@ describe('GET /api/notion/instances', () => {
     const response = await GET(request);
 
     expect(vi.mocked(notionLib.getTaskInstances)).toHaveBeenCalledWith(
-      expect.anything(),
+      mockClient,
       'instance-db-id',
       '2026-01-07'
     );
@@ -125,7 +129,9 @@ describe('GET /api/notion/instances', () => {
   it('should return 500 on error', async () => {
     process.env.NOTION_API_KEY = 'test-api-key';
     process.env.NOTION_INSTANCE_DB_ID = 'instance-db-id';
+    process.env.NOTION_TEMPLATE_DB_ID = 'template-db-id';
 
+    vi.mocked(notionLib.createNotionClient).mockReturnValue({} as any);
     vi.mocked(notionLib.getTaskInstances).mockRejectedValue(new Error('Connection failed'));
 
     const request = new NextRequest('http://localhost:3000/api/notion/instances');
@@ -212,6 +218,7 @@ describe('POST /api/notion/instances', () => {
       completedAt: null,
     };
 
+    vi.mocked(notionLib.createNotionClient).mockReturnValue({} as any);
     vi.mocked(notionLib.getTaskTemplates).mockResolvedValue([mockTemplate]);
     vi.mocked(notionLib.createTaskInstance).mockResolvedValue(mockInstance);
 
@@ -234,6 +241,7 @@ describe('POST /api/notion/instances', () => {
     process.env.NOTION_INSTANCE_DB_ID = 'instance-db-id';
     process.env.NOTION_TEMPLATE_DB_ID = 'template-db-id';
 
+    vi.mocked(notionLib.createNotionClient).mockReturnValue({} as any);
     vi.mocked(notionLib.getTaskTemplates).mockResolvedValue([]);
 
     const request = new NextRequest('http://localhost:3000/api/notion/instances', {
@@ -255,6 +263,7 @@ describe('POST /api/notion/instances', () => {
     process.env.NOTION_INSTANCE_DB_ID = 'instance-db-id';
     process.env.NOTION_TEMPLATE_DB_ID = 'template-db-id';
 
+    vi.mocked(notionLib.createNotionClient).mockReturnValue({} as any);
     vi.mocked(notionLib.getTaskTemplates).mockRejectedValue(new Error('Connection failed'));
 
     const request = new NextRequest('http://localhost:3000/api/notion/instances', {

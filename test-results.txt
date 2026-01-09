@@ -1,0 +1,362 @@
+
+> todo_flow@0.1.0 test:run /Users/sooj/Desktop/업로드/todo_flow
+> vitest run
+
+
+[1m[46m RUN [49m[22m [36mv4.0.16 [39m[90m/Users/sooj/Desktop/업로드/todo_flow[39m
+
+[90mstderr[2m | app/api/notion/templates/route.test.ts[2m > [22m[2mGET /api/notion/templates[2m > [22m[2mshould return 500 on error
+[22m[39mError fetching templates: Error: Connection failed
+    at [90m/Users/sooj/Desktop/업로드/todo_flow/[39mapp/api/notion/templates/route.test.ts:76:61
+    at [90mfile:///Users/sooj/Desktop/%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.16/node_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///Users/sooj/Desktop/%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.16/node_modules/[4m@vitest/runner[24m/dist/index.js:915:26
+    at [90mfile:///Users/sooj/Desktop/%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.16/node_modules/[4m@vitest/runner[24m/dist/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///Users/sooj/Desktop/%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.16/node_modules/[4m@vitest/runner[24m/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///Users/sooj/Desktop/%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.16/node_modules/[4m@vitest/runner[24m/dist/index.js:1653:37
+    at Traces.$ [90m(file:///Users/sooj/Desktop/%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/[39mnode_modules/[4m.pnpm[24m/vitest@4.0.16_@types+node@20.19.27_jiti@2.6.1_jsdom@27.4.0_lightningcss@1.30.2/node_modules/[4mvitest[24m/dist/chunks/traces.U4xDYhzZ.js:115:27[90m)[39m
+    at trace [90m(file:///Users/sooj/Desktop/%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/[39mnode_modules/[4m.pnpm[24m/vitest@4.0.16_@types+node@20.19.27_jiti@2.6.1_jsdom@27.4.0_lightningcss@1.30.2/node_modules/[4mvitest[24m/dist/chunks/test.B8ej_ZHS.js:239:21[90m)[39m
+    at runTest [90m(file:///Users/sooj/Desktop/%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.16/node_modules/[4m@vitest/runner[24m/dist/index.js:1653:12[90m)[39m
+
+ [32m✓[39m app/api/notion/templates/route.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [31m❯[39m app/api/notion/flow-steps/[stepId]/route.test.ts [2m([22m[2m3 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 13[2mms[22m[39m
+     [32m✓[39m should return 500 if NOTION_API_KEY is missing[32m 5[2mms[22m[39m
+     [32m✓[39m should return 400 for invalid payload[32m 1[2mms[22m[39m
+[31m     [31m×[31m should update flow step done[39m[32m 6[2mms[22m[39m
+[90mstderr[2m | app/api/notion/instances/route.test.ts[2m > [22m[2mGET /api/notion/instances[2m > [22m[2mshould return 500 on error
+[22m[39mError fetching instances: Error: Connection failed
+    at [90m/Users/sooj/Desktop/업로드/todo_flow/[39mapp/api/notion/instances/route.test.ts:129:61
+    at [90mfile:///Users/sooj/Desktop/%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.16/node_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///Users/sooj/Desktop/%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.16/node_modules/[4m@vitest/runner[24m/dist/index.js:915:26
+    at [90mfile:///Users/sooj/Desktop/%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.16/node_modules/[4m@vitest/runner[24m/dist/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///Users/sooj/Desktop/%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.16/node_modules/[4m@vitest/runner[24m/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///Users/sooj/Desktop/%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.16/node_modules/[4m@vitest/runner[24m/dist/index.js:1653:37
+    at Traces.$ [90m(file:///Users/sooj/Desktop/%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/[39mnode_modules/[4m.pnpm[24m/vitest@4.0.16_@types+node@20.19.27_jiti@2.6.1_jsdom@27.4.0_lightningcss@1.30.2/node_modules/[4mvitest[24m/dist/chunks/traces.U4xDYhzZ.js:115:27[90m)[39m
+    at trace [90m(file:///Users/sooj/Desktop/%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/[39mnode_modules/[4m.pnpm[24m/vitest@4.0.16_@types+node@20.19.27_jiti@2.6.1_jsdom@27.4.0_lightningcss@1.30.2/node_modules/[4mvitest[24m/dist/chunks/test.B8ej_ZHS.js:239:21[90m)[39m
+    at runTest [90m(file:///Users/sooj/Desktop/%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.16/node_modules/[4m@vitest/runner[24m/dist/index.js:1653:12[90m)[39m
+
+[90mstderr[2m | app/api/notion/flow-steps/route.test.ts[2m > [22m[2mGET /api/notion/flow-steps[2m > [22m[2mshould return 500 on error
+[22m[39mError fetching flow steps: Error: Connection failed
+    at [90m/Users/sooj/Desktop/업로드/todo_flow/[39mapp/api/notion/flow-steps/route.test.ts:97:57
+    at [90mfile:///Users/sooj/Desktop/%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.16/node_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///Users/sooj/Desktop/%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.16/node_modules/[4m@vitest/runner[24m/dist/index.js:915:26
+    at [90mfile:///Users/sooj/Desktop/%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.16/node_modules/[4m@vitest/runner[24m/dist/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///Users/sooj/Desktop/%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.16/node_modules/[4m@vitest/runner[24m/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///Users/sooj/Desktop/%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.16/node_modules/[4m@vitest/runner[24m/dist/index.js:1653:37
+    at Traces.$ [90m(file:///Users/sooj/Desktop/%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/[39mnode_modules/[4m.pnpm[24m/vitest@4.0.16_@types+node@20.19.27_jiti@2.6.1_jsdom@27.4.0_lightningcss@1.30.2/node_modules/[4mvitest[24m/dist/chunks/traces.U4xDYhzZ.js:115:27[90m)[39m
+    at trace [90m(file:///Users/sooj/Desktop/%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/[39mnode_modules/[4m.pnpm[24m/vitest@4.0.16_@types+node@20.19.27_jiti@2.6.1_jsdom@27.4.0_lightningcss@1.30.2/node_modules/[4mvitest[24m/dist/chunks/test.B8ej_ZHS.js:239:21[90m)[39m
+    at runTest [90m(file:///Users/sooj/Desktop/%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.16/node_modules/[4m@vitest/runner[24m/dist/index.js:1653:12[90m)[39m
+
+ [31m❯[39m app/api/notion/flow-steps/route.test.ts [2m([22m[2m4 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 19[2mms[22m[39m
+     [32m✓[39m should return 500 if environment variables are missing[32m 6[2mms[22m[39m
+     [32m✓[39m should return flow steps[32m 1[2mms[22m[39m
+[31m     [31m×[31m should filter steps by templateId[39m[32m 7[2mms[22m[39m
+     [32m✓[39m should return 500 on error[32m 3[2mms[22m[39m
+[90mstderr[2m | app/api/notion/instances/route.test.ts[2m > [22m[2mPOST /api/notion/instances[2m > [22m[2mshould return 500 on error
+[22m[39mError creating instance: Error: Connection failed
+    at [90m/Users/sooj/Desktop/업로드/todo_flow/[39mapp/api/notion/instances/route.test.ts:258:61
+    at [90mfile:///Users/sooj/Desktop/%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.16/node_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///Users/sooj/Desktop/%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.16/node_modules/[4m@vitest/runner[24m/dist/index.js:915:26
+    at [90mfile:///Users/sooj/Desktop/%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.16/node_modules/[4m@vitest/runner[24m/dist/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///Users/sooj/Desktop/%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.16/node_modules/[4m@vitest/runner[24m/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///Users/sooj/Desktop/%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.16/node_modules/[4m@vitest/runner[24m/dist/index.js:1653:37
+    at Traces.$ [90m(file:///Users/sooj/Desktop/%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/[39mnode_modules/[4m.pnpm[24m/vitest@4.0.16_@types+node@20.19.27_jiti@2.6.1_jsdom@27.4.0_lightningcss@1.30.2/node_modules/[4mvitest[24m/dist/chunks/traces.U4xDYhzZ.js:115:27[90m)[39m
+    at trace [90m(file:///Users/sooj/Desktop/%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/[39mnode_modules/[4m.pnpm[24m/vitest@4.0.16_@types+node@20.19.27_jiti@2.6.1_jsdom@27.4.0_lightningcss@1.30.2/node_modules/[4mvitest[24m/dist/chunks/test.B8ej_ZHS.js:239:21[90m)[39m
+    at runTest [90m(file:///Users/sooj/Desktop/%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.0.16/node_modules/[4m@vitest/runner[24m/dist/index.js:1653:12[90m)[39m
+
+ [31m❯[39m app/api/notion/instances/route.test.ts [2m([22m[2m9 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 21[2mms[22m[39m
+     [32m✓[39m should return 500 if environment variables are missing[32m 5[2mms[22m[39m
+     [32m✓[39m should return task instances[32m 1[2mms[22m[39m
+[31m     [31m×[31m should filter instances by date[39m[32m 6[2mms[22m[39m
+     [32m✓[39m should return 500 on error[32m 3[2mms[22m[39m
+     [32m✓[39m should return 500 if environment variables are missing[32m 1[2mms[22m[39m
+     [32m✓[39m should return 400 if required parameters are missing[32m 1[2mms[22m[39m
+     [32m✓[39m should create a task instance[32m 1[2mms[22m[39m
+     [32m✓[39m should return 404 if template not found[32m 1[2mms[22m[39m
+     [32m✓[39m should return 500 on error[32m 1[2mms[22m[39m
+ [32m✓[39m hooks/useTaskTemplates.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 115[2mms[22m[39m
+ [32m✓[39m components/calendar/NotionCalendar.test.tsx [2m([22m[2m1 test[22m[2m)[22m[32m 70[2mms[22m[39m
+ [32m✓[39m hooks/useTaskInstances.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 170[2mms[22m[39m
+ [32m✓[39m components/flow/__tests__/FlowBoard.flow-step-toggle.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 33[2mms[22m[39m
+
+<--- Last few GCs --->
+
+[16035:0x128008000]    41834 ms: Scavenge (during sweeping) 4060.8 (4075.3) -> 4055.4 (4077.1) MB, pooled: 0.0 MB, 4.14 / 0.00 ms (average mu = 0.278, current mu = 0.252) allocation failure; 
+[16035:0x128008000]    42765 ms: Mark-Compact (reduce) 4078.1 (4092.8) -> 4058.3 (4068.1) MB, pooled: 0.0 MB, 78.72 / 0.00 ms (+ 781.2 ms in 144 steps since start of marking, biggest step 66.8 ms, walltime since start of marking 908 ms) (average mu = 0.24
+FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory
+----- Native stack trace -----
+
+ 1: 0x106dc8d5c node::OOMErrorHandler(char const*, v8::OOMDetails const&) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+ 2: 0x106f7463c v8::Utils::ReportOOMFailure(v8::internal::Isolate*, char const*, v8::OOMDetails const&) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+ 3: 0x106f745f4 v8::internal::V8::FatalProcessOutOfMemory(v8::internal::Isolate*, char const*, v8::OOMDetails const&) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+ 4: 0x10712291c v8::internal::Heap::ShouldOptimizeForLoadTime() const [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+ 5: 0x107124f2c v8::internal::Heap::OldGenerationConsumedBytes() const [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+ 6: 0x107124dd4 v8::internal::Heap::RecomputeLimits(v8::internal::GarbageCollector, v8::base::TimeTicks) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+ 7: 0x1071327a8 v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags, v8::internal::PerformHeapLimitCheck)::$_1::operator()() const [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+ 8: 0x10713244c void heap::base::Stack::SetMarkerAndCallbackImpl<v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags, v8::internal::PerformHeapLimitCheck)::$_1>(heap::base::Stack*, void*, void const*) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+ 9: 0x10775624c PushAllRegistersAndIterateStack [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+10: 0x107120e18 v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags, v8::internal::PerformHeapLimitCheck) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+11: 0x1070af328 v8::internal::StackGuard::HandleInterrupts(v8::internal::StackGuard::InterruptLevel) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+12: 0x107410c14 v8::internal::Runtime_StackGuardWithGap(int, unsigned long*, v8::internal::Isolate*) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+13: 0x106be9474 Builtins_CEntry_Return1_ArgvOnStack_NoBuiltinExit [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+14: 0x149b0f378 
+15: 0x149b1c4fc 
+16: 0x149c7c544 
+17: 0x149b1be4c 
+18: 0x149b19a8c 
+19: 0x149ba66b0 
+20: 0x149ba06ec 
+21: 0x149b30c48 
+22: 0x106b495ec Builtins_InterpreterEntryTrampoline [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+23: 0x106b495ec Builtins_InterpreterEntryTrampoline [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+24: 0x106b495ec Builtins_InterpreterEntryTrampoline [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+25: 0x106b495ec Builtins_InterpreterEntryTrampoline [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+26: 0x106b495ec Builtins_InterpreterEntryTrampoline [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+27: 0x106b495ec Builtins_InterpreterEntryTrampoline [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+28: 0x106b495ec Builtins_InterpreterEntryTrampoline [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+29: 0x106b495ec Builtins_InterpreterEntryTrampoline [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+30: 0x106c5c6b0 Builtins_PromiseConstructor [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+31: 0x106b49f90 Builtins_InterpreterPushArgsThenFastConstructFunction [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+32: 0x106cd9020 Builtins_ConstructHandler [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+33: 0x106b495ec Builtins_InterpreterEntryTrampoline [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+34: 0x106b495ec Builtins_InterpreterEntryTrampoline [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+35: 0x14994320c 
+36: 0x106b495ec Builtins_InterpreterEntryTrampoline [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+37: 0x106b495ec Builtins_InterpreterEntryTrampoline [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+38: 0x106b874c4 Builtins_AsyncFunctionAwaitResolveClosure [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+39: 0x106c5e058 Builtins_PromiseFulfillReactionJob [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+40: 0x106b76920 Builtins_RunMicrotasks [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+41: 0x106b46850 Builtins_JSRunMicrotasksEntry [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+42: 0x10708ae18 v8::internal::(anonymous namespace)::Invoke(v8::internal::Isolate*, v8::internal::(anonymous namespace)::InvokeParams const&) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+43: 0x10708b4c8 v8::internal::(anonymous namespace)::InvokeWithTryCatch(v8::internal::Isolate*, v8::internal::(anonymous namespace)::InvokeParams const&) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+44: 0x10708b5b8 v8::internal::Execution::TryRunMicrotasks(v8::internal::Isolate*, v8::internal::MicrotaskQueue*) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+45: 0x1070ad7c8 v8::internal::MicrotaskQueue::RunMicrotasks(v8::internal::Isolate*) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+46: 0x1070ad5e4 v8::internal::MicrotaskQueue::PerformCheckpointInternal(v8::Isolate*) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+47: 0x106b4b298 Builtins_CallApiCallbackGeneric [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+48: 0x149933d34 
+49: 0x106b4696c Builtins_JSEntryTrampoline [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+50: 0x106b46610 Builtins_JSEntry [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+51: 0x10708ae48 v8::internal::(anonymous namespace)::Invoke(v8::internal::Isolate*, v8::internal::(anonymous namespace)::InvokeParams const&) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+52: 0x10708a82c v8::internal::Execution::Call(v8::internal::Isolate*, v8::internal::DirectHandle<v8::internal::Object>, v8::internal::DirectHandle<v8::internal::Object>, v8::base::Vector<v8::internal::DirectHandle<v8::internal::Object> const>) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+53: 0x107c94b9c v8::Function::Call(v8::Isolate*, v8::Local<v8::Context>, v8::Local<v8::Value>, int, v8::Local<v8::Value>*) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+54: 0x106d20c30 node::InternalCallbackScope::Close() [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+55: 0x106d20eb4 node::InternalMakeCallback(node::Environment*, v8::Local<v8::Object>, v8::Local<v8::Object>, v8::Local<v8::Function>, int, v8::Local<v8::Value>*, node::async_context, v8::Local<v8::Value>) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+56: 0x106d2cd70 node::AsyncWrap::MakeCallback(v8::Local<v8::Function>, int, v8::Local<v8::Value>*) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+57: 0x106e7e7e4 node::StreamBase::CallJSOnreadMethod(long, v8::Local<v8::ArrayBuffer>, unsigned long, node::StreamBase::StreamBaseJSChecks) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+58: 0x106e7fb40 node::EmitToJSStreamListener::OnStreamRead(long, uv_buf_t const&) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+59: 0x106e82268 node::LibuvStreamWrap::OnUvRead(long, uv_buf_t const*) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+60: 0x106e8266c node::LibuvStreamWrap::ReadStart()::$_1::__invoke(uv_stream_s*, long, uv_buf_t const*) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+61: 0x102cbb668 uv__stream_io [/opt/homebrew/Cellar/libuv/1.51.0/lib/libuv.1.0.0.dylib]
+62: 0x102cc0e28 uv__io_poll [/opt/homebrew/Cellar/libuv/1.51.0/lib/libuv.1.0.0.dylib]
+63: 0x102cb2a00 uv_run [/opt/homebrew/Cellar/libuv/1.51.0/lib/libuv.1.0.0.dylib]
+64: 0x106d215c8 node::SpinEventLoopInternal(node::Environment*) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+65: 0x106df3e60 node::NodeMainInstance::Run(node::ExitCode*, node::Environment*) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+66: 0x106df3b94 node::NodeMainInstance::Run() [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+67: 0x106da1f30 node::Start(int, char**) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+68: 0x188720274 start [/usr/lib/dyld]
+
+<--- Last few GCs --->
+
+[16036:0x138008000]   330533 ms: Scavenge (during sweeping) 4035.2 (4112.5) -> 4020.3 (4113.0) MB, pooled: 0.0 MB, 4.00 / 0.00 ms (average mu = 0.395, current mu = 0.415) allocation failure; 
+[16036:0x138008000]   331505 ms: Mark-Compact 4035.8 (4113.0) -> 4007.1 (4113.0) MB, pooled: 0.0 MB, 951.11 / 0.00 ms (average mu = 0.391, current mu = 0.387) allocation failure; scavenge might not succeed
+
+FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory
+----- Native stack trace -----
+
+ 1: 0x1086e8d5c node::OOMErrorHandler(char const*, v8::OOMDetails const&) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+ 2: 0x10889463c v8::Utils::ReportOOMFailure(v8::internal::Isolate*, char const*, v8::OOMDetails const&) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+ 3: 0x1088945f4 v8::internal::V8::FatalProcessOutOfMemory(v8::internal::Isolate*, char const*, v8::OOMDetails const&) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+ 4: 0x108a4291c v8::internal::Heap::ShouldOptimizeForLoadTime() const [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+ 5: 0x108a44f2c v8::internal::Heap::OldGenerationConsumedBytes() const [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+ 6: 0x108a44dd4 v8::internal::Heap::RecomputeLimits(v8::internal::GarbageCollector, v8::base::TimeTicks) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+ 7: 0x108a527a8 v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags, v8::internal::PerformHeapLimitCheck)::$_1::operator()() const [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+ 8: 0x108a5244c void heap::base::Stack::SetMarkerAndCallbackImpl<v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags, v8::internal::PerformHeapLimitCheck)::$_1>(heap::base::Stack*, void*, void const*) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+ 9: 0x10907624c PushAllRegistersAndIterateStack [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+10: 0x108a40e18 v8::internal::Heap::CollectGarbage(v8::internal::AllocationSpace, v8::internal::GarbageCollectionReason, v8::GCCallbackFlags, v8::internal::PerformHeapLimitCheck) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+11: 0x108a393b4 std::__1::invoke_result<v8::internal::HeapAllocator::AllocateRawWithRetryOrFailSlowPath(int, v8::internal::AllocationType, v8::internal::AllocationOrigin, v8::internal::AllocationAlignment, v8::internal::AllocationHint)::$_0&>::type v8::internal::HeapAllocator::CollectGarbageAndRetryAllocation<v8::internal::HeapAllocator::AllocateRawWithRetryOrFailSlowPath(int, v8::internal::AllocationType, v8::internal::AllocationOrigin, v8::internal::AllocationAlignment, v8::internal::AllocationHint)::$_0&>(v8::internal::HeapAllocator::AllocateRawWithRetryOrFailSlowPath(int, v8::internal::AllocationType, v8::internal::AllocationOrigin, v8::internal::AllocationAlignment, v8::internal::AllocationHint)::$_0&, v8::internal::AllocationType) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+12: 0x108a38220 v8::internal::HeapAllocator::AllocateRawWithRetryOrFailSlowPath(int, v8::internal::AllocationType, v8::internal::AllocationOrigin, v8::internal::AllocationAlignment, v8::internal::AllocationHint) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+13: 0x108a2059c v8::internal::Factory::NewFillerObject(int, v8::internal::AllocationAlignment, v8::internal::AllocationType, v8::internal::AllocationOrigin) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+14: 0x108d30dd0 v8::internal::Runtime_AllocateInYoungGeneration(int, unsigned long*, v8::internal::Isolate*) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+15: 0x108509474 Builtins_CEntry_Return1_ArgvOnStack_NoBuiltinExit [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+16: 0x108466008 Builtins_FastNewObject [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+17: 0x1084658f4 Builtins_JSConstructStubGeneric [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+18: 0x1483eb82c 
+19: 0x1483c7318 
+20: 0x1483b57ac 
+21: 0x148471a08 
+22: 0x1084695ec Builtins_InterpreterEntryTrampoline [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+23: 0x1084695ec Builtins_InterpreterEntryTrampoline [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+24: 0x1084695ec Builtins_InterpreterEntryTrampoline [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+25: 0x1084695ec Builtins_InterpreterEntryTrampoline [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+26: 0x1084695ec Builtins_InterpreterEntryTrampoline [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+27: 0x1084695ec Builtins_InterpreterEntryTrampoline [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+28: 0x1084695ec Builtins_InterpreterEntryTrampoline [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+29: 0x1084695ec Builtins_InterpreterEntryTrampoline [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+30: 0x10857c6b0 Builtins_PromiseConstructor [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+31: 0x108469f90 Builtins_InterpreterPushArgsThenFastConstructFunction [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+32: 0x1085f9020 Builtins_ConstructHandler [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+33: 0x1084695ec Builtins_InterpreterEntryTrampoline [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+34: 0x1084695ec Builtins_InterpreterEntryTrampoline [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+35: 0x14800ea2c 
+36: 0x1084695ec Builtins_InterpreterEntryTrampoline [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+37: 0x1084695ec Builtins_InterpreterEntryTrampoline [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+38: 0x1084a74c4 Builtins_AsyncFunctionAwaitResolveClosure [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+39: 0x10857e058 Builtins_PromiseFulfillReactionJob [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+40: 0x108496920 Builtins_RunMicrotasks [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+41: 0x108466850 Builtins_JSRunMicrotasksEntry [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+42: 0x1089aae18 v8::internal::(anonymous namespace)::Invoke(v8::internal::Isolate*, v8::internal::(anonymous namespace)::InvokeParams const&) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+43: 0x1089ab4c8 v8::internal::(anonymous namespace)::InvokeWithTryCatch(v8::internal::Isolate*, v8::internal::(anonymous namespace)::InvokeParams const&) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+44: 0x1089ab5b8 v8::internal::Execution::TryRunMicrotasks(v8::internal::Isolate*, v8::internal::MicrotaskQueue*) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+45: 0x1089cd7c8 v8::internal::MicrotaskQueue::RunMicrotasks(v8::internal::Isolate*) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+46: 0x1089cd5e4 v8::internal::MicrotaskQueue::PerformCheckpointInternal(v8::Isolate*) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+47: 0x10846b298 Builtins_CallApiCallbackGeneric [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+48: 0x148173ef4 
+49: 0x10846696c Builtins_JSEntryTrampoline [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+50: 0x108466610 Builtins_JSEntry [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+51: 0x1089aae48 v8::internal::(anonymous namespace)::Invoke(v8::internal::Isolate*, v8::internal::(anonymous namespace)::InvokeParams const&) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+52: 0x1089aa82c v8::internal::Execution::Call(v8::internal::Isolate*, v8::internal::DirectHandle<v8::internal::Object>, v8::internal::DirectHandle<v8::internal::Object>, v8::base::Vector<v8::internal::DirectHandle<v8::internal::Object> const>) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+53: 0x1095b4b9c v8::Function::Call(v8::Isolate*, v8::Local<v8::Context>, v8::Local<v8::Value>, int, v8::Local<v8::Value>*) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+54: 0x108640c30 node::InternalCallbackScope::Close() [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+55: 0x108640eb4 node::InternalMakeCallback(node::Environment*, v8::Local<v8::Object>, v8::Local<v8::Object>, v8::Local<v8::Function>, int, v8::Local<v8::Value>*, node::async_context, v8::Local<v8::Value>) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+56: 0x10864cd70 node::AsyncWrap::MakeCallback(v8::Local<v8::Function>, int, v8::Local<v8::Value>*) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+57: 0x10879e7e4 node::StreamBase::CallJSOnreadMethod(long, v8::Local<v8::ArrayBuffer>, unsigned long, node::StreamBase::StreamBaseJSChecks) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+58: 0x10879fb40 node::EmitToJSStreamListener::OnStreamRead(long, uv_buf_t const&) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+59: 0x1087a2268 node::LibuvStreamWrap::OnUvRead(long, uv_buf_t const*) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+60: 0x1087a266c node::LibuvStreamWrap::ReadStart()::$_1::__invoke(uv_stream_s*, long, uv_buf_t const*) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+61: 0x104703668 uv__stream_io [/opt/homebrew/Cellar/libuv/1.51.0/lib/libuv.1.0.0.dylib]
+62: 0x104708e28 uv__io_poll [/opt/homebrew/Cellar/libuv/1.51.0/lib/libuv.1.0.0.dylib]
+63: 0x1046faa00 uv_run [/opt/homebrew/Cellar/libuv/1.51.0/lib/libuv.1.0.0.dylib]
+64: 0x1086415c8 node::SpinEventLoopInternal(node::Environment*) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+65: 0x108713e60 node::NodeMainInstance::Run(node::ExitCode*, node::Environment*) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+66: 0x108713b94 node::NodeMainInstance::Run() [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+67: 0x1086c1f30 node::Start(int, char**) [/opt/homebrew/Cellar/node/25.2.1/lib/libnode.141.dylib]
+68: 0x188720274 start [/usr/lib/dyld]
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 3 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m app/api/notion/flow-steps/route.test.ts[2m > [22mGET /api/notion/flow-steps[2m > [22mshould filter steps by templateId
+[31m[1mAssertionError[22m: expected "vi.fn()" to be called with arguments: [ Array(3) ][90m
+
+Received: 
+
+[1m  1st vi.fn() call:
+
+[22m[2m  [[22m
+[32m-   Anything,[90m
+[31m+   undefined,[90m
+[2m    "step-db-id",[22m
+[2m    "template-1",[22m
+[2m  ][22m
+[31m[90m
+
+Number of calls: [1m1[22m
+[31m[39m
+[36m [2m❯[22m app/api/notion/flow-steps/route.test.ts:[2m86:47[22m[39m
+    [90m 84| [39m    [34mexpect[39m(response[33m.[39mstatus)[33m.[39m[34mtoBe[39m([34m200[39m)[33m;[39m
+    [90m 85| [39m    [34mexpect[39m(data[33m.[39msteps)[33m.[39m[34mtoHaveLength[39m([34m1[39m)[33m;[39m
+    [90m 86| [39m    [34mexpect[39m(vi[33m.[39m[34mmocked[39m(notionLib[33m.[39mgetFlowSteps))[33m.[39m[34mtoHaveBeenCalledWith[39m(
+    [90m   | [39m                                              [31m^[39m
+    [90m 87| [39m      expect[33m.[39m[34manything[39m()[33m,[39m
+    [90m 88| [39m      [32m'step-db-id'[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m app/api/notion/instances/route.test.ts[2m > [22mGET /api/notion/instances[2m > [22mshould filter instances by date
+[31m[1mAssertionError[22m: expected "vi.fn()" to be called with arguments: [ Anything, 'instance-db-id', …(1) ][90m
+
+Received: 
+
+[1m  1st vi.fn() call:
+
+[22m[2m  [[22m
+[32m-   Anything,[90m
+[31m+   undefined,[90m
+[2m    "instance-db-id",[22m
+[2m    "2026-01-07",[22m
+[2m  ][22m
+[31m[90m
+
+Number of calls: [1m1[22m
+[31m[39m
+[36m [2m❯[22m app/api/notion/instances/route.test.ts:[2m118:51[22m[39m
+    [90m116| [39m    [35mconst[39m response [33m=[39m [35mawait[39m [33mGET[39m(request)[33m;[39m
+    [90m117| [39m
+    [90m118| [39m    [34mexpect[39m(vi[33m.[39m[34mmocked[39m(notionLib[33m.[39mgetTaskInstances))[33m.[39m[34mtoHaveBeenCalledWith[39m(
+    [90m   | [39m                                                  [31m^[39m
+    [90m119| [39m      expect[33m.[39m[34manything[39m()[33m,[39m
+    [90m120| [39m      [32m'instance-db-id'[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m app/api/notion/flow-steps/[stepId]/route.test.ts[2m > [22mPATCH /api/notion/flow-steps/[stepId][2m > [22mshould update flow step done
+[31m[1mAssertionError[22m: expected "vi.fn()" to be called with arguments: [ Anything, 'step-1', true ][90m
+
+Received: 
+
+[1m  1st vi.fn() call:
+
+[22m[2m  [[22m
+[32m-   Anything,[90m
+[31m+   undefined,[90m
+[2m    "step-1",[22m
+[2m    true,[22m
+[2m  ][22m
+[31m[90m
+
+Number of calls: [1m1[22m
+[31m[39m
+[36m [2m❯[22m app/api/notion/flow-steps/[stepId]/route.test.ts:[2m66:53[22m[39m
+    [90m 64| [39m    [34mexpect[39m(response[33m.[39mstatus)[33m.[39m[34mtoBe[39m([34m200[39m)[33m;[39m
+    [90m 65| [39m    [34mexpect[39m(data[33m.[39msuccess)[33m.[39m[34mtoBe[39m([35mtrue[39m)[33m;[39m
+    [90m 66| [39m    expect(vi.mocked(notionLib.updateFlowStepDone)).toHaveBeenCalledWi…
+    [90m   | [39m                                                    [31m^[39m
+    [90m 67| [39m      expect[33m.[39m[34manything[39m()[33m,[39m
+    [90m 68| [39m      [32m'step-1'[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Unhandled Errors [49m[22m[31m⎯⎯⎯⎯⎯⎯[39m
+[31m[1m
+Vitest caught 2 unhandled errors during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Unhandled Error [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+[31m[1mError[22m: [vitest-pool]: Worker forks emitted error.[39m
+[90m [2m❯[22m EventEmitter.<anonymous> ../../%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/node_modules/.pnpm/vitest@4.0.16_@types+node@20.19.27_jiti@2.6.1_jsdom@27.4.0_lightningcss@1.30.2/node_modules/vitest/dist/chunks/cli-api.BKg19Fvw.js:[2m8015:22[22m[39m
+[90m [2m❯[22m EventEmitter.emit node:events:[2m508:28[22m[39m
+[90m [2m❯[22m ChildProcess.emitUnexpectedExit ../../%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/node_modules/.pnpm/vitest@4.0.16_@types+node@20.19.27_jiti@2.6.1_jsdom@27.4.0_lightningcss@1.30.2/node_modules/vitest/dist/chunks/cli-api.BKg19Fvw.js:[2m7588:22[22m[39m
+[90m [2m❯[22m ChildProcess.emit node:events:[2m508:28[22m[39m
+[90m [2m❯[22m Process.ChildProcess._handle.onexit node:internal/child_process:[2m293:12[22m[39m
+
+[31m[1mCaused by: Error[22m: Worker exited unexpectedly[39m
+[90m [2m❯[22m ChildProcess.emitUnexpectedExit ../../%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/node_modules/.pnpm/vitest@4.0.16_@types+node@20.19.27_jiti@2.6.1_jsdom@27.4.0_lightningcss@1.30.2/node_modules/vitest/dist/chunks/cli-api.BKg19Fvw.js:[2m7587:33[22m[39m
+[90m [2m❯[22m ChildProcess.emit node:events:[2m508:28[22m[39m
+[90m [2m❯[22m Process.ChildProcess._handle.onexit node:internal/child_process:[2m293:12[22m[39m
+
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Unhandled Error [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+[31m[1mError[22m: [vitest-pool]: Worker forks emitted error.[39m
+[90m [2m❯[22m EventEmitter.<anonymous> ../../%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/node_modules/.pnpm/vitest@4.0.16_@types+node@20.19.27_jiti@2.6.1_jsdom@27.4.0_lightningcss@1.30.2/node_modules/vitest/dist/chunks/cli-api.BKg19Fvw.js:[2m8015:22[22m[39m
+[90m [2m❯[22m EventEmitter.emit node:events:[2m508:28[22m[39m
+[90m [2m❯[22m ChildProcess.emitUnexpectedExit ../../%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/node_modules/.pnpm/vitest@4.0.16_@types+node@20.19.27_jiti@2.6.1_jsdom@27.4.0_lightningcss@1.30.2/node_modules/vitest/dist/chunks/cli-api.BKg19Fvw.js:[2m7588:22[22m[39m
+[90m [2m❯[22m ChildProcess.emit node:events:[2m508:28[22m[39m
+[90m [2m❯[22m Process.ChildProcess._handle.onexit node:internal/child_process:[2m293:12[22m[39m
+
+[31m[1mCaused by: Error[22m: Worker exited unexpectedly[39m
+[90m [2m❯[22m ChildProcess.emitUnexpectedExit ../../%E1%84%8B%E1%85%A5%E1%86%B8%E1%84%85%E1%85%A9%E1%84%83%E1%85%B3/todo_flow/node_modules/.pnpm/vitest@4.0.16_@types+node@20.19.27_jiti@2.6.1_jsdom@27.4.0_lightningcss@1.30.2/node_modules/vitest/dist/chunks/cli-api.BKg19Fvw.js:[2m7587:33[22m[39m
+[90m [2m❯[22m ChildProcess.emit node:events:[2m508:28[22m[39m
+[90m [2m❯[22m Process.ChildProcess._handle.onexit node:internal/child_process:[2m293:12[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[39m
+
+
+[2m Test Files [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m5 passed[39m[22m[90m (10)[39m
+[2m      Tests [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m25 passed[39m[22m[90m (34)[39m
+[2m     Errors [22m [1m[31m2 errors[39m[22m
+[2m   Start at [22m 11:40:30
+[2m   Duration [22m 331.69s[2m (transform 910ms, setup 1.58s, import 2.46s, tests 451ms, environment 9.74s)[22m
+
+ ELIFECYCLE  Command failed with exit code 1.

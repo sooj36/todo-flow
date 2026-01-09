@@ -26,7 +26,7 @@ describe('PATCH /api/notion/flow-steps/[stepId]', () => {
       body: JSON.stringify({ done: true }),
     });
 
-    const response = await PATCH(request, { params: { stepId: 'step-1' } });
+    const response = await PATCH(request, { params: Promise.resolve({ stepId: 'step-1' }) });
     const data = await response.json();
 
     expect(response.status).toBe(500);
@@ -41,7 +41,7 @@ describe('PATCH /api/notion/flow-steps/[stepId]', () => {
       body: JSON.stringify({ done: 'yes' }),
     });
 
-    const response = await PATCH(request, { params: { stepId: 'step-1' } });
+    const response = await PATCH(request, { params: Promise.resolve({ stepId: 'step-1' }) });
     const data = await response.json();
 
     expect(response.status).toBe(400);
@@ -51,6 +51,8 @@ describe('PATCH /api/notion/flow-steps/[stepId]', () => {
   it('should update flow step done', async () => {
     process.env.NOTION_API_KEY = 'test-api-key';
 
+    const mockClient = {} as any;
+    vi.mocked(notionLib.createNotionClient).mockReturnValue(mockClient);
     vi.mocked(notionLib.updateFlowStepDone).mockResolvedValue();
 
     const request = new NextRequest('http://localhost:3000/api/notion/flow-steps/step-1', {
@@ -58,13 +60,13 @@ describe('PATCH /api/notion/flow-steps/[stepId]', () => {
       body: JSON.stringify({ done: true }),
     });
 
-    const response = await PATCH(request, { params: { stepId: 'step-1' } });
+    const response = await PATCH(request, { params: Promise.resolve({ stepId: 'step-1' }) });
     const data = await response.json();
 
     expect(response.status).toBe(200);
     expect(data.success).toBe(true);
     expect(vi.mocked(notionLib.updateFlowStepDone)).toHaveBeenCalledWith(
-      expect.anything(),
+      mockClient,
       'step-1',
       true
     );
