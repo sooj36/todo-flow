@@ -68,29 +68,33 @@
 - 목표: Calendar grid에서 선택된 날짜(selectedDate) 하이라이트 (현재는 항상 오늘만 표시)
 - 파일: components/calendar/NotionCalendar.tsx
 - 원칙: isToday + isSelected 두 개의 시각적 표시 (선택된 날짜 강조, 오늘 표시)
+- 중요: isSelected는 연/월/일 전체 비교 필요 (day만 비교하면 다른 월도 하이라이트됨)
 
 ### 11.1 Update Calendar Day Calculation
-- [ ] `isSelected` 계산 추가 (day === selectedDate.getDate())
+- [ ] `isSelected` 계산: cellDate.toDateString() === selectedDate.toDateString()
 - [ ] CalendarDay에 `isSelected` prop 전달
 - [ ] Phase 01/02 섹션 모두 적용
+- [ ] 버그 방지: day만 비교하지 말고 전체 날짜 비교
 - [ ] 커밋: feat: pass isSelected prop to CalendarDay
 
 ### 11.2 Update CalendarDay Styling
 - [ ] `isSelected` props interface 추가
 - [ ] Selected 스타일: bold border (border-4 border-black)
 - [ ] Selected 배경: subtle (bg-blue-50)
-- [ ] Today 표시: dot indicator (green circle) - if not selected
+- [ ] Today 표시: green dot - **only if not selected**
+- [ ] Overlap 처리: selected = today일 때 → selected 스타일만 사용
 - [ ] 커밋: feat: highlight selected date in calendar grid
 
 ### 11.3 Testing & Verification
-- [ ] Manual: 다른 날짜로 이동 → 해당 날짜 하이라이트
+- [ ] Manual: 다른 날짜로 이동 → 해당 날짜만 하이라이트
+- [ ] Manual: 다른 월로 이동 → 다른 월의 같은 일자는 하이라이트 안됨
 - [ ] Manual: selected = today 케이스 확인
 - [ ] 테스트 업데이트 (isSelected 검증)
 - [ ] pnpm test 통과
 - [ ] 커밋: test: verify selected date highlighting
 
 ### 11.4 Final Verification
-- [ ] 월 경계 테스트
+- [ ] 월 경계 테스트 (1월 15일 선택 → 2월 15일은 하이라이트 안됨)
 - [ ] 접근성 확인 (contrast, focus)
 - [ ] Console 에러 없음
 - [ ] 커밋: docs: mark Phase 11 complete
