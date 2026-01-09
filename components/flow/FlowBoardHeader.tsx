@@ -79,15 +79,7 @@ export const FlowBoardHeader: React.FC<FlowBoardHeaderProps> = ({
           {syncError && syncErrorMessage && `Sync failed: ${syncErrorMessage}`}
         </div>
 
-        <div
-          className={`flex items-center gap-2 px-4 py-2 rounded-md text-xs font-bold ${isConnected
-            ? "bg-green-100 text-green-700"
-            : "bg-gray-200 text-gray-600"
-            }`}
-        >
-          <Play size={14} fill="currentColor" />
-          {isConnected ? "notion connect success" : "Configure .env.local"}
-        </div>
+
         <div className="flex items-center gap-2">
           <button
             onClick={handleSync}
