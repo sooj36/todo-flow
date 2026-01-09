@@ -10,6 +10,7 @@ export default function Home() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [splitRatio, setSplitRatio] = useState(0.5);
   const [isDragging, setIsDragging] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date()); // Shared date state
   const mainRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -62,14 +63,17 @@ export default function Home() {
           className="h-full border-r border-[#ececeb] flex flex-col bg-white z-10 shadow-[4px_0_24px_rgba(0,0,0,0.02)] min-w-0 flex-none"
           style={{ width: `${splitRatio * 100}%` }}
         >
-          <NotionCalendar />
+          <NotionCalendar
+            selectedDate={selectedDate}
+            onDateChange={setSelectedDate}
+          />
         </div>
 
         <div
           className="h-full flex flex-col bg-[#f9fafb] min-w-0 flex-none"
           style={{ width: `${(1 - splitRatio) * 100}%` }}
         >
-          <FlowBoard />
+          <FlowBoard selectedDate={selectedDate} />
         </div>
 
         <div
@@ -80,9 +84,8 @@ export default function Home() {
           aria-valuenow={Math.round(splitRatio * 100)}
           title="Drag to resize"
           onPointerDown={() => setIsDragging(true)}
-          className={`absolute top-0 bottom-0 w-3 cursor-col-resize z-20 group ${
-            isDragging ? "cursor-col-resize" : ""
-          }`}
+          className={`absolute top-0 bottom-0 w-3 cursor-col-resize z-20 group ${isDragging ? "cursor-col-resize" : ""
+            }`}
           style={{ left: `calc(${splitRatio * 100}% - 6px)` }}
         >
           <div className="h-full w-px bg-[#ececeb] mx-auto transition-colors group-hover:bg-[#cfd2d7] group-hover:w-0.5" />
