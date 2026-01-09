@@ -4,7 +4,6 @@
 import { Client } from '@notionhq/client';
 import type { TaskInstance, TaskTemplate, TaskStatus } from '@/types';
 import {
-    extractTitle,
     extractRelation,
     extractDate,
     extractSelect,
