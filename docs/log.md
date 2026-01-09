@@ -45,7 +45,6 @@
 - Low: 숫자 기반 검증에 주석 추가 - 통합 테스트에서는 전체 렌더링 검증이 목적임을 명확화
 - 문서 용어 통일: "E2E" → "통합 테스트 (RTL 기반)"으로 수정
 - 참고: MVP 단계에서는 Playwright/Cypress 같은 진짜 E2E 도구 사용하지 않음
-- 커밋 ID: a55afd8
 
 ## 코드 리뷰 후속: 불필요한 import 제거 (2026-01-07)
 - Low: within import 제거 - 실제로 사용하지 않는 import 정리
@@ -101,7 +100,6 @@
 - 버튼에 aria-label 추가 - 에러 메시지를 스크린 리더에 전달 – 2026-01-08
 - FlowBoard/NotionCalendar 모두 적용 – 2026-01-08
 - FlowBoard.test.tsx: 3개 테스트 통과 – 2026-01-08
-- 커밋 ID: 62608fb – 2026-01-08
 
 ## 성능 최적화: stepUpdatingRef 직접 mutation (2026-01-08)
 - Low: stepUpdatingRef 업데이트 시 객체 스프레드 제거 → 직접 mutation으로 변경 – 2026-01-08
@@ -110,6 +108,7 @@
 - 변경: `stepUpdatingRef.current = { ...stepUpdatingRef.current, [stepId]: true }` → `stepUpdatingRef.current[stepId] = true` – 2026-01-08
 - components/flow/FlowBoard.tsx line 135, 164 수정 – 2026-01-08
 - FlowBoard.test.tsx: 3개 테스트 통과 – 2026-01-08
+
 ## Phase 7 작업 기록: FlowBoard 리팩토링 (2026-01-09)
 - 목표: FlowBoard.tsx 602줄 → 200줄 이하로 분리
 - 원칙: 각 단계마다 기존 테스트 통과 확인 → 커밋
@@ -184,3 +183,28 @@
 - pnpm lint 통과 ✓ – 2026-01-09
 - pnpm build 통과 ✓ – 2026-01-09
 - 커밋 ID: 61a34d8 – 2026-01-09
+
+## Phase 7+ 작업 기록: Test Debt Resolution (2026-01-09)
+- 목표: API 테스트 실패 해결
+- 우선순위: Medium (리팩토링 블로킹 아님)
+
+### 7+.2 API 테스트 로직 수정
+- app/api/notion/flow-steps/[stepId]/route.test.ts 수정 – 2026-01-09
+  - Next.js 15에서 params가 Promise로 변경됨
+  - route에서 params를 await 처리
+  - 테스트에서 Promise.resolve() 사용
+  - createNotionClient mock 추가
+- app/api/notion/flow-steps/route.test.ts 수정 – 2026-01-09
+  - createNotionClient mock 추가 (모든 테스트)
+- app/api/notion/instances/route.test.ts 수정 – 2026-01-09
+  - createNotionClient 및 getTaskTemplates mock 추가 (모든 테스트)
+- 결과: 16개 API 테스트 모두 통과 ✅ – 2026-01-09
+- 커밋 ID: 17bd16a – 2026-01-09
+
+## 문서 정리: Phase 7+ 보관 (2026-01-09)
+- Phase 7+ (Test Debt Resolution) 완료 처리 – 2026-01-09
+  - API 테스트 16개 모두 통과 ✅
+  - 통합 테스트는 메모리 문제로 보류 (Phase 7+.3)
+- docs/pre_prompt_plan.md에 Phase 7+ 추가 (보관용) – 2026-01-09
+- docs/prompt_plan.md에서 Phase 7+ 제거 (진행 중 태스크에서 제외) – 2026-01-09
+- 커밋 ID: 216b919 – 2026-01-09

@@ -49,6 +49,7 @@ describe('GET /api/notion/flow-steps', () => {
       },
     ];
 
+    vi.mocked(notionLib.createNotionClient).mockReturnValue({} as any);
     vi.mocked(notionLib.getFlowSteps).mockResolvedValue(mockSteps);
 
     const request = new NextRequest('http://localhost:3000/api/notion/flow-steps');
@@ -73,6 +74,8 @@ describe('GET /api/notion/flow-steps', () => {
       },
     ];
 
+    const mockClient = {} as any;
+    vi.mocked(notionLib.createNotionClient).mockReturnValue(mockClient);
     vi.mocked(notionLib.getFlowSteps).mockResolvedValue(mockSteps);
 
     const request = new NextRequest(
@@ -84,7 +87,7 @@ describe('GET /api/notion/flow-steps', () => {
     expect(response.status).toBe(200);
     expect(data.steps).toHaveLength(1);
     expect(vi.mocked(notionLib.getFlowSteps)).toHaveBeenCalledWith(
-      expect.anything(),
+      mockClient,
       'step-db-id',
       'template-1'
     );
@@ -94,6 +97,7 @@ describe('GET /api/notion/flow-steps', () => {
     process.env.NOTION_API_KEY = 'test-api-key';
     process.env.NOTION_STEP_DB_ID = 'step-db-id';
 
+    vi.mocked(notionLib.createNotionClient).mockReturnValue({} as any);
     vi.mocked(notionLib.getFlowSteps).mockRejectedValue(new Error('Connection failed'));
 
     const request = new NextRequest('http://localhost:3000/api/notion/flow-steps');
