@@ -173,13 +173,26 @@ export const NotionCalendar: React.FC = () => {
             )}
           </div>
           <div className="flex items-center bg-[#efefed] rounded-md p-1">
-            <button className="p-1 hover:bg-white hover:shadow-sm rounded transition-all">
+            <button
+              onClick={handlePreviousDay}
+              className="p-1 hover:bg-white hover:shadow-sm rounded transition-all"
+              aria-label="Previous day"
+            >
               <ChevronLeft size={16} />
             </button>
-            <button className="px-3 text-xs font-bold uppercase tracking-tight">
-              Today
+            <button
+              onClick={handleToday}
+              className="px-3 text-xs font-bold uppercase tracking-tight hover:bg-white rounded transition-all"
+            >
+              {selectedDate.toDateString() === now.toDateString()
+                ? 'Today'
+                : selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
             </button>
-            <button className="p-1 hover:bg-white hover:shadow-sm rounded transition-all">
+            <button
+              onClick={handleNextDay}
+              className="p-1 hover:bg-white hover:shadow-sm rounded transition-all"
+              aria-label="Next day"
+            >
               <ChevronRight size={16} />
             </button>
           </div>
