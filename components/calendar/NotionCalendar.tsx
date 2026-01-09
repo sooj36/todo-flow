@@ -221,6 +221,7 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
               const dayData = calendarData.get(date);
               const cellDate = new Date(year, month, day);
               const isToday = cellDate.toDateString() === now.toDateString();
+              const isSelected = cellDate.toDateString() === selectedDate.toDateString();
               return (
                 <CalendarDay
                   key={day}
@@ -228,6 +229,7 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
                   data={dayData}
                   loading={loading}
                   isToday={isToday}
+                  isSelected={isSelected}
                 />
               );
             })}
@@ -255,6 +257,7 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
               const dayData = calendarData.get(date);
               const cellDate = new Date(year, month, day);
               const isToday = cellDate.toDateString() === now.toDateString();
+              const isSelected = cellDate.toDateString() === selectedDate.toDateString();
               return (
                 <CalendarDay
                   key={day}
@@ -263,6 +266,7 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
                   isSecondPhase
                   loading={loading}
                   isToday={isToday}
+                  isSelected={isSelected}
                 />
               );
             })}
@@ -279,9 +283,10 @@ interface CalendarDayProps {
   data?: CalendarDayData;
   loading?: boolean;
   isToday?: boolean;
+  isSelected?: boolean;
 }
 
-const CalendarDay: React.FC<CalendarDayProps> = ({ day, data, loading, isToday }) => {
+const CalendarDay: React.FC<CalendarDayProps> = ({ day, data, loading, isToday, isSelected }) => {
   const completionRate = data && data.totalTasks > 0
     ? data.completedTasks / data.totalTasks
     : 0;
@@ -294,14 +299,18 @@ const CalendarDay: React.FC<CalendarDayProps> = ({ day, data, loading, isToday }
         ? "bg-blue-50 border-blue-200"
         : "bg-[#fbfbfa]";
 
-  const todayBorder = isToday ? "border-2 border-black" : "border border-[#ececeb]";
-  const todayBg = isToday ? "bg-green-200/80" : bgColor;
+  // Priority: isSelected > isToday
+  const borderClass = isSelected
+    ? "border-4 border-black"  // Selected: prominent
+    : (isToday ? "border-2 border-green-500" : "border border-[#ececeb]");  // Today: subtle
+
+  const selectedBg = isSelected ? "bg-blue-50" : bgColor;
 
   if (loading) {
     return (
       <div
         data-testid={`calendar-day-${day}`}
-        className={`group min-h-[100px] rounded-lg p-2 bg-[#fbfbfa] animate-pulse ${todayBorder}`}
+        className={`group min-h-[100px] rounded-lg p-2 bg-[#fbfbfa] animate-pulse ${borderClass}`}
       >
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs font-bold text-[#37352f]/40">{day}</span>
@@ -314,8 +323,12 @@ const CalendarDay: React.FC<CalendarDayProps> = ({ day, data, loading, isToday }
   return (
     <div
       data-testid={`calendar-day-${day}`}
-      className={`group min-h-[100px] rounded-lg p-2 transition-all hover:shadow-md cursor-pointer ${todayBg} ${todayBorder} hover:bg-white`}
+      className={`group relative min-h-[100px] rounded-lg p-2 transition-all hover:shadow-md cursor-pointer ${selectedBg} ${borderClass} hover:bg-white`}
     >
+      {/* Today dot: only show if today but NOT selected */}
+      {isToday && !isSelected && (
+        <div className="absolute top-1 right-1 w-2 h-2 bg-green-500 rounded-full" />
+      )}
       <div className="flex items-center justify-between mb-2">
         <span className="text-xs font-bold text-[#37352f]/40">{day}</span>
         <button className="opacity-0 group-hover:opacity-100 p-0.5 hover:bg-[#efefed] rounded transition-all">
