@@ -24,9 +24,8 @@
 
 ### 10.1 Make NotionCalendar Controllable
 - [ ] props interface 추가 (selectedDate, onDateChange)
-- [ ] controlled/uncontrolled mode 지원
 - [ ] navigation handlers에서 onDateChange 호출
-- [ ] standalone 사용 시 backward compatibility 확인
+- [ ] 기존 내부 state 제거 (controlled only)
 - [ ] 커밋: feat: make NotionCalendar date controllable
 
 ### 10.2 Make FlowBoard Date-Aware
@@ -37,7 +36,7 @@
 - [ ] 커밋: feat: make FlowBoard date-aware
 
 ### 10.3 Sync via page.tsx
-- [ ] page.tsx를 client component로 변환 ('use client')
+- [ ] page.tsx 상태 확인 (이미 client component인지 확인)
 - [ ] selectedDate state 추가
 - [ ] NotionCalendar에 props 전달
 - [ ] FlowBoard에 props 전달
