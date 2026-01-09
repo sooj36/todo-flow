@@ -41,26 +41,31 @@
   - 테스트 로직 실패는 여전히 존재 가능 (7+.2, 7+.3에서 처리)
   - 커밋: c008a68
 
-### 7+.2 API 테스트 로직 수정 (Medium Priority)
-- [ ] app/api/notion/instances/route.test.ts 수정
+### 7+.2 API 테스트 로직 수정 (Medium Priority) ✅ 완료
+- [x] app/api/notion/instances/route.test.ts 수정
   - 실패 케이스: should filter instances by date
-  - 원인: 날짜 필터링 로직 또는 mock 데이터 불일치
-  - 예상 작업: 테스트 데이터 또는 필터 assertion 수정
-- [ ] app/api/notion/flow-steps/route.test.ts 수정
+  - 원인: createNotionClient mock 누락, getTaskTemplates mock 누락
+  - 해결: createNotionClient 및 getTaskTemplates를 모든 테스트에 mock 추가
+  - 커밋: 17bd16a
+- [x] app/api/notion/flow-steps/route.test.ts 수정
   - 실패 케이스: should filter steps by templateId
-  - 원인: templateId 필터링 로직 또는 mock 데이터 불일치
-  - 예상 작업: 테스트 데이터 또는 필터 assertion 수정
-- [ ] app/api/notion/flow-steps/[stepId]/route.test.ts 수정
+  - 원인: createNotionClient mock 누락
+  - 해결: createNotionClient를 모든 테스트에 mock 추가
+  - 커밋: 17bd16a
+- [x] app/api/notion/flow-steps/[stepId]/route.test.ts 수정
   - 실패 케이스: should update flow step done
-  - 원인: PATCH 요청 처리 또는 mock 응답 불일치
-  - 예상 작업: API 응답 mock 또는 assertion 수정
+  - 원인: Next.js 15에서 params가 Promise로 변경됨, createNotionClient mock 누락
+  - 해결: route에서 params를 await 처리, 테스트에서 Promise.resolve() 사용, createNotionClient mock 추가
+  - 커밋: 17bd16a
+- 결과: 16개 API 테스트 모두 통과 ✅
 
 ### 7+.3 통합 테스트 수정 (Low Priority)
 - [ ] app/__tests__/page.integration.test.tsx 수정
   - 실패 케이스: 3건 (main page, calendar cells, FlowBoard elements)
-  - 원인: ResizeObserver + localStorage 환경 문제
-  - Note: 7+.1 완료 후 재실행 필요. 여전히 실패 시 테스트 로직 검토
-- [ ] 최종 검증: pnpm test:run 전체 통과 확인
+  - 원인: ResizeObserver + localStorage 환경 문제 해결됨, 하지만 메모리 부족 발생
+  - Note: 통합 테스트 실행 시 메모리 부족 (JavaScript heap out of memory)
+  - Note: API 테스트(16개)는 모두 통과, 통합 테스트는 별도 메모리 최적화 필요
+- [ ] 최종 검증: pnpm test:run 전체 통과 확인 (메모리 문제로 보류)
 
 ## Phase 8 Tasks (Code Refactoring - lib/notion.ts)
 - 목표: lib/notion.ts 329줄 분리 → 유지보수성/재사용성 향상, 책임 분리
