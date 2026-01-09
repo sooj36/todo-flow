@@ -55,6 +55,26 @@ export const NotionCalendar: React.FC = () => {
     }
   }, [refetch]);
 
+  const handlePreviousDay = useCallback(() => {
+    setSelectedDate(prev => {
+      const newDate = new Date(prev);
+      newDate.setDate(newDate.getDate() - 1);
+      return newDate;
+    });
+  }, []);
+
+  const handleNextDay = useCallback(() => {
+    setSelectedDate(prev => {
+      const newDate = new Date(prev);
+      newDate.setDate(newDate.getDate() + 1);
+      return newDate;
+    });
+  }, []);
+
+  const handleToday = useCallback(() => {
+    setSelectedDate(new Date());
+  }, []);
+
   useEffect(() => {
     return () => {
       if (syncTimeoutRef.current) {
