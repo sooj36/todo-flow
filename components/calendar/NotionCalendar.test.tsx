@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { NotionCalendar } from "./NotionCalendar";
 
@@ -25,6 +25,7 @@ describe("NotionCalendar", () => {
 
   afterEach(() => {
     vi.useRealTimers();
+    cleanup();
   });
 
   const defaultProps = {
@@ -105,5 +106,28 @@ describe("NotionCalendar", () => {
     // Just verify it's a valid Date object and different from original
     expect(calledDate instanceof Date).toBe(true);
     expect(calledDate.getTime()).not.toBe(endOfMonth.getTime());
+  });
+
+  it("highlights selected date and shows today dot when different", () => {
+    // FIXED_DATE is Jan 15 (Today)
+    const jan8 = new Date(2026, 0, 8);
+
+    render(<NotionCalendar selectedDate={jan8} onDateChange={mockOnDateChange} />);
+
+    const day8 = screen.getByTestId("calendar-day-8");
+    const day15 = screen.getByTestId("calendar-day-15");
+
+    // Day 8 (Selected) should have bold border
+    expect(day8).toHaveClass("border-4");
+    expect(day8).toHaveClass("border-black");
+    expect(day8).toHaveClass("bg-blue-50");
+
+    // Day 15 (Today) should have subtle green border and a green dot
+    expect(day15).toHaveClass("border-2");
+    expect(day15).toHaveClass("border-green-500");
+
+    // Check for the green dot indicator inside day 15
+    const dot = day15.querySelector(".bg-green-500.rounded-full");
+    expect(dot).toBeInTheDocument();
   });
 });
