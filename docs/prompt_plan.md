@@ -57,7 +57,7 @@
 - 정리: refactor: consolidate notion lib exports
 
 ### 8.1 공통 파싱 유틸 분리
-- [ ] lib/notion/parsers.ts 생성
+- [x] lib/notion/parsers.ts 생성
   - extractTitle: Title 속성 추출 (lines 52-54, 135-137, 219-222 패턴)
   - extractSelect: Select 속성 추출 (lines 64-66, 76-78, 238-240 패턴)
   - extractCheckbox: Checkbox 속성 추출 (lines 70-72, 82-84, 152-155 패턴)
@@ -67,8 +67,8 @@
   - extractDate: Date 속성 추출 (lines 232-234, 259-261 패턴)
   - extractRichText: Rich Text 추출 (lines 58-60 패턴)
   - 타입: 제네릭 활용 (TaskColor, Frequency, TaskStatus 등)
-  - 검증: 각 파싱 함수 단위 테스트 작성 (parsers.test.ts)
-  - 커밋: refactor: extract notion property parsers
+  - [x] 검증: 각 파싱 함수 단위 테스트 작성 (parsers.test.ts) - 23 tests passed
+  - [x] 커밋: test: add unit tests for notion parsers
 
 ### 8.2 클라이언트 모듈 분리
 - [ ] lib/notion/client.ts 생성
