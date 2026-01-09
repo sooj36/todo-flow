@@ -57,7 +57,8 @@
   - 원인: Next.js 15에서 params가 Promise로 변경됨, createNotionClient mock 누락
   - 해결: route에서 params를 await 처리, 테스트에서 Promise.resolve() 사용, createNotionClient mock 추가
   - 커밋: 17bd16a
-- 결과: 16개 API 테스트 모두 통과 ✅
+- 결과: 16개 API 테스트 개별 실행 시 모두 통과 ✅
+- 참고: 전체 테스트 실행 시 메모리 부족(OOM) 발생 - 통합 테스트로 인한 메모리 문제, API 테스트 자체는 정상
 
 ### 7+.3 통합 테스트 수정 (Low Priority)
 - [ ] app/__tests__/page.integration.test.tsx 수정
