@@ -108,6 +108,112 @@
 - [x] 타입 오류 수정 (React import, async 함수 타입)
 - 커밋: a0f5751 (문서화), 61a34d8 (타입 수정), 800f16b (문서 업데이트)
 
+## Phase 8 Tasks (Code Refactoring - lib/notion.ts)
+- 목표: lib/notion.ts 329줄 분리 → 유지보수성/재사용성 향상, 책임 분리
+- 원칙: 각 단계마다 기존 API 테스트 통과 확인 → 커밋
+- 브랜치: refactor/notion-lib-decomposition (refactor/flowboard-decomposition 완료 후 생성)
+- 영향도: API 라우트 3개 (`templates`, `flow-steps`, `instances`) 의존성 있음
+
+### 8.0 리팩토링 순서 체크리스트
+- [ ] 현재 브랜치/변경사항 확인 (git status)
+- [ ] lib/notion.ts 현재 구조 분석 및 의존성 파악
+  - [ ] 클라이언트 관리 (lines 5-26)
+  - [ ] Task Templates (lines 32-99)
+  - [ ] Flow Steps (lines 105-186)
+  - [ ] Task Instances (lines 192-329)
+- [ ] API 라우트 의존성 확인
+  - [ ] app/api/notion/templates/route.ts
+  - [ ] app/api/notion/flow-steps/route.ts
+  - [ ] app/api/notion/instances/route.ts
+- [ ] 기존 API 테스트 실행 확인 (pnpm test route.test)
+- [ ] 각 단계 완료 후: 타입 체크 + API 테스트 + 커밋
+- [ ] 단계별 수행: parsers → client → 각 도메인 모듈 순서 (의존성 역순)
+- [ ] 분리 후 기존 lib/notion.ts 삭제 또는 re-export 파일로 전환
+- [ ] API 라우트 import 경로 수정 확인
+
+### 8.0.a 실행 순서 템플릿 (log.md 기록용)
+```
+- [ ] 단계: 8.x (예: 8.1 parsers 유틸 분리)
+- [ ] 변경 요약:
+- [ ] 검증: pnpm lint / pnpm test (API 라우트 테스트 결과)
+- [ ] 커밋: <commit hash> (message)
+```
+
+### 8.0.b 커밋 메시지 규칙 예시
+- 유틸: refactor: extract notion property parsers
+- 클라이언트: refactor: extract notion client module
+- 도메인: refactor: extract notion templates module
+- 정리: refactor: consolidate notion lib exports
+
+### 8.1 공통 파싱 유틸 분리
+- [ ] lib/notion/parsers.ts 생성
+  - extractTitle: Title 속성 추출 (lines 52-54, 135-137, 219-222 패턴)
+  - extractSelect: Select 속성 추출 (lines 64-66, 76-78, 238-240 패턴)
+  - extractCheckbox: Checkbox 속성 추출 (lines 70-72, 82-84, 152-155 패턴)
+  - extractRelation: Relation 속성 추출 (lines 147-149, 226-228, 244-246 패턴)
+  - extractRelationMulti: Relation 다중 추출 (lines 250-252 패턴)
+  - extractNumber: Number 속성 추출 (lines 141-143 패턴)
+  - extractDate: Date 속성 추출 (lines 232-234, 259-261 패턴)
+  - extractRichText: Rich Text 추출 (lines 58-60 패턴)
+  - 타입: 제네릭 활용 (TaskColor, Frequency, TaskStatus 등)
+  - 검증: 각 파싱 함수 단위 테스트 작성 (parsers.test.ts)
+  - 커밋: refactor: extract notion property parsers
+
+### 8.2 클라이언트 모듈 분리
+- [ ] lib/notion/client.ts 생성
+  - createNotionClient 함수 (lines 6-11)
+  - getNotionClient 함수 (lines 17-26)
+  - Client import 포함
+  - 검증: API 라우트에서 클라이언트 사용 정상 확인
+  - 커밋: refactor: extract notion client module
+
+### 8.3 Task Templates 모듈 분리
+- [ ] lib/notion/templates.ts 생성
+  - getTaskTemplates 함수 (lines 32-99)
+  - parsers.ts의 파싱 함수 활용으로 코드 간소화
+  - Client import 및 타입 import
+  - 검증: app/api/notion/templates/route.ts 정상 작동
+  - 검증: pnpm test templates/route.test.ts 통과
+  - 커밋: refactor: extract notion templates module
+
+### 8.4 Flow Steps 모듈 분리
+- [ ] lib/notion/flowSteps.ts 생성
+  - getFlowSteps 함수 (lines 105-167)
+  - updateFlowStepDone 함수 (lines 173-186)
+  - parsers.ts의 파싱 함수 활용으로 코드 간소화
+  - Client import 및 타입 import
+  - 검증: app/api/notion/flow-steps/route.ts 정상 작동
+  - 검증: pnpm test flow-steps/route.test.ts 통과
+  - 커밋: refactor: extract notion flow steps module
+
+### 8.5 Task Instances 모듈 분리
+- [ ] lib/notion/instances.ts 생성
+  - getTaskInstances 함수 (lines 192-277)
+  - createTaskInstance 함수 (lines 283-329)
+  - parsers.ts의 파싱 함수 활용으로 코드 간소화
+  - Client import 및 타입 import
+  - 검증: app/api/notion/instances/route.ts 정상 작동
+  - 검증: pnpm test instances/route.test.ts 통과
+  - 커밋: refactor: extract notion instances module
+
+### 8.6 lib/notion.ts 정리 및 re-export
+- [ ] lib/notion/index.ts 생성 (또는 기존 lib/notion.ts를 index.ts로 변경)
+  - client, templates, flowSteps, instances 모듈에서 re-export
+  - 기존 import 경로 유지를 위한 호환성 레이어
+  - 예: `export * from './client'`, `export * from './templates'` 등
+  - 검증: 모든 API 라우트에서 import 정상 작동
+  - 커밋: refactor: consolidate notion lib exports
+
+### 8.7 최종 검증
+- [ ] lib/notion/ 폴더 구조 확인
+  - client.ts, templates.ts, flowSteps.ts, instances.ts, parsers.ts, index.ts
+- [ ] 모든 API 라우트 정상 작동 (수동 테스트)
+- [ ] pnpm lint, pnpm test 통과
+- [ ] 파싱 함수 재사용으로 코드 라인 수 감소 확인
+- [ ] 리팩토링 전후 비교 문서 작성 (docs/log.md)
+- [ ] 타입 오류/import 경로 오류 없음 확인
+- 커밋: docs: update Phase 8 refactoring log
+
 ## Phase 7+ Tasks (Test Debt Resolution)
 - 목표: 기존 테스트 실패 해결 (리팩토링과 독립적)
 - 우선순위: Medium (리팩토링 블로킹 아님, 병행 또는 이후 처리 가능)
