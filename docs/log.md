@@ -200,3 +200,11 @@
   - createNotionClient 및 getTaskTemplates mock 추가 (모든 테스트)
 - 결과: 16개 API 테스트 모두 통과 ✅ – 2026-01-09
 - 커밋 ID: 17bd16a – 2026-01-09
+
+## 문서 정리: Phase 7+ 보관 (2026-01-09)
+- Phase 7+ (Test Debt Resolution) 완료 처리 – 2026-01-09
+  - API 테스트 16개 모두 통과 ✅
+  - 통합 테스트는 메모리 문제로 보류 (Phase 7+.3)
+- docs/pre_prompt_plan.md에 Phase 7+ 추가 (보관용) – 2026-01-09
+- docs/prompt_plan.md에서 Phase 7+ 제거 (진행 중 태스크에서 제외) – 2026-01-09
+- 커밋 ID: 216b919 – 2026-01-09
