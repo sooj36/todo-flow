@@ -71,12 +71,12 @@
   - [x] 커밋: test: add unit tests for notion parsers
 
 ### 8.2 클라이언트 모듈 분리
-- [ ] lib/notion/client.ts 생성
-  - createNotionClient 함수 (lines 6-11)
-  - getNotionClient 함수 (lines 17-26)
-  - Client import 포함
-  - 검증: API 라우트에서 클라이언트 사용 정상 확인
-  - 커밋: refactor: extract notion client module
+- [x] lib/notion/client.ts 생성
+  - createNotionClient 함수 (lines 6-11) ✅
+  - getNotionClient 함수 (lines 17-26) ✅
+  - Client import 포함 ✅
+  - [x] 검증: API 라우트에서 클라이언트 사용 정상 확인 - 19 tests passed
+  - [x] 커밋: Phase 8.0에서 완료 (4f06ab2)
 
 ### 8.3 Task Templates 모듈 분리
 - [ ] lib/notion/templates.ts 생성
