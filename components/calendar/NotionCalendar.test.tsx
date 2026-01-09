@@ -13,8 +13,9 @@ vi.mock("@/hooks/useTaskInstances", () => ({
 
 describe("NotionCalendar", () => {
   const mockOnDateChange = vi.fn();
+  const now = new Date();
   const defaultProps = {
-    selectedDate: new Date(2026, 0, 9), // Jan 9, 2026
+    selectedDate: now, // Use actual current date so "today" highlight is always tested
     onDateChange: mockOnDateChange,
   };
 
@@ -23,12 +24,11 @@ describe("NotionCalendar", () => {
   });
 
   it("renders the current month header and phase sections", () => {
-    const now = new Date();
     const todayDate = now.getDate();
     const monthLabel = new Intl.DateTimeFormat("en-US", {
       month: "long",
       year: "numeric",
-    }).format(defaultProps.selectedDate);
+    }).format(now);
 
     render(<NotionCalendar {...defaultProps} />);
 
@@ -39,10 +39,8 @@ describe("NotionCalendar", () => {
     expect(screen.getByText("Phase 02: 16 — 31")).toBeInTheDocument();
     expect(screen.getByText("1")).toBeInTheDocument();
     expect(screen.getByText("31")).toBeInTheDocument();
-    // Only check "today" border if selectedDate is actually today
-    if (defaultProps.selectedDate.toDateString() === now.toDateString()) {
-      expect(screen.getByTestId(`calendar-day-${todayDate}`)).toHaveClass("border-black");
-    }
+    // Today highlight should always be visible since selectedDate = now
+    expect(screen.getByTestId(`calendar-day-${todayDate}`)).toHaveClass("border-black");
   });
 
   it("calls onDateChange when previous day arrow is clicked", () => {
