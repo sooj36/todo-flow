@@ -24,23 +24,23 @@
 - 영향도: API 라우트 3개 (`templates`, `flow-steps`, `instances`) 의존성 있음
 
 ### 8.0 리팩토링 순서 체크리스트
-- [ ] 현재 브랜치/변경사항 확인 (git status)
-- [ ] 브랜치 생성 가능 여부 확인 (git checkout -b 시도 or .git/refs/heads 쓰기 권한 확인)
-- [ ] lib/notion.ts 현재 구조 분석 및 의존성 파악
-  - [ ] 클라이언트 관리 (line 기준은 참고용, 함수명 기준으로 확인)
-  - [ ] Task Templates (line 기준은 참고용, 함수명 기준으로 확인)
-  - [ ] Flow Steps (line 기준은 참고용, 함수명 기준으로 확인)
-  - [ ] Task Instances (line 기준은 참고용, 함수명 기준으로 확인)
-- [ ] API 라우트 의존성 확인
-  - [ ] app/api/notion/templates/route.ts
-  - [ ] app/api/notion/flow-steps/route.ts
-  - [ ] app/api/notion/instances/route.ts
-- [ ] 기존 API 테스트 실행 확인 (pnpm test:run app/api/notion)
-- [ ] 각 단계 완료 후: 타입 체크 + API 테스트(pnpm test:run app/api/notion) + 커밋
-- [ ] 단계별 수행: parsers → client → 각 도메인 모듈 순서 (의존성 역순)
-- [ ] import 경로 정책 결정 (기존 `lib/notion` 유지 vs `lib/notion/*`로 일괄 변경)
-- [ ] 분리 후 기존 lib/notion.ts 삭제 또는 re-export 파일로 전환
-- [ ] API 라우트 import 경로 수정 확인 (선택한 정책에 맞게 일괄 적용)
+- [x] 현재 브랜치/변경사항 확인 (git status)
+- [x] 브랜치 생성 가능 여부 확인 (git checkout -b 시도 or .git/refs/heads 쓰기 권한 확인)
+- [x] lib/notion.ts 현재 구조 분석 및 의존성 파악
+  - [x] 클라이언트 관리 (line 기준은 참고용, 함수명 기준으로 확인)
+  - [x] Task Templates (line 기준은 참고용, 함수명 기준으로 확인)
+  - [x] Flow Steps (line 기준은 참고용, 함수명 기준으로 확인)
+  - [x] Task Instances (line 기준은 참고용, 함수명 기준으로 확인)
+- [x] API 라우트 의존성 확인
+  - [x] app/api/notion/templates/route.ts
+  - [x] app/api/notion/flow-steps/route.ts
+  - [x] app/api/notion/instances/route.ts
+- [x] 기존 API 테스트 실행 확인 (pnpm test:run app/api/notion) - 19 tests passed
+- [x] 각 단계 완료 후: 타입 체크 + API 테스트(pnpm test:run app/api/notion) + 커밋
+- [x] 단계별 수행: parsers → client → 각 도메인 모듈 순서 (의존성 역순) - 완료: 4f06ab2, b53df52, 2d0a97d
+- [x] import 경로 정책 결정 (기존 `lib/notion` 유지 vs `lib/notion/*`로 일괄 변경) - lib/notion/index.ts로 re-export
+- [x] 분리 후 기존 lib/notion.ts 삭제 또는 re-export 파일로 전환 - 삭제 완료
+- [x] API 라우트 import 경로 수정 확인 (선택한 정책에 맞게 일괄 적용) - @/lib/notion 경로 유지됨
 
 ### 8.0.a 실행 순서 템플릿 (log.md 기록용)
 ```
