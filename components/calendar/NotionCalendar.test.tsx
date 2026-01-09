@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { NotionCalendar } from "./NotionCalendar";
 
 vi.mock("@/hooks/useTaskInstances", () => ({
@@ -13,22 +13,31 @@ vi.mock("@/hooks/useTaskInstances", () => ({
 
 describe("NotionCalendar", () => {
   const mockOnDateChange = vi.fn();
-  const now = new Date();
-  const defaultProps = {
-    selectedDate: now, // Use actual current date so "today" highlight is always tested
-    onDateChange: mockOnDateChange,
-  };
+
+  // Fix time to a known date for deterministic tests
+  const FIXED_DATE = new Date(2026, 0, 15, 12, 0, 0); // Jan 15, 2026, 12:00:00
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.useFakeTimers();
+    vi.setSystemTime(FIXED_DATE);
   });
 
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  const defaultProps = {
+    selectedDate: new Date(FIXED_DATE), // Use fixed date
+    onDateChange: mockOnDateChange,
+  };
+
   it("renders the current month header and phase sections", () => {
-    const todayDate = now.getDate();
+    const todayDate = FIXED_DATE.getDate(); // 15
     const monthLabel = new Intl.DateTimeFormat("en-US", {
       month: "long",
       year: "numeric",
-    }).format(now);
+    }).format(FIXED_DATE);
 
     render(<NotionCalendar {...defaultProps} />);
 
@@ -39,7 +48,7 @@ describe("NotionCalendar", () => {
     expect(screen.getByText("Phase 02: 16 — 31")).toBeInTheDocument();
     expect(screen.getByText("1")).toBeInTheDocument();
     expect(screen.getByText("31")).toBeInTheDocument();
-    // Today highlight should always be visible since selectedDate = now
+    // Today highlight should always be visible for day 15
     expect(screen.getByTestId(`calendar-day-${todayDate}`)).toHaveClass("border-black");
   });
 
@@ -52,7 +61,7 @@ describe("NotionCalendar", () => {
 
     expect(mockOnDateChange).toHaveBeenCalledTimes(1);
     const calledDate = mockOnDateChange.mock.calls[0][0];
-    expect(calledDate.getDate()).toBe(8); // Jan 8
+    expect(calledDate.getDate()).toBe(14); // Jan 14
   });
 
   it("calls onDateChange when next day arrow is clicked", () => {
@@ -64,7 +73,7 @@ describe("NotionCalendar", () => {
 
     expect(mockOnDateChange).toHaveBeenCalledTimes(1);
     const calledDate = mockOnDateChange.mock.calls[0][0];
-    expect(calledDate.getDate()).toBe(10); // Jan 10
+    expect(calledDate.getDate()).toBe(16); // Jan 16
   });
 
   it("calls onDateChange with today when TODAY button is clicked", () => {
@@ -77,8 +86,9 @@ describe("NotionCalendar", () => {
 
     expect(mockOnDateChange).toHaveBeenCalledTimes(1);
     const calledDate = mockOnDateChange.mock.calls[0][0];
-    // Should be called with a new Date (today)
-    expect(calledDate.getDate()).toBe(new Date().getDate());
+    // Should be called with new Date() which is FIXED_DATE (Jan 15)
+    expect(calledDate.getDate()).toBe(15);
+    expect(calledDate.getMonth()).toBe(0); // January
   });
 
   it("handles month boundary navigation", () => {
