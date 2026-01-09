@@ -18,7 +18,7 @@
 - Skip files that are not relevant to the current task.
 
 ## Phase 9 Tasks (Calendar Date Navigation)
-- 목표: Calendar TODAY 버튼에 날짜 탐색 기능 추가 (전날/다음날 이동, 달력 동기화)
+- 목표: Calendar 좌우 화살표로 날짜 탐색 기능 추가 (전날/다음날 이동 + 달력 동기화, TODAY 버튼으로 오늘 복귀)
 - 파일: components/calendar/NotionCalendar.tsx
 - 원칙: 상태 관리 → 핸들러 구현 → UI 연결 → 테스트 검증
 
@@ -34,7 +34,7 @@
 - [ ] `handleNextDay` 함수 구현 (날짜 +1일)
 - [ ] `handleToday` 함수 구현 (현재 날짜로 리셋)
 - [ ] 월/연도 경계 처리 (12/31 → 1/1 등)
-- [ ] 검증: 날짜 변경 로직 단위 테스트
+- [ ] 검증: 수동 테스트로 날짜 변경 동작 확인
 - [ ] 커밋: feat: implement date navigation handlers
 
 ### 9.3 Calendar Data Sync
@@ -69,7 +69,7 @@
 - [ ] 전체 날짜 탐색 플로우 수동 테스트
 - [ ] 접근성 확인 (키보드 탐색, screen reader)
 - [ ] 성능 확인 (불필요한 리렌더링 없음)
-- [ ] pnpm test 통과
+- [ ] pnpm lint, pnpm test 통과
 - [ ] 커밋: docs: mark Phase 9 complete
 
 ## Future Extension: Agentic AI (Auto Triage)
