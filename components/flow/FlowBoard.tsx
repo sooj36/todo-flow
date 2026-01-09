@@ -26,18 +26,22 @@ import { useFlowSteps } from "@/hooks/useFlowSteps";
 import { CustomFlowNode } from "./CustomFlowNode";
 import { FlowBoardHeader } from "./FlowBoardHeader";
 
-// Helper function to get local date in YYYY-MM-DD format
-function getLocalDateString(): string {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+
+interface FlowBoardProps {
+  selectedDate?: Date;
 }
 
-export const FlowBoard: React.FC = () => {
-  const today = getLocalDateString();
-  const { instances, loading: instancesLoading, error: instancesError, refetch: refetchInstances } = useTaskInstances(today);
+export const FlowBoard: React.FC<FlowBoardProps> = ({ selectedDate = new Date() }) => {
+  // Helper function to format Date to YYYY-MM-DD
+  const formatDateString = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const dateString = formatDateString(selectedDate);
+  const { instances, loading: instancesLoading, error: instancesError, refetch: refetchInstances } = useTaskInstances(dateString);
   const { templates, loading: templatesLoading, error: templatesError, refetch: refetchTemplates } = useTaskTemplates();
 
   const {
