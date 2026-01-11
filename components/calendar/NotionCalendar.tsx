@@ -78,6 +78,11 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
     onDateChange(new Date());
   }, [onDateChange]);
 
+  const handleDayClick = useCallback((day: number) => {
+    const newDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), day);
+    onDateChange(newDate);
+  }, [selectedDate, onDateChange]);
+
   useEffect(() => {
     return () => {
       if (syncTimeoutRef.current) {
@@ -230,6 +235,7 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
                   loading={loading}
                   isToday={isToday}
                   isSelected={isSelected}
+                  onClick={handleDayClick}
                 />
               );
             })}
@@ -267,6 +273,7 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
                   loading={loading}
                   isToday={isToday}
                   isSelected={isSelected}
+                  onClick={handleDayClick}
                 />
               );
             })}
@@ -284,9 +291,10 @@ interface CalendarDayProps {
   loading?: boolean;
   isToday?: boolean;
   isSelected?: boolean;
+  onClick?: (day: number) => void;
 }
 
-const CalendarDay: React.FC<CalendarDayProps> = ({ day, data, loading, isToday, isSelected }) => {
+const CalendarDay: React.FC<CalendarDayProps> = ({ day, data, loading, isToday, isSelected, onClick }) => {
   const completionRate = data && data.totalTasks > 0
     ? data.completedTasks / data.totalTasks
     : 0;
@@ -323,6 +331,7 @@ const CalendarDay: React.FC<CalendarDayProps> = ({ day, data, loading, isToday, 
   return (
     <div
       data-testid={`calendar-day-${day}`}
+      onClick={() => onClick?.(day)}
       className={`group relative min-h-[100px] rounded-lg p-2 transition-all hover:shadow-md cursor-pointer ${selectedBg} ${borderClass} hover:bg-white`}
     >
       {/* Today dot: only show if today but NOT selected */}
