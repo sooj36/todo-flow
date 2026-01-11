@@ -130,4 +130,18 @@ describe("NotionCalendar", () => {
     const dot = day15.querySelector(".bg-green-500.rounded-full");
     expect(dot).toBeInTheDocument();
   });
+
+  it("calls onDateChange when a calendar day cell is clicked", () => {
+    render(<NotionCalendar {...defaultProps} />);
+
+    // Click day 10
+    const day10 = screen.getByTestId("calendar-day-10");
+    fireEvent.click(day10);
+
+    expect(mockOnDateChange).toHaveBeenCalledTimes(1);
+    const calledDate = mockOnDateChange.mock.calls[0][0];
+    expect(calledDate.getDate()).toBe(10);
+    expect(calledDate.getMonth()).toBe(0); // Jan (0-based)
+    expect(calledDate.getFullYear()).toBe(2026);
+  });
 });
