@@ -1,11 +1,21 @@
 // lib/notion/keywords.test.ts
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { getCompletedKeywordPages } from './keywords';
 import * as notionClient from './client';
 
 describe('getCompletedKeywordPages', () => {
+  let consoleWarnSpy: ReturnType<typeof vi.spyOn> | undefined;
+
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    // Clean up console.warn spy if it was created
+    if (consoleWarnSpy) {
+      consoleWarnSpy.mockRestore();
+      consoleWarnSpy = undefined;
+    }
   });
 
   it('should query Notion with correct filter for completed keyword extraction', async () => {
@@ -59,7 +69,7 @@ describe('getCompletedKeywordPages', () => {
   });
 
   it('should normalize keyword page data correctly', async () => {
-    const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     const mockQuery = vi.fn().mockResolvedValue({
       results: [
@@ -105,8 +115,6 @@ describe('getCompletedKeywordPages', () => {
 
     // No warning should be logged when all pages have keywords
     expect(consoleWarnSpy).not.toHaveBeenCalled();
-
-    consoleWarnSpy.mockRestore();
   });
 
   it('should filter by queryText in title and keywords (trimmed)', async () => {
@@ -240,7 +248,7 @@ describe('getCompletedKeywordPages', () => {
   });
 
   it('should filter out pages with empty keywords and return only valid ones', async () => {
-    const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     const mockQuery = vi.fn().mockResolvedValue({
       results: [
@@ -295,8 +303,6 @@ describe('getCompletedKeywordPages', () => {
     expect(consoleWarnSpy).toHaveBeenCalledWith(
       '[getCompletedKeywordPages] Filtered out 1 page(s) with no keywords: Page with no keywords'
     );
-
-    consoleWarnSpy.mockRestore();
   });
 
   it('should throw error when NOTION_KEYWORD_DB_ID is not set', async () => {
