@@ -43,7 +43,7 @@ describe('useAgentQuery', () => {
     resolveFetch!({
       ok: true,
       json: async () => ({
-        meta: { totalPages: 1, totalKeywords: 0 },
+        meta: { totalPages: 1, clustersFound: 0 },
         clusters: [],
         topKeywords: []
       }),
@@ -52,12 +52,12 @@ describe('useAgentQuery', () => {
 
   it('should update phase through fetch → normalize → cluster → done on success', async () => {
     const mockResponse = {
-      meta: { totalPages: 2, totalKeywords: 5 },
+      meta: { totalPages: 2, clustersFound: 1 },
       clusters: [
         {
-          label: 'Test',
+          name: 'Test',
           keywords: ['test'],
-          pageRefs: [{ pageId: 'page1', title: 'Test Page' }]
+          pageRefs: ['page1']
         }
       ],
       topKeywords: [{ keyword: 'test', count: 3 }],
@@ -99,7 +99,7 @@ describe('useAgentQuery', () => {
 
   it('should send POST request to /api/agent/keywords with queryText in body', async () => {
     const mockResponse = {
-      meta: { totalPages: 1, totalKeywords: 0 },
+      meta: { totalPages: 1, clustersFound: 0 },
       clusters: [],
       topKeywords: [],
     };
@@ -122,7 +122,7 @@ describe('useAgentQuery', () => {
 
   it('should retry with last queryText when retry is called', async () => {
     const mockResponse = {
-      meta: { totalPages: 1, totalKeywords: 0 },
+      meta: { totalPages: 1, clustersFound: 0 },
       clusters: [],
       topKeywords: [],
     };

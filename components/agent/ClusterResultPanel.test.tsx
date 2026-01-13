@@ -11,23 +11,18 @@ describe("ClusterResultPanel", () => {
   const mockData = {
     meta: {
       totalPages: 5,
-      totalKeywords: 25,
+      clustersFound: 2,
     },
     clusters: [
       {
-        label: "UI/UX",
+        name: "UI/UX",
         keywords: ["디자인", "사용자 경험", "인터페이스"],
-        pageRefs: [
-          { pageId: "page1", title: "디자인 시스템 구축" },
-          { pageId: "page2", title: "사용성 개선" },
-        ],
+        pageRefs: ["page1", "page2"],
       },
       {
-        label: "Backend",
+        name: "Backend",
         keywords: ["API", "데이터베이스", "서버"],
-        pageRefs: [
-          { pageId: "page3", title: "API 설계" },
-        ],
+        pageRefs: ["page3"],
       },
     ],
     topKeywords: [
@@ -37,11 +32,11 @@ describe("ClusterResultPanel", () => {
     ],
   };
 
-  it("renders meta information (total pages and keywords)", () => {
+  it("renders meta information (total pages and clusters found)", () => {
     render(<ClusterResultPanel data={mockData} />);
 
     expect(screen.getByText(/분석된 페이지:/)).toBeInTheDocument();
-    expect(screen.getByText(/총 키워드:/)).toBeInTheDocument();
+    expect(screen.getByText(/클러스터 수:/)).toBeInTheDocument();
     // Use getAllByText since "개" appears in both meta items
     const items = screen.getAllByText(/\d+개/);
     expect(items.length).toBeGreaterThanOrEqual(2);
@@ -64,12 +59,12 @@ describe("ClusterResultPanel", () => {
     expect(screen.getAllByText("API").length).toBeGreaterThan(0);
   });
 
-  it("renders page references with titles", () => {
+  it("renders page references with pageIds", () => {
     render(<ClusterResultPanel data={mockData} />);
 
-    expect(screen.getByText(/디자인 시스템 구축/)).toBeInTheDocument();
-    expect(screen.getByText(/사용성 개선/)).toBeInTheDocument();
-    expect(screen.getByText(/API 설계/)).toBeInTheDocument();
+    expect(screen.getByText(/page1/)).toBeInTheDocument();
+    expect(screen.getByText(/page2/)).toBeInTheDocument();
+    expect(screen.getByText(/page3/)).toBeInTheDocument();
   });
 
   it("renders top keywords with counts", () => {

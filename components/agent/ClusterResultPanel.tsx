@@ -34,8 +34,8 @@ export const ClusterResultPanel: React.FC<ClusterResultPanelProps> = ({
           <span className="text-gray-900">{data.meta.totalPages}개</span>
         </div>
         <div>
-          <span className="font-medium">총 키워드:</span>{" "}
-          <span className="text-gray-900">{data.meta.totalKeywords}개</span>
+          <span className="font-medium">클러스터 수:</span>{" "}
+          <span className="text-gray-900">{data.meta.clustersFound}개</span>
         </div>
       </div>
 
@@ -57,7 +57,7 @@ export const ClusterResultPanel: React.FC<ClusterResultPanelProps> = ({
                 aria-controls={`cluster-content-${index}`}
               >
                 <span className="font-medium text-gray-900">
-                  {cluster.label}
+                  {cluster.name}
                 </span>
                 {isExpanded ? (
                   <ChevronUp className="w-5 h-5 text-gray-500" />
@@ -95,9 +95,9 @@ export const ClusterResultPanel: React.FC<ClusterResultPanelProps> = ({
                     관련 페이지
                   </h4>
                   <ul className="flex flex-col gap-1">
-                    {cluster.pageRefs.map((ref) => (
-                      <li key={ref.pageId} className="text-sm text-gray-600">
-                        • {ref.title}
+                    {cluster.pageRefs.map((pageId) => (
+                      <li key={pageId} className="text-sm text-gray-600">
+                        • {pageId}
                       </li>
                     ))}
                   </ul>
