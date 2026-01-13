@@ -62,10 +62,10 @@
 
 #### 13.1.4 결과 패널 (ClusterResultPanel)
 - 파일: `components/agent/ClusterResultPanel.tsx`
-- [ ] Test: 결과 데이터(meta, clusters, topKeywords) 렌더링
-- [ ] Impl: 접기/펼치기 토글 상태 관리
-- [ ] Test: 클러스터 접기/펼치기 인터랙션 확인
-- [ ] 커밋: `feat(agent): add ClusterResultPanel with collapsible clusters`
+- [x] Test: 결과 데이터(meta, clusters, topKeywords) 렌더링
+- [x] Impl: 접기/펼치기 토글 상태 관리
+- [x] Test: 클러스터 접기/펼치기 인터랙션 확인
+- [x] 커밋: `feat(agent): add ClusterResultPanel with collapsible clusters`
 
 #### 13.1.5 통합 (app/page.tsx)
 - 파일: `app/page.tsx`
