@@ -27,10 +27,11 @@ describe('Agent UI Integration', () => {
 
     beforeEach(() => {
         fetchMock = vi.fn() as vi.Mock;
-        global.fetch = fetchMock as any;
+        vi.stubGlobal('fetch', fetchMock);
     });
 
     afterEach(() => {
+        vi.unstubAllGlobals();
         vi.restoreAllMocks();
     });
 
