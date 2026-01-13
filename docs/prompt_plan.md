@@ -23,27 +23,7 @@
 - 원칙: 클릭 시 즉시 반응 (Optimistic UI 느낌), 명확한 상태 전파 (Calendar -> Parent -> Flow)
 - UI/UX 결정: 클릭 시 포커스 강제 이동은 생략하되, 선택 스타일(isSelected)로 시각적 피드백 제공
 
-### 12.1 Implement Click Handler in CalendarDay
-- [x] `CalendarDayProps`에 `onClick` 핸들러 추가
-- [x] `CalendarDay` 컴포넌트의 root div에 `onClick` 연결
-- [x] 클릭 시 해당 날짜의 `day`를 인자로 넘김
 
-### 12.2 Connect NotionCalendar to Date State
-- [x] `NotionCalendar.tsx`: `onDateChange(new Date(selectedDate.getFullYear(), selectedDate.getMonth(), day))` 호출
-    - 검증: `selectedDate.getMonth()`는 0-based이며 `new Date` 생성 시에도 그대로 사용됨을 확인
-- [x] `Phase 01`, `Phase 02` 맵핑 시 각 `CalendarDay`에 핸들러 전달
-
-### 12.3 Synchronization Path Documentation
-- [x] 상위 컴포넌트(`app/page.tsx`, `Home` 컴포넌트)에서 `selectedDate` 상태가 `NotionCalendar`와 `FlowBoard`에 공유되고 있음을 확인 (이미 구현됨)
-- [x] 동기화 흐름: `CalendarDay(click)` -> `NotionCalendar(onDateChange)` -> `Home(setSelectedDate)` -> `FlowBoard(props update)`
-
-### 12.4 Verification & Polish
-- [ ] Manual: 달력 날짜 클릭 시 FlowBoard의 타이틀 및 태스크 목록이 동기화되는지 확인
-- [ ] Manual: 월 경계 클릭 테스트 (예: 1월 31일 클릭 시 2월로 넘어가지 않고 1월 31일이 유지되는지 확인)
-- [ ] Manual: 년 경계 클릭 테스트 (예: 12월 31일 클릭 시 올바른 년/월 유지 확인)
-- [x] 테스트: `NotionCalendar.test.tsx`에 클릭 시 `onDateChange` 호출 검증 추가
-- [ ] 통합 테스트: `app/__tests__/page.integration.test.tsx`에서 달력 클릭 시 `FlowBoard` 데이터가 바뀌는 시나리오 추가
-- [ ] 커밋: feat: implement calendar day click to sync date
 
 ## Future Extension: Agentic AI (Auto Triage)
 - 목표: 캘린더/인스턴스 데이터를 보고 일정 충돌/미완료를 자동 조정

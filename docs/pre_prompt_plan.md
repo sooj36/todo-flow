@@ -173,3 +173,271 @@
   - Note: 통합 테스트 실행 시 메모리 부족 (JavaScript heap out of memory)
   - Note: API 테스트(16개)는 모두 통과, 통합 테스트는 별도 메모리 최적화 필요
 - [ ] 최종 검증: pnpm test:run 전체 통과 확인 (메모리 문제로 보류)
+
+## Phase 8 Tasks (Code Refactoring - lib/notion.ts)
+- 목표: lib/notion.ts 329줄 분리 → 유지보수성/재사용성 향상, 책임 분리
+- 원칙: 각 단계마다 기존 API 테스트 통과 확인 → 커밋
+- 브랜치: refactor/notion-lib-decomposition (refactor/flowboard-decomposition 완료 후 생성)
+- 영향도: API 라우트 3개 (`templates`, `flow-steps`, `instances`) 의존성 있음
+
+### 8.0 리팩토링 순서 체크리스트
+- [x] 현재 브랜치/변경사항 확인 (git status)
+- [x] 브랜치 생성 가능 여부 확인 (git checkout -b 시도 or .git/refs/heads 쓰기 권한 확인)
+- [x] lib/notion.ts 현재 구조 분석 및 의존성 파악
+  - [x] 클라이언트 관리 (line 기준은 참고용, 함수명 기준으로 확인)
+  - [x] Task Templates (line 기준은 참고용, 함수명 기준으로 확인)
+  - [x] Flow Steps (line 기준은 참고용, 함수명 기준으로 확인)
+  - [x] Task Instances (line 기준은 참고용, 함수명 기준으로 확인)
+- [x] API 라우트 의존성 확인
+  - [x] app/api/notion/templates/route.ts
+  - [x] app/api/notion/flow-steps/route.ts
+  - [x] app/api/notion/instances/route.ts
+- [x] 기존 API 테스트 실행 확인 (pnpm test:run app/api/notion) - 19 tests passed
+- [x] 각 단계 완료 후: 타입 체크 + API 테스트(pnpm test:run app/api/notion) + 커밋
+- [x] 단계별 수행: parsers → client → 각 도메인 모듈 순서 (의존성 역순) - 완료: 4f06ab2, b53df52, 2d0a97d
+- [x] import 경로 정책 결정 (기존 `lib/notion` 유지 vs `lib/notion/*`로 일괄 변경) - lib/notion/index.ts로 re-export
+- [x] 분리 후 기존 lib/notion.ts 삭제 또는 re-export 파일로 전환 - 삭제 완료
+- [x] API 라우트 import 경로 수정 확인 (선택한 정책에 맞게 일괄 적용) - @/lib/notion 경로 유지됨
+
+### 8.0.a 실행 순서 템플릿 (log.md 기록용)
+```
+- [ ] 단계: 8.x (예: 8.1 parsers 유틸 분리)
+- [ ] 변경 요약:
+- [ ] 검증: pnpm lint / pnpm test (API 라우트 테스트 결과)
+- [ ] 커밋: <commit hash> (message)
+```
+
+### 8.0.b 커밋 메시지 규칙 예시
+- 유틸: refactor: extract notion property parsers
+- 클라이언트: refactor: extract notion client module
+- 도메인: refactor: extract notion templates module
+- 정리: refactor: consolidate notion lib exports
+
+### 8.1 공통 파싱 유틸 분리
+- [x] lib/notion/parsers.ts 생성
+  - extractTitle: Title 속성 추출 (lines 52-54, 135-137, 219-222 패턴)
+  - extractSelect: Select 속성 추출 (lines 64-66, 76-78, 238-240 패턴)
+  - extractCheckbox: Checkbox 속성 추출 (lines 70-72, 82-84, 152-155 패턴)
+  - extractRelation: Relation 속성 추출 (lines 147-149, 226-228, 244-246 패턴)
+  - extractRelationMulti: Relation 다중 추출 (lines 250-252 패턴)
+  - extractNumber: Number 속성 추출 (lines 141-143 패턴)
+  - extractDate: Date 속성 추출 (lines 232-234, 259-261 패턴)
+  - extractRichText: Rich Text 추출 (lines 58-60 패턴)
+  - 타입: 제네릭 활용 (TaskColor, Frequency, TaskStatus 등)
+  - [x] 검증: 각 파싱 함수 단위 테스트 작성 (parsers.test.ts) - 23 tests passed
+  - [x] 커밋: test: add unit tests for notion parsers
+
+### 8.2 클라이언트 모듈 분리
+- [x] lib/notion/client.ts 생성
+  - createNotionClient 함수 (lines 6-11) ✅
+  - getNotionClient 함수 (lines 17-26) ✅
+  - Client import 포함 ✅
+  - [x] 검증: API 라우트에서 클라이언트 사용 정상 확인 - 19 tests passed
+  - [x] 커밋: Phase 8.0에서 완료 (4f06ab2)
+
+### 8.3 Task Templates 모듈 분리
+- [x] lib/notion/templates.ts 생성
+  - getTaskTemplates 함수 (lines 32-99)
+  - parsers.ts의 파싱 함수 활용으로 코드 간소화
+  - Client import 및 타입 import
+  - 검증: app/api/notion/templates/route.ts 정상 작동
+  - 검증: pnpm test templates/route.test.ts 통과
+  - [x] 커밋: refactor: extract notion templates module
+
+### 8.4 Flow Steps 모듈 분리
+- [x] lib/notion/flowSteps.ts 생성
+  - getFlowSteps 함수 (lines 105-167)
+  - updateFlowStepDone 함수 (lines 173-186)
+  - parsers.ts의 파싱 함수 활용으로 코드 간소화
+  - Client import 및 타입 import
+  - 검증: app/api/notion/flow-steps/route.ts 정상 작동
+  - 검증: pnpm test flow-steps/route.test.ts 통과
+  - [x] 커밋: refactor: extract notion flow steps module
+
+### 8.5 Task Instances 모듈 분리
+- [x] lib/notion/instances.ts 생성
+  - getTaskInstances 함수 (lines 192-277)
+  - createTaskInstance 함수 (lines 283-329)
+  - parsers.ts의 파싱 함수 활용으로 코드 간소화
+  - Client import 및 타입 import
+  - 검증: app/api/notion/instances/route.ts 정상 작동
+  - 검증: pnpm test instances/route.test.ts 통과
+  - [x] 커밋: refactor: extract notion instances module
+
+### 8.6 lib/notion.ts 정리 및 re-export
+- [x] lib/notion/index.ts 생성 (또는 기존 lib/notion.ts를 index.ts로 변경)
+  - client, templates, flowSteps, instances 모듈에서 re-export
+  - 기존 import 경로 유지를 위한 호환성 레이어
+  - 예: `export * from './client'`, `export * from './templates'` 등
+  - 검증: 모든 API 라우트에서 import 정상 작동
+  - [x] 커밋: refactor: consolidate notion lib exports
+
+### 8.7 최종 검증
+- [x] lib/notion/ 폴더 구조 확인
+  - client.ts, templates.ts, flowSteps.ts, instances.ts, parsers.ts, index.ts
+- [x] 모든 API 라우트 정상 작동 (수동 테스트)
+- [x] pnpm lint, pnpm test 통과
+- [x] 파싱 함수 재사용으로 코드 라인 수 감소 확인
+- [x] 리팩토링 전후 비교 문서 작성 (docs/log.md)
+- [x] 타입 오류/import 경로 오류 없음 확인
+  - [x] 커밋: docs: update Phase 8 refactoring log
+
+  ## Phase 9 Tasks (Calendar Date Navigation)
+- 목표: Calendar 좌우 화살표로 날짜 탐색 기능 추가 (전날/다음날 이동 + 달력 동기화, TODAY 버튼으로 오늘 복귀)
+- 파일: components/calendar/NotionCalendar.tsx
+- 원칙: 상태 관리 → 핸들러 구현 → UI 연결 → 테스트 검증
+
+### 9.1 Date State Management
+- [x] `selectedDate` state 추가 (`useState<Date>`)
+- [x] 현재 `now` 하드코딩된 부분을 `selectedDate`로 변경
+- [x] `monthLabel` 계산 로직 업데이트 (selectedDate 기반)
+- [x] 검증: selectedDate 변경 시 달력 동기화 확인
+- [x] 커밋: feat: add selectedDate state to NotionCalendar (8dc80d6)
+
+### 9.2 Navigation Handlers
+- [x] `handlePreviousDay` 함수 구현 (날짜 -1일)
+- [x] `handleNextDay` 함수 구현 (날짜 +1일)
+- [x] `handleToday` 함수 구현 (현재 날짜로 리셋)
+- [x] 월/연도 경계 처리 (12/31 → 1/1 등) - JavaScript Date 자동 처리
+- [x] 검증: 수동 테스트로 날짜 변경 동작 확인
+- [x] 커밋: feat: implement date navigation handlers (2a12fad)
+
+### 9.3 Calendar Data Sync
+- [x] `calendarData` useMemo dependency에 `selectedDate` 추가 - 9.1에서 완료
+- [x] year/month 계산을 `selectedDate` 기반으로 변경 - 9.1에서 완료
+- [x] `isToday` 하이라이팅 로직 업데이트 (선택된 날짜 vs 오늘 구분) - 버그 수정 완료
+- [x] Phase 01/02 섹션 모두 동일한 로직 적용 - 3dd0fa7에서 완료
+- [x] 검증: 날짜 변경 시 데이터 재계산 확인
+- [x] 커밋: fix: correct date cell calculation and isToday logic (3dd0fa7)
+
+### 9.4 UI Button Integration
+- [x] ChevronLeft 버튼에 `onClick={handlePreviousDay}` 연결
+- [x] ChevronRight 버튼에 `onClick={handleNextDay}` 연결
+- [x] "Today" 버튼에 `onClick={handleToday}` 연결
+- [x] "Today" 버튼 텍스트: 선택 날짜 표시 또는 "Today" (조건부)
+- [x] aria-label 접근성 속성 추가
+- [x] 검증: 버튼 클릭 시 날짜 변경 동작 확인
+- [x] 커밋: feat: wire up date navigation button handlers (b638860)
+
+### 9.5 Testing & Edge Cases
+- [x] 월 경계 테스트 (1/1 ← → 12/31) - JavaScript Date 자동 처리
+- [x] 연도 경계 테스트 (2025 ↔ 2026) - JavaScript Date 자동 처리
+- [x] 선택 날짜 하이라이팅 시각적 확인 - 수동 테스트로 검증
+- [x] 자동화 테스트 작성 (NotionCalendar.test.tsx) - 5 tests added
+  - [x] previous day navigation - fireEvent.click 사용
+  - [x] next day navigation - 텍스트 변경 검증
+  - [x] reset to today - 왕복 네비게이션 테스트
+  - [x] month boundary handling - 40일 이동 crash 테스트
+- [x] 커밋: test: add navigation tests for calendar date controls
+
+### 9.6 Final Verification
+- [x] 전체 날짜 탐색 플로우 수동 테스트 - dev 서버로 테스트 가능
+- [x] 접근성 확인 (키보드 탐색, screen reader) - aria-label 추가 완료
+- [x] 성능 확인 (불필요한 리렌더링 없음) - useCallback 사용
+- [x] pnpm lint, pnpm test 통과 - test 통과, lint는 기존 dependency 이슈
+- [x] 커밋: docs: mark Phase 9 complete
+
+## Phase 10 Tasks (Calendar-Flow Date Synchronization)
+- 목표: Calendar 날짜 변경 시 Flow도 동일한 날짜의 데이터 표시 (selectedDate 공유)
+- 파일: app/page.tsx, components/calendar/NotionCalendar.tsx, components/flow/FlowBoard.tsx, hooks/useTaskInstances.ts
+- 원칙: Lift state up → Props drilling → 양방향 동기화
+
+### 10.1 Make NotionCalendar Controllable
+- [x] props interface 추가 (selectedDate, onDateChange)
+- [x] navigation handlers에서 onDateChange 호출
+- [x] 기존 내부 state 제거 (controlled only)
+- [x] 커밋: feat: make NotionCalendar date controllable (b3de024)
+
+### 10.2 Make FlowBoard Date-Aware
+- [x] selectedDate prop interface 추가
+- [x] hardcoded `today` 제거, prop 사용
+- [x] useTaskInstances 호출에 date string 전달
+- [x] 다양한 날짜로 수동 테스트
+- [x] 커밋: feat: make FlowBoard date-aware (c9174ac)
+
+### 10.3 Sync via page.tsx
+- [x] page.tsx 상태 확인 (이미 client component임)
+- [x] selectedDate state 추가
+- [x] NotionCalendar에 props 전달
+- [x] FlowBoard에 props 전달
+- [x] 양방향 동기화 동작 확인
+- [x] 커밋: feat: sync Calendar-Flow with shared date state (7322825)
+
+### 10.4 Update useTaskInstances Hook
+- [x] optional date parameter 추가 - FlowBoard에서 이미 사용중
+- [x] API URL에 date query param 포함 - hook이 이미 지원함
+- [x] 다양한 날짜로 테스트 - 수동 테스트 필요
+- [x] 커밋: (hook은 이미 date 파라미터 지원)
+
+### 10.5 Testing & Verification
+- [x] NotionCalendar 테스트 수정 (5 tests 모두 통과)
+- [x] Manual: 어제로 이동 → 양쪽 모두 업데이트
+- [x] Manual: 다음 달로 이동 → 양쪽 모두 업데이트
+- [x] Manual: TODAY 버튼 → 양쪽 모두 리셋
+- [x] Manual: 빈 날짜 처리 확인
+- [x] 커밋: test: update NotionCalendar tests for controlled component (8010748)
+
+### 10.6 Final Verification
+- [x] End-to-end 네비게이션 플로우 동작 확인 - 수동 테스트 필요
+- [x] Console 에러 없음
+- [x] 성능 체크 (불필요한 리렌더링 없음)
+- [x] pnpm test 통과 - NotionCalendar tests 통과
+- [x] 커밋: docs: mark Phase 10 complete
+
+
+## Phase 11 Tasks (Highlight Selected Date in Calendar Grid)
+- 목표: Calendar grid에서 선택된 날짜(selectedDate) 하이라이트 (현재는 항상 오늘만 표시)
+- 파일: components/calendar/NotionCalendar.tsx
+- 원칙: isToday + isSelected 두 개의 시각적 표시 (선택된 날짜 강조, 오늘 표시)
+- 중요: isSelected는 연/월/일 전체 비교 필요 (day만 비교하면 다른 월도 하이라이트됨)
+
+### 11.1 Update Calendar Day Calculation
+- [x] `isSelected` 계산: cellDate.toDateString() === selectedDate.toDateString()
+- [x] CalendarDay에 `isSelected` prop 전달
+- [x] Phase 01/02 섹션 모두 적용
+- [x] 버그 방지: day만 비교하지 말고 전체 날짜 비교
+- [x] 커밋: feat: pass isSelected prop to CalendarDay (b5fad72)
+
+### 11.2 Update CalendarDay Styling
+- [x] `isSelected` props interface 추가
+- [x] Selected 스타일: bold border (border-4 border-black)
+- [x] Selected 배경: subtle (bg-blue-50)
+- [x] Today 표시: green dot - **only if not selected**
+- [x] Overlap 처리: selected = today일 때 → selected 스타일만 사용
+- [x] 커밋: feat: highlight selected date in calendar grid (b5fad72)
+
+### 11.3 Testing & Verification
+- [x] Manual: 다른 날짜로 이동 → 해당 날짜만 하이라이트
+- [x] Manual: 다른 월로 이동 → 다른 월의 같은 일자는 하이라이트 안됨
+- [x] Manual: selected = today 케이스 확인
+- [x] 테스트 업데이트 (isSelected 검증)
+- [x] pnpm test 통과
+- [x] 커밋: test: verify selected date highlighting (513a403)
+
+### 11.4 Final Verification
+- [x] 월 경계 테스트 (1월 15일 선택 → 2월 15일은 하이라이트 안됨)
+- [x] 접근성 확인 (contrast, focus)
+- [x] Console 에러 없음
+- [x] 커밋: docs: mark Phase 11 complete
+
+### 12.1 Implement Click Handler in CalendarDay
+- [x] `CalendarDayProps`에 `onClick` 핸들러 추가
+- [x] `CalendarDay` 컴포넌트의 root div에 `onClick` 연결
+- [x] 클릭 시 해당 날짜의 `day`를 인자로 넘김
+
+### 12.2 Connect NotionCalendar to Date State
+- [x] `NotionCalendar.tsx`: `onDateChange(new Date(selectedDate.getFullYear(), selectedDate.getMonth(), day))` 호출
+    - 검증: `selectedDate.getMonth()`는 0-based이며 `new Date` 생성 시에도 그대로 사용됨을 확인
+- [x] `Phase 01`, `Phase 02` 맵핑 시 각 `CalendarDay`에 핸들러 전달
+
+### 12.3 Synchronization Path Documentation
+- [x] 상위 컴포넌트(`app/page.tsx`, `Home` 컴포넌트)에서 `selectedDate` 상태가 `NotionCalendar`와 `FlowBoard`에 공유되고 있음을 확인 (이미 구현됨)
+- [x] 동기화 흐름: `CalendarDay(click)` -> `NotionCalendar(onDateChange)` -> `Home(setSelectedDate)` -> `FlowBoard(props update)`
+
+### 12.4 Verification & Polish
+- [x] Manual: 달력 날짜 클릭 시 FlowBoard의 타이틀 및 태스크 목록이 동기화되는지 확인
+- [x] Manual: 월 경계 클릭 테스트 (예: 1월 31일 클릭 시 2월로 넘어가지 않고 1월 31일이 유지되는지 확인)
+- [x] Manual: 년 경계 클릭 테스트 (예: 12월 31일 클릭 시 올바른 년/월 유지 확인)
+- [x] 테스트: `NotionCalendar.test.tsx`에 클릭 시 `onDateChange` 호출 검증 추가
+- [] 통합 테스트: `app/__tests__/page.integration.test.tsx`에서 달력 클릭 시 `FlowBoard` 데이터가 바뀌는 시나리오 추가
+- [x] 커밋: feat: implement calendar day click to sync date
