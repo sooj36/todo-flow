@@ -47,20 +47,11 @@ describe('SearchBar', () => {
     // Simulate typing during IME composition (e.g., Korean input)
     fireEvent.change(input, { target: { value: '한글' } });
 
-    // Create a KeyboardEvent with isComposing: true
-    const event = new KeyboardEvent('keydown', {
+    // Use fireEvent.keyDown with isComposing flag on synthetic event
+    fireEvent.keyDown(input, {
       key: 'Enter',
-      bubbles: true,
-      cancelable: true
+      isComposing: true
     });
-
-    // Mock isComposing on the nativeEvent
-    Object.defineProperty(event, 'isComposing', {
-      value: true,
-      writable: false
-    });
-
-    fireEvent(input, event);
 
     expect(mockOnSearch).not.toHaveBeenCalled();
   });
@@ -75,7 +66,7 @@ describe('SearchBar', () => {
     fireEvent.change(input, { target: { value: '한글' } });
     fireEvent.keyDown(input, {
       key: 'Enter',
-      nativeEvent: { isComposing: false } as KeyboardEvent
+      isComposing: false
     });
 
     expect(mockOnSearch).toHaveBeenCalledWith('한글');
