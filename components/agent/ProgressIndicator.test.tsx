@@ -30,8 +30,8 @@ describe("ProgressIndicator", () => {
     const spinner = container.querySelector(".animate-spin");
     expect(spinner).toBeNull();
 
-    // Should have check icon (svg with specific class or aria-hidden)
-    const checkIcon = container.querySelector("svg");
+    // Should have check icon with accessible label
+    const checkIcon = screen.getByLabelText("완료");
     expect(checkIcon).toBeInTheDocument();
   });
 
