@@ -123,10 +123,10 @@
 
 #### 13.3.3 스키마 검증 (zod)
 - 파일: `lib/agent/schema.ts`
-- [ ] Test: zod 스키마로 클러스터 응답 파싱 성공/실패 케이스
-- [ ] Impl: ClusterResultSchema 정의 (meta, clusters, topKeywords)
-- [ ] Impl: 파싱 실패 시 ZodError throw
-- [ ] 커밋: `feat(agent): add zod schema for cluster result`
+- [x] Test: zod 스키마로 클러스터 응답 파싱 성공/실패 케이스
+- [x] Impl: ClusterResultSchema 정의 (meta, clusters, topKeywords)
+- [x] Impl: 파싱 실패 시 ZodError throw
+- [x] 커밋: `feat(agent): add zod schema for cluster result`
 
 #### 13.3.4 Fallback 처리
 - 파일: `app/api/agent/keywords/route.ts`
