@@ -37,15 +37,15 @@
 - 반환값: `{ phase, data, error, executeQuery: (text: string) => Promise<void>, retry: () => Promise<void> }`
 - retry 동작: 내부에 마지막 queryText를 useRef로 보관, retry 호출 시 저장된 값 재사용
 - retry 예외 처리: lastQueryText가 비어있으면 no-op (early return), console.warn으로 "재시도할 검색어가 없습니다" 경고
-- [ ] Test: 초기 상태 phase="idle", executeQuery 호출 시 phase="fetch"로 변경
-- [ ] Impl: useState로 phase, data, error 관리 + useRef로 lastQueryText 보관
-- [ ] Impl: executeQuery 내부에서 lastQueryText.current 업데이트 + phase 단계별 업데이트 (fetch → normalize → cluster → done)
-- [ ] Impl: retry 함수는 lastQueryText.current 체크 후, 비어있으면 early return + console.warn
-- [ ] Impl: POST /api/agent/keywords 호출, body: `{ queryText }`
-- [ ] Test: 성공 시 phase="done" + 데이터 저장, 실패 시 phase="error"
-- [ ] Test: retry 호출 시 마지막 queryText로 executeQuery 재실행 확인
-- [ ] Test: lastQueryText 없을 때 retry 호출 → no-op 확인
-- [ ] 커밋: `feat(agent): add useAgentQuery hook with phase tracking and retry`
+- [x] Test: 초기 상태 phase="idle", executeQuery 호출 시 phase="fetch"로 변경
+- [x] Impl: useState로 phase, data, error 관리 + useRef로 lastQueryText 보관
+- [x] Impl: executeQuery 내부에서 lastQueryText.current 업데이트 + phase 단계별 업데이트 (fetch → normalize → cluster → done)
+- [x] Impl: retry 함수는 lastQueryText.current 체크 후, 비어있으면 early return + console.warn
+- [x] Impl: POST /api/agent/keywords 호출, body: `{ queryText }`
+- [x] Test: 성공 시 phase="done" + 데이터 저장, 실패 시 phase="error"
+- [x] Test: retry 호출 시 마지막 queryText로 executeQuery 재실행 확인
+- [x] Test: lastQueryText 없을 때 retry 호출 → no-op 확인
+- [x] 커밋: `feat(agent): add useAgentQuery hook with phase tracking and retry`
 
 #### 13.1.3 진행 단계 표시 (ProgressIndicator)
 - 파일: `components/agent/ProgressIndicator.tsx`
