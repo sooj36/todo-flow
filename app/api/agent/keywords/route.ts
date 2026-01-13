@@ -1,5 +1,8 @@
 // app/api/agent/keywords/route.ts
 import { NextResponse } from 'next/server';
+import { getCompletedKeywordPages } from '@/lib/notion/keywords';
+import { clusterKeywords } from '@/lib/agent/clustering';
+import { buildFallbackResult } from '@/lib/agent/fallback';
 
 export async function POST(req: Request) {
   try {
@@ -23,20 +26,30 @@ export async function POST(req: Request) {
     // Extract queryText with default value
     const queryText = body.queryText ?? '';
 
-    // TODO: Phase 13.3.2 - Integrate Notion query
-    // TODO: Phase 13.3.2 - Integrate Gemini clustering
-    // TODO: Phase 13.3.3 - Validate with zod schema
+    // Phase 13.2: Fetch completed keyword pages from Notion
+    const pages = await getCompletedKeywordPages(queryText);
 
-    // Temporary response structure
-    return NextResponse.json({
-      meta: {
-        totalPages: 0,
-        clustersFound: 0,
-        queryText,
-      },
-      clusters: [],
-      topKeywords: [],
-    });
+    // Phase 13.3: Attempt Gemini clustering with 1 retry
+    let clusterResult;
+    let lastError;
+
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        clusterResult = await clusterKeywords(pages);
+        break; // Success, exit retry loop
+      } catch (error) {
+        lastError = error;
+        console.warn(`Clustering attempt ${attempt + 1} failed:`, error);
+      }
+    }
+
+    // Phase 13.3.4: If both attempts failed, use frequency-based fallback
+    if (!clusterResult) {
+      console.warn('All clustering attempts failed, using fallback');
+      clusterResult = buildFallbackResult(pages);
+    }
+
+    return NextResponse.json(clusterResult);
   } catch (error) {
     console.error('Error in keywords agent:', error);
     return NextResponse.json(
