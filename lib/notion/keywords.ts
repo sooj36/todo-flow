@@ -1,0 +1,107 @@
+// lib/notion/keywords.ts
+// Notion keyword pages query and normalization
+
+import { getNotionClient } from './client';
+import { extractTitle } from './parsers';
+import type { KeywordPage } from '@/types';
+
+/**
+ * Extract keywords from multi_select property
+ */
+function extractKeywords(property: unknown): string[] {
+  if (
+    property &&
+    typeof property === 'object' &&
+    'type' in property &&
+    property.type === 'multi_select' &&
+    'multi_select' in property &&
+    Array.isArray(property.multi_select)
+  ) {
+    const keywords = property.multi_select
+      .map((item) => {
+        if (item && typeof item === 'object' && 'name' in item && typeof item.name === 'string') {
+          return item.name.trim();
+        }
+        return '';
+      })
+      .filter((keyword) => keyword.length > 0);
+
+    // Remove duplicates
+    return Array.from(new Set(keywords));
+  }
+  return [];
+}
+
+/**
+ * Get completed keyword extraction pages from Notion
+ * @param queryText - Optional search text to filter by title or keywords (case-insensitive, trimmed)
+ * @returns Array of normalized keyword pages
+ */
+export async function getCompletedKeywordPages(queryText?: string): Promise<KeywordPage[]> {
+  const notion = getNotionClient();
+  const dbId = process.env.NOTION_KEYWORD_DB_ID;
+
+  if (!dbId) {
+    throw new Error('NOTION_KEYWORD_DB_ID environment variable is not set');
+  }
+
+  // Build filter
+  const baseFilter = {
+    property: '키워드 추출',
+    checkbox: {
+      equals: true,
+    },
+  };
+
+  let filter: unknown = baseFilter;
+
+  // Add queryText filter if provided
+  if (queryText && queryText.trim()) {
+    const trimmedQuery = queryText.trim().toLowerCase();
+    filter = {
+      and: [
+        baseFilter,
+        {
+          or: [
+            {
+              property: 'Title',
+              title: {
+                contains: trimmedQuery,
+              },
+            },
+            {
+              property: '키워드',
+              multi_select: {
+                contains: trimmedQuery,
+              },
+            },
+          ],
+        },
+      ],
+    };
+  }
+
+  const response = await notion.databases.query({
+    database_id: dbId,
+    filter: filter as any,
+    sorts: [
+      {
+        timestamp: 'last_edited_time',
+        direction: 'descending',
+      },
+    ],
+    page_size: 20,
+  });
+
+  // Normalize results
+  return response.results.map((page: any) => {
+    const title = extractTitle(page.properties['Title']);
+    const keywords = extractKeywords(page.properties['키워드']);
+
+    return {
+      pageId: page.id,
+      title,
+      keywords,
+    };
+  });
+}

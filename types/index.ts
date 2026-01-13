@@ -68,3 +68,12 @@ export interface CreateTaskModalState {
   isOpen: boolean;
   selectedTemplateIds: string[];
 }
+
+// ============================================
+// Keyword Page - AI Agent용 키워드 추출 페이지
+// ============================================
+export interface KeywordPage {
+  pageId: string;
+  title: string;
+  keywords: string[];
+}

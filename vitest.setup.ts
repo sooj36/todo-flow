@@ -6,6 +6,7 @@ process.env.NOTION_API_KEY = process.env.NOTION_API_KEY || 'test-api-key';
 process.env.NOTION_TEMPLATE_DB_ID = process.env.NOTION_TEMPLATE_DB_ID || 'test-template-db';
 process.env.NOTION_STEP_DB_ID = process.env.NOTION_STEP_DB_ID || 'test-step-db';
 process.env.NOTION_INSTANCE_DB_ID = process.env.NOTION_INSTANCE_DB_ID || 'test-instance-db';
+process.env.NOTION_KEYWORD_DB_ID = process.env.NOTION_KEYWORD_DB_ID || 'test-keyword-db';
 
 // Mock ResizeObserver for React Flow tests
 globalThis.ResizeObserver = class ResizeObserver {
