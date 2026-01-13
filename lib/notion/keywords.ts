@@ -98,8 +98,13 @@ export async function getCompletedKeywordPages(queryText?: string): Promise<Keyw
     page_size: 20,
   });
 
+  // Check if no completed pages found
+  if (response.results.length === 0) {
+    throw new Error('완료된 키워드 추출 페이지가 없습니다. Notion에서 최소 3~5개의 페이지에 키워드를 추출해주세요.');
+  }
+
   // Normalize results
-  return response.results.map((page: any) => {
+  const normalized = response.results.map((page: any) => {
     const title = extractTitle(page.properties['Title']);
     const keywords = extractKeywords(page.properties['키워드']);
 
@@ -109,4 +114,14 @@ export async function getCompletedKeywordPages(queryText?: string): Promise<Keyw
       keywords,
     };
   });
+
+  // Filter out pages with no keywords
+  const validPages = normalized.filter((page) => page.keywords.length > 0);
+
+  // Check if all pages have no keywords
+  if (validPages.length === 0) {
+    throw new Error('키워드가 하나도 없습니다. Notion 페이지에 키워드를 추가해주세요.');
+  }
+
+  return validPages;
 }

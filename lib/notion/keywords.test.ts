@@ -169,7 +169,7 @@ describe('getCompletedKeywordPages', () => {
     });
   });
 
-  it('should return empty array when no completed pages found', async () => {
+  it('should throw error when no completed pages found', async () => {
     const mockQuery = vi.fn().mockResolvedValue({
       results: [],
     });
@@ -182,16 +182,74 @@ describe('getCompletedKeywordPages', () => {
 
     vi.spyOn(notionClient, 'getNotionClient').mockReturnValue(mockClient);
 
-    const result = await getCompletedKeywordPages();
-
-    expect(result).toEqual([]);
+    await expect(getCompletedKeywordPages()).rejects.toThrow(
+      '완료된 키워드 추출 페이지가 없습니다. Notion에서 최소 3~5개의 페이지에 키워드를 추출해주세요.'
+    );
   });
 
-  it('should handle pages with empty keywords array', async () => {
+  it('should throw error when all pages have no keywords', async () => {
     const mockQuery = vi.fn().mockResolvedValue({
       results: [
         {
           id: 'page-1',
+          properties: {
+            'Title': {
+              type: 'title',
+              title: [{ plain_text: 'Page with no keywords' }],
+            },
+            '키워드': {
+              type: 'multi_select',
+              multi_select: [],
+            },
+          },
+        },
+        {
+          id: 'page-2',
+          properties: {
+            'Title': {
+              type: 'title',
+              title: [{ plain_text: 'Another page with no keywords' }],
+            },
+            '키워드': {
+              type: 'multi_select',
+              multi_select: [],
+            },
+          },
+        },
+      ],
+    });
+
+    const mockClient = {
+      databases: {
+        query: mockQuery,
+      },
+    } as unknown as ReturnType<typeof notionClient.getNotionClient>;
+
+    vi.spyOn(notionClient, 'getNotionClient').mockReturnValue(mockClient);
+
+    await expect(getCompletedKeywordPages()).rejects.toThrow(
+      '키워드가 하나도 없습니다. Notion 페이지에 키워드를 추가해주세요.'
+    );
+  });
+
+  it('should filter out pages with empty keywords and return only valid ones', async () => {
+    const mockQuery = vi.fn().mockResolvedValue({
+      results: [
+        {
+          id: 'page-1',
+          properties: {
+            'Title': {
+              type: 'title',
+              title: [{ plain_text: 'Valid page' }],
+            },
+            '키워드': {
+              type: 'multi_select',
+              multi_select: [{ name: 'keyword1' }],
+            },
+          },
+        },
+        {
+          id: 'page-2',
           properties: {
             'Title': {
               type: 'title',
@@ -219,8 +277,8 @@ describe('getCompletedKeywordPages', () => {
     expect(result).toEqual([
       {
         pageId: 'page-1',
-        title: 'Page with no keywords',
-        keywords: [],
+        title: 'Valid page',
+        keywords: ['keyword1'],
       },
     ]);
   });
