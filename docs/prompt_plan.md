@@ -40,13 +40,16 @@
 #### 13.1.2 상태 관리 (useAgentQuery 훅)
 - 파일: `lib/hooks/useAgentQuery.ts`
 - queryText 전달 방식: 사용자 입력 → `{ queryText }` body로 POST → API에서 Notion 필터(title/keywords 부분 일치)에 전달
-- 반환값: `{ phase, data, error, executeQuery: (text: string) => Promise<void> }`
+- 반환값: `{ phase, data, error, executeQuery: (text: string) => Promise<void>, retry: () => Promise<void> }`
+- retry 동작: 내부에 마지막 queryText를 useRef로 보관, retry 호출 시 저장된 값 재사용
 - [ ] Test: 초기 상태 phase="idle", executeQuery 호출 시 phase="fetch"로 변경
-- [ ] Impl: useState로 phase, data, error 관리
-- [ ] Impl: executeQuery 내부에서 phase 단계별 업데이트 (fetch → normalize → cluster → done)
+- [ ] Impl: useState로 phase, data, error 관리 + useRef로 lastQueryText 보관
+- [ ] Impl: executeQuery 내부에서 lastQueryText.current 업데이트 + phase 단계별 업데이트 (fetch → normalize → cluster → done)
+- [ ] Impl: retry 함수는 lastQueryText.current를 사용하여 executeQuery 재호출
 - [ ] Impl: POST /api/agent/keywords 호출, body: `{ queryText }`
 - [ ] Test: 성공 시 phase="done" + 데이터 저장, 실패 시 phase="error"
-- [ ] 커밋: `feat(agent): add useAgentQuery hook with phase tracking`
+- [ ] Test: retry 호출 시 마지막 queryText로 executeQuery 재실행 확인
+- [ ] 커밋: `feat(agent): add useAgentQuery hook with phase tracking and retry`
 
 #### 13.1.3 진행 단계 표시 (ProgressIndicator)
 - 파일: `components/agent/ProgressIndicator.tsx`
@@ -68,12 +71,12 @@
 
 #### 13.1.5 통합 (app/page.tsx)
 - 파일: `app/page.tsx`
-- onRetry 연결 흐름: useAgentQuery의 executeQuery → ProgressIndicator의 onRetry prop으로 직접 전달
+- onRetry 연결 흐름: useAgentQuery의 retry → ProgressIndicator의 onRetry prop으로 직접 전달 (retry는 마지막 queryText 자동 재사용)
 - [ ] Impl: SearchBar, ProgressIndicator, ClusterResultPanel 배치
-- [ ] Impl: useAgentQuery에서 { phase, data, error, executeQuery } 받아서 각 컴포넌트에 전달
-- [ ] Impl: ProgressIndicator에 phase, error, onRetry={executeQuery} 전달
+- [ ] Impl: useAgentQuery에서 { phase, data, error, executeQuery, retry } 받아서 각 컴포넌트에 전달
+- [ ] Impl: SearchBar에 onSearch={executeQuery}, ProgressIndicator에 onRetry={retry} 전달
 - [ ] Test: 검색 → 로딩 → 결과 표시 플로우 통합 테스트
-- [ ] Test: 에러 발생 → "다시 시도" 클릭 → executeQuery 재호출 확인
+- [ ] Test: 에러 발생 → "다시 시도" 클릭 → retry 재호출 확인 (마지막 queryText 유지)
 - [ ] 커밋: `feat(agent): integrate agent UI into main page`
 
 ### 13.2 Notion Retrieval (키워드 추출 완료 필터)
