@@ -130,11 +130,11 @@
 
 #### 13.3.4 Fallback 처리
 - 파일: `app/api/agent/keywords/route.ts`
-- [ ] Test: Gemini 실패 시 1회 재시도 확인
-- [ ] Impl: try-catch로 재시도 로직 추가
-- [ ] Test: 2회 실패 시 topKeywords만 반환 (빈도 집계)
-- [ ] Impl: 빈도 집계 fallback 함수 추가
-- [ ] 커밋: `feat(api): add fallback for LLM failure`
+- [x] Test: Gemini 실패 시 1회 재시도 확인
+- [x] Impl: try-catch로 재시도 로직 추가
+- [x] Test: 2회 실패 시 topKeywords만 반환 (빈도 집계)
+- [x] Impl: 빈도 집계 fallback 함수 추가
+- [x] 커밋: `feat(api): add fallback for LLM failure`
 
 #### 13.3.5 성능/비용 메모
 - 파일: `docs/plan_b.md` (추가 섹션)
