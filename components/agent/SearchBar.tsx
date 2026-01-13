@@ -12,7 +12,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     // Check both e.isComposing and e.nativeEvent.isComposing for browser compatibility
-    const isComposing = e.isComposing || (e.nativeEvent as any).isComposing;
+    const isComposing = e.isComposing || Boolean(e.nativeEvent && (e.nativeEvent as any).isComposing);
     if (e.key === 'Enter' && query.trim() && !isComposing) {
       onSearch(query.trim());
     }
