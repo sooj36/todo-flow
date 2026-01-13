@@ -17,12 +17,6 @@
 - Default order: prompt_plan.md → spec.md → PRD.md → COMPONENTS.md → DATA_MODEL.md → log.md
 - Skip files that are not relevant to the current task.
 
-## Phase 12 Tasks (Interactive Calendar Day Clicks)
-- 목표: Calendar day 클릭 시 selectedDate 변경 및 FlowBoard 동기화
-- 파일: components/calendar/NotionCalendar.tsx, app/page.tsx
-- 원칙: 클릭 시 즉시 반응 (Optimistic UI 느낌), 명확한 상태 전파 (Calendar -> Parent -> Flow)
-- UI/UX 결정: 클릭 시 포커스 강제 이동은 생략하되, 선택 스타일(isSelected)로 시각적 피드백 제공
-
 ## Phase 13 Tasks (AI Agent MVP: Keyword Clustering)
 - 목표: 검색창 입력 → Notion "키워드 추출 완료" 페이지 수집 → LLM 클러스터링 결과 UI 렌더링
 - 원칙: LLM은 Notion 직접 탐색 금지, 구조화 JSON + zod 검증, 진행 단계 표시 필수
@@ -32,10 +26,10 @@
 
 #### 13.1.1 SearchBar 컴포넌트 (기본 레이아웃)
 - 파일: `components/agent/SearchBar.tsx`
-- [ ] Test: SearchBar 렌더링, placeholder 표시 확인
-- [ ] Impl: input + Enter 핸들러 추가, onSearch prop 전달
-- [ ] Test: Enter 입력 시 onSearch 콜백 호출 확인
-- [ ] 커밋: `feat(agent): add SearchBar component`
+- [x] Test: SearchBar 렌더링, placeholder 표시 확인
+- [x] Impl: input + Enter 핸들러 추가, onSearch prop 전달
+- [x] Test: Enter 입력 시 onSearch 콜백 호출 확인
+- [x] 커밋: `feat(agent): add SearchBar component`
 
 #### 13.1.2 상태 관리 (useAgentQuery 훅)
 - 파일: `lib/hooks/useAgentQuery.ts`
@@ -188,7 +182,7 @@
 
 
 
-## Future Extension: Agentic AI (Auto Triage)
+## Future Extension: Agentic AI (Auto Triage) (ai agent)
 - 목표: 캘린더/인스턴스 데이터를 보고 일정 충돌/미완료를 자동 조정
 - 계획: 우선순위 재배치/연기/분할 계획 생성
 - 도구 실행: Notion DB 업데이트
