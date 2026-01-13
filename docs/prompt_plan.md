@@ -39,18 +39,23 @@
 
 #### 13.1.2 상태 관리 (useAgentQuery 훅)
 - 파일: `lib/hooks/useAgentQuery.ts`
-- [ ] Test: 초기 상태 idle, query 호출 시 running으로 변경
-- [ ] Impl: useState로 상태(idle/running/success/error), queryText 관리
-- [ ] Impl: POST /api/agent/keywords 호출 함수 추가
-- [ ] Test: 성공 시 success + 데이터 저장, 실패 시 error 상태
-- [ ] 커밋: `feat(agent): add useAgentQuery hook for state management`
+- queryText 전달 방식: 사용자 입력 → `{ queryText }` body로 POST → API에서 Notion 필터(title/keywords 부분 일치)에 전달
+- 반환값: `{ phase, data, error, executeQuery: (text: string) => Promise<void> }`
+- [ ] Test: 초기 상태 phase="idle", executeQuery 호출 시 phase="fetch"로 변경
+- [ ] Impl: useState로 phase, data, error 관리
+- [ ] Impl: executeQuery 내부에서 phase 단계별 업데이트 (fetch → normalize → cluster → done)
+- [ ] Impl: POST /api/agent/keywords 호출, body: `{ queryText }`
+- [ ] Test: 성공 시 phase="done" + 데이터 저장, 실패 시 phase="error"
+- [ ] 커밋: `feat(agent): add useAgentQuery hook with phase tracking`
 
 #### 13.1.3 진행 단계 표시 (ProgressIndicator)
 - 파일: `components/agent/ProgressIndicator.tsx`
-- [ ] Test: running 상태일 때 "조회 중..." 텍스트 렌더링
-- [ ] Impl: status prop 받아서 단계별 메시지 표시
-- [ ] Test: success/error 상태 메시지 렌더링 확인
-- [ ] 커밋: `feat(agent): add ProgressIndicator for step display`
+- 상태값 타입: `phase: "idle" | "fetch" | "normalize" | "cluster" | "done" | "error"`
+- [ ] Test: phase="fetch"일 때 "Notion에서 완료 페이지 조회 중..." 렌더링
+- [ ] Impl: phase prop 받아서 단계별 메시지 표시
+- [ ] Test: phase="normalize" → "키워드 정규화 중...", phase="cluster" → "클러스터링 중..." 렌더링 확인
+- [ ] Test: phase="done"/error 상태 메시지 렌더링 확인
+- [ ] 커밋: `feat(agent): add ProgressIndicator with phase-based messaging`
 
 #### 13.1.4 결과 패널 (ClusterResultPanel)
 - 파일: `components/agent/ClusterResultPanel.tsx`
@@ -154,8 +159,12 @@
 - [ ] Test: 빈도 집계 fallback 동작 (lib/agent/clustering.test.ts)
 
 #### 13.5.3 Integration Tests
+- Mock 전략: MSW (Mock Service Worker) 사용, POST /api/agent/keywords 핸들러 등록
 - [ ] Test: UI 통합 (검색 → 로딩 → 결과) (app/__tests__/agent.test.tsx)
+  - MSW로 성공/실패 시나리오 mock 응답 설정
+  - userEvent로 검색창 입력 → Enter → phase 변화 → 결과 렌더링 확인
 - [ ] Test: API 라우트 E2E (app/api/agent/keywords/route.test.ts)
+  - Notion/Gemini 호출은 vi.spyOn으로 mock, 실제 라우트 핸들러 호출
 
 #### 13.5.4 Final Commit
 - [ ] 커밋: `feat: complete AI agent keyword clustering MVP (Phase 13)`
