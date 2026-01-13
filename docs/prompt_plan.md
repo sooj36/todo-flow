@@ -99,10 +99,10 @@
 
 #### 13.2.3 에러 처리 (Failure Modes)
 - 파일: `lib/notion/keywords.ts`
-- [ ] Test: 완료 페이지 0개 → 특정 에러 메시지 throw
-- [ ] Impl: 키워드 속성 없음 → 가이드 메시지 throw
-- [ ] Test: Cold start 시나리오 → "최소 3~5개 키워드 입력 필요" 안내
-- [ ] 커밋: `feat(notion): add failure handling for empty results`
+- [x] Test: 완료 페이지 0개 → 특정 에러 메시지 throw
+- [x] Impl: 키워드 속성 없음 → 가이드 메시지 throw
+- [x] Test: Cold start 시나리오 → "최소 3~5개 키워드 입력 필요" 안내
+- [x] 커밋: `feat(notion): add failure handling for empty results`
 
 ### 13.3 LLM Orchestration (Gemini + 구조화 출력)
 
