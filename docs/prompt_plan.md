@@ -108,10 +108,10 @@
 
 #### 13.3.1 API 라우트 (기본 구조)
 - 파일: `app/api/agent/keywords/route.ts`
-- [ ] Test: POST 요청 시 queryText 파싱 확인
-- [ ] Impl: export async function POST(req: Request)
-- [ ] Impl: 입력: { queryText?: string }, 기본값 빈 문자열
-- [ ] 커밋: `feat(api): add POST /api/agent/keywords route`
+- [x] Test: POST 요청 시 queryText 파싱 확인
+- [x] Impl: export async function POST(req: Request)
+- [x] Impl: 입력: { queryText?: string }, 기본값 빈 문자열
+- [x] 커밋: `feat(api): add POST /api/agent/keywords route`
 
 #### 13.3.2 Gemini 클러스터링 함수
 - 파일: `lib/agent/clustering.ts`
