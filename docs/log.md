@@ -1,5 +1,17 @@
 # log.md
 
+## Phase 13 작업 기록 (AI Agent MVP: Keyword Clustering)
+
+### Phase 13.2.1-13.2.2: Notion Query 함수 및 데이터 정규화 (2026-01-13)
+- lib/notion/keywords.ts: getCompletedKeywordPages 함수 구현
+- KeywordPage 타입 추가 (pageId, title, keywords[])
+- Notion API query: 키워드 추출 == true 필터
+- queryText 필터링: 대소문자 무시, trim, title OR keywords 부분 일치
+- 정렬: last_edited_time descending, limit: 20
+- keywords 정규화: trim, 중복 제거, 빈 값 제거
+- lib/notion/keywords.test.ts: 5개 테스트 모두 통과
+- 커밋 ID: 23aaabe
+
 ## 테스트 결과
 - NotionCalendar.test.tsx: 현재 월/Phase/일자 렌더링 통과 (데이터 연동 포함) – 2026-01-07
 - FlowBoard.test.tsx: 연결 전 상태 UI 렌더링 통과 – 2026-01-07
