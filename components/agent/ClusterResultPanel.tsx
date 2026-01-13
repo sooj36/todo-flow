@@ -77,6 +77,8 @@ export const ClusterResultPanel: React.FC<ClusterResultPanelProps> = ({
               <button
                 onClick={() => toggleCluster(index)}
                 className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                aria-expanded={isExpanded}
+                aria-controls={`cluster-content-${index}`}
               >
                 <span className="font-medium text-gray-900">
                   {cluster.label}
@@ -90,7 +92,10 @@ export const ClusterResultPanel: React.FC<ClusterResultPanelProps> = ({
 
               {/* Cluster Content */}
               {isExpanded && (
-                <div className="p-4 bg-white flex flex-col gap-3">
+                <div
+                  id={`cluster-content-${index}`}
+                  className="p-4 bg-white flex flex-col gap-3"
+                >
                   {/* Keywords */}
                   <div>
                     <h4 className="text-sm font-medium text-gray-700 mb-2">

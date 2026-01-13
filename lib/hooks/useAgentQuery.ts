@@ -5,13 +5,20 @@ export type Phase = 'idle' | 'fetch' | 'normalize' | 'cluster' | 'done' | 'error
 export interface ClusterResult {
   meta: {
     totalPages: number;
+    totalKeywords: number;
   };
   clusters: Array<{
     label: string;
     keywords: string[];
-    pageRefs: string[];
+    pageRefs: Array<{
+      pageId: string;
+      title: string;
+    }>;
   }>;
-  topKeywords: string[];
+  topKeywords: Array<{
+    keyword: string;
+    count: number;
+  }>;
 }
 
 export interface UseAgentQueryReturn {

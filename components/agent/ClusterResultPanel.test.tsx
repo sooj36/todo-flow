@@ -101,4 +101,16 @@ describe("ClusterResultPanel", () => {
     // Keywords should be visible again
     expect(screen.getByText("사용자 경험")).toBeInTheDocument();
   });
+
+  it("has proper accessibility attributes on cluster toggles", () => {
+    render(<ClusterResultPanel data={mockData} />);
+
+    const uiUxButton = screen.getByText("UI/UX").closest("button");
+    expect(uiUxButton).toHaveAttribute("aria-expanded", "true");
+    expect(uiUxButton).toHaveAttribute("aria-controls", "cluster-content-0");
+
+    const backendButton = screen.getByText("Backend").closest("button");
+    expect(backendButton).toHaveAttribute("aria-expanded", "true");
+    expect(backendButton).toHaveAttribute("aria-controls", "cluster-content-1");
+  });
 });
