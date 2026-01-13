@@ -83,19 +83,19 @@
 - 파일: `lib/notion/keywords.ts`
 - queryText 필터 규칙: 대소문자 무시(case-insensitive), 공백 trim 후 부분 일치(contains), title OR keywords 속성 검색
 - limit: 20 제한 근거: Gemini Free Tier TPM 한도(32k) + 페이지당 평균 150 tokens 가정 = 안전 마진 확보 + 3~5초 응답 시간 목표
-- [ ] Test: getCompletedKeywordPages 호출 시 필터 조건 확인
-- [ ] Impl: Notion API query, 필터: `키워드 추출 == true`
-- [ ] Impl: 정렬: 최근 업데이트 순, limit: 20
-- [ ] Impl: queryText 필터 적용 (trim, toLowerCase, contains 검색)
-- [ ] Test: queryText 있을 때 title/keywords 대소문자 무시 부분 일치 확인
-- [ ] 커밋: `feat(notion): add getCompletedKeywordPages query`
+- [x] Test: getCompletedKeywordPages 호출 시 필터 조건 확인
+- [x] Impl: Notion API query, 필터: `키워드 추출 == true`
+- [x] Impl: 정렬: 최근 업데이트 순, limit: 20
+- [x] Impl: queryText 필터 적용 (trim, toLowerCase, contains 검색)
+- [x] Test: queryText 있을 때 title/keywords 대소문자 무시 부분 일치 확인
+- [x] 커밋: `feat(notion): add getCompletedKeywordPages query`
 
 #### 13.2.2 데이터 정규화
 - 파일: `lib/notion/keywords.ts` (함수 내부)
-- [ ] Test: 응답 데이터를 { pageId, title, keywords[] } 형태로 변환
-- [ ] Impl: trim, 중복 제거, 빈 값 제거 로직 추가
-- [ ] Test: keywords 배열 정제 결과 확인
-- [ ] 커밋: `feat(notion): normalize keyword page data`
+- [x] Test: 응답 데이터를 { pageId, title, keywords[] } 형태로 변환
+- [x] Impl: trim, 중복 제거, 빈 값 제거 로직 추가
+- [x] Test: keywords 배열 정제 결과 확인
+- [x] 커밋: `feat(notion): normalize keyword page data` (13.2.1과 함께 완료)
 
 #### 13.2.3 에러 처리 (Failure Modes)
 - 파일: `lib/notion/keywords.ts`
