@@ -3,16 +3,21 @@ import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
   try {
-    // Parse request body
+    // Parse request body with strict error handling
     let body: { queryText?: string } = {};
-    try {
-      const text = await req.text();
-      if (text) {
+
+    // Read body text first to distinguish empty body from malformed JSON
+    const text = await req.text();
+    if (text) {
+      try {
         body = JSON.parse(text);
+      } catch (error) {
+        // Return 400 only for malformed JSON (not empty body)
+        return NextResponse.json(
+          { error: 'Invalid request body' },
+          { status: 400 }
+        );
       }
-    } catch (error) {
-      // If parsing fails, use empty object
-      body = {};
     }
 
     // Extract queryText with default value
