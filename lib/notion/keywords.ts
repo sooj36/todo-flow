@@ -1,5 +1,10 @@
 // lib/notion/keywords.ts
 // Notion keyword pages query and normalization
+//
+// NOTE: Notion API 'contains' filter case-sensitivity is not documented.
+// This implementation uses the original queryText (trimmed only) to match
+// user input exactly. Users should match the case of their Notion data.
+// See: https://developers.notion.com/reference/post-database-query-filter
 
 import { getNotionClient } from './client';
 import { extractTitle } from './parsers';
@@ -34,7 +39,7 @@ function extractKeywords(property: unknown): string[] {
 
 /**
  * Get completed keyword extraction pages from Notion
- * @param queryText - Optional search text to filter by title or keywords (case-insensitive, trimmed)
+ * @param queryText - Optional search text to filter by title or keywords (trimmed, case-matching as-is)
  * @returns Array of normalized keyword pages
  */
 export async function getCompletedKeywordPages(queryText?: string): Promise<KeywordPage[]> {
@@ -55,9 +60,9 @@ export async function getCompletedKeywordPages(queryText?: string): Promise<Keyw
 
   let filter: unknown = baseFilter;
 
-  // Add queryText filter if provided
+  // Add queryText filter if provided (trimmed, preserving original case)
   if (queryText && queryText.trim()) {
-    const trimmedQuery = queryText.trim().toLowerCase();
+    const trimmedQuery = queryText.trim();
     filter = {
       and: [
         baseFilter,

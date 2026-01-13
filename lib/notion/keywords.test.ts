@@ -102,7 +102,7 @@ describe('getCompletedKeywordPages', () => {
     ]);
   });
 
-  it('should filter by queryText in title (case-insensitive)', async () => {
+  it('should filter by queryText in title and keywords (trimmed)', async () => {
     const mockQuery = vi.fn().mockResolvedValue({
       results: [
         {
@@ -114,7 +114,7 @@ describe('getCompletedKeywordPages', () => {
             },
             '키워드': {
               type: 'multi_select',
-              multi_select: [{ name: 'interview' }],
+              multi_select: [{ name: 'Interview' }],
             },
           },
         },
@@ -129,7 +129,7 @@ describe('getCompletedKeywordPages', () => {
 
     vi.spyOn(notionClient, 'getNotionClient').mockReturnValue(mockClient);
 
-    await getCompletedKeywordPages('  INTERVIEW  ');
+    await getCompletedKeywordPages('  Interview  ');
 
     expect(mockQuery).toHaveBeenCalledWith({
       database_id: process.env.NOTION_KEYWORD_DB_ID,
@@ -146,13 +146,13 @@ describe('getCompletedKeywordPages', () => {
               {
                 property: 'Title',
                 title: {
-                  contains: 'interview',
+                  contains: 'Interview',
                 },
               },
               {
                 property: '키워드',
                 multi_select: {
-                  contains: 'interview',
+                  contains: 'Interview',
                 },
               },
             ],
@@ -223,5 +223,25 @@ describe('getCompletedKeywordPages', () => {
         keywords: [],
       },
     ]);
+  });
+
+  it('should throw error when NOTION_KEYWORD_DB_ID is not set', async () => {
+    const originalDbId = process.env.NOTION_KEYWORD_DB_ID;
+    delete process.env.NOTION_KEYWORD_DB_ID;
+
+    const mockClient = {
+      databases: {
+        query: vi.fn(),
+      },
+    } as unknown as ReturnType<typeof notionClient.getNotionClient>;
+
+    vi.spyOn(notionClient, 'getNotionClient').mockReturnValue(mockClient);
+
+    await expect(getCompletedKeywordPages()).rejects.toThrow(
+      'NOTION_KEYWORD_DB_ID environment variable is not set'
+    );
+
+    // Restore original value
+    process.env.NOTION_KEYWORD_DB_ID = originalDbId;
   });
 });
