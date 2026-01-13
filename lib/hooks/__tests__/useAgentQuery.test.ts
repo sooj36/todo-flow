@@ -4,11 +4,12 @@ import { useAgentQuery } from '../useAgentQuery';
 
 describe('useAgentQuery', () => {
   beforeEach(() => {
-    global.fetch = vi.fn();
+    vi.stubGlobal('fetch', vi.fn());
     vi.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
   afterEach(() => {
+    vi.unstubAllGlobals();
     vi.restoreAllMocks();
   });
 
@@ -58,7 +59,6 @@ describe('useAgentQuery', () => {
     });
 
     const { result } = renderHook(() => useAgentQuery());
-    const phases: string[] = [];
 
     await result.current.executeQuery('test query');
 
