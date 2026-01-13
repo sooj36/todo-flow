@@ -68,8 +68,12 @@
 
 #### 13.1.5 통합 (app/page.tsx)
 - 파일: `app/page.tsx`
+- onRetry 연결 흐름: useAgentQuery의 executeQuery → ProgressIndicator의 onRetry prop으로 직접 전달
 - [ ] Impl: SearchBar, ProgressIndicator, ClusterResultPanel 배치
+- [ ] Impl: useAgentQuery에서 { phase, data, error, executeQuery } 받아서 각 컴포넌트에 전달
+- [ ] Impl: ProgressIndicator에 phase, error, onRetry={executeQuery} 전달
 - [ ] Test: 검색 → 로딩 → 결과 표시 플로우 통합 테스트
+- [ ] Test: 에러 발생 → "다시 시도" 클릭 → executeQuery 재호출 확인
 - [ ] 커밋: `feat(agent): integrate agent UI into main page`
 
 ### 13.2 Notion Retrieval (키워드 추출 완료 필터)
