@@ -59,6 +59,8 @@ describe('getCompletedKeywordPages', () => {
   });
 
   it('should normalize keyword page data correctly', async () => {
+    const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
     const mockQuery = vi.fn().mockResolvedValue({
       results: [
         {
@@ -100,6 +102,11 @@ describe('getCompletedKeywordPages', () => {
         keywords: ['keyword1', 'keyword2'], // trimmed, deduplicated, empty removed
       },
     ]);
+
+    // No warning should be logged when all pages have keywords
+    expect(consoleWarnSpy).not.toHaveBeenCalled();
+
+    consoleWarnSpy.mockRestore();
   });
 
   it('should filter by queryText in title and keywords (trimmed)', async () => {
@@ -233,6 +240,8 @@ describe('getCompletedKeywordPages', () => {
   });
 
   it('should filter out pages with empty keywords and return only valid ones', async () => {
+    const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
     const mockQuery = vi.fn().mockResolvedValue({
       results: [
         {
@@ -281,6 +290,13 @@ describe('getCompletedKeywordPages', () => {
         keywords: ['keyword1'],
       },
     ]);
+
+    // Verify warning was logged for filtered pages
+    expect(consoleWarnSpy).toHaveBeenCalledWith(
+      '[getCompletedKeywordPages] Filtered out 1 page(s) with no keywords: Page with no keywords'
+    );
+
+    consoleWarnSpy.mockRestore();
   });
 
   it('should throw error when NOTION_KEYWORD_DB_ID is not set', async () => {

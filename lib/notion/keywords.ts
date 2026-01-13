@@ -39,8 +39,23 @@ function extractKeywords(property: unknown): string[] {
 
 /**
  * Get completed keyword extraction pages from Notion
+ *
+ * This function queries the Notion database for pages with "키워드 추출" checkbox enabled,
+ * normalizes the data, and filters out pages with empty keywords.
+ *
  * @param queryText - Optional search text to filter by title or keywords (trimmed, case-matching as-is)
- * @returns Array of normalized keyword pages
+ * @returns Array of normalized keyword pages (only pages with at least one keyword)
+ *
+ * @throws {Error} When no completed pages found (cold start scenario) -
+ *                 "완료된 키워드 추출 페이지가 없습니다. Notion에서 최소 3~5개의 페이지에 키워드를 추출해주세요."
+ * @throws {Error} When all pages have empty keywords -
+ *                 "키워드가 하나도 없습니다. Notion 페이지에 키워드를 추가해주세요."
+ * @throws {Error} When NOTION_KEYWORD_DB_ID environment variable is not set
+ *
+ * @remarks
+ * - Pages without any keywords are silently filtered out and logged to console
+ * - This is a breaking change from previous behavior (returning empty array)
+ * - Callers should handle errors and display appropriate user guidance
  */
 export async function getCompletedKeywordPages(queryText?: string): Promise<KeywordPage[]> {
   const notion = getNotionClient();
@@ -117,6 +132,17 @@ export async function getCompletedKeywordPages(queryText?: string): Promise<Keyw
 
   // Filter out pages with no keywords
   const validPages = normalized.filter((page) => page.keywords.length > 0);
+
+  // Log filtered pages for debugging
+  const filteredCount = normalized.length - validPages.length;
+  if (filteredCount > 0) {
+    const filteredTitles = normalized
+      .filter((page) => page.keywords.length === 0)
+      .map((page) => page.title);
+    console.warn(
+      `[getCompletedKeywordPages] Filtered out ${filteredCount} page(s) with no keywords: ${filteredTitles.join(', ')}`
+    );
+  }
 
   // Check if all pages have no keywords
   if (validPages.length === 0) {
