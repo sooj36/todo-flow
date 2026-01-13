@@ -22,9 +22,17 @@ describe("ProgressIndicator", () => {
     expect(screen.getByText("클러스터링 중...")).toBeInTheDocument();
   });
 
-  it('renders "완료" when phase is "done"', () => {
-    render(<ProgressIndicator phase="done" />);
+  it('renders "완료" with check icon when phase is "done"', () => {
+    const { container } = render(<ProgressIndicator phase="done" />);
     expect(screen.getByText("완료")).toBeInTheDocument();
+
+    // Should not have spinner
+    const spinner = container.querySelector(".animate-spin");
+    expect(spinner).toBeNull();
+
+    // Should have check icon (svg with specific class or aria-hidden)
+    const checkIcon = container.querySelector("svg");
+    expect(checkIcon).toBeInTheDocument();
   });
 
   it("renders error message and retry button when phase is error", () => {
