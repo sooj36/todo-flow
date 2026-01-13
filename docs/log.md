@@ -208,3 +208,24 @@
 - docs/pre_prompt_plan.md에 Phase 7+ 추가 (보관용) – 2026-01-09
 - docs/prompt_plan.md에서 Phase 7+ 제거 (진행 중 태스크에서 제외) – 2026-01-09
 - 커밋 ID: 216b919 – 2026-01-09
+
+## Phase 13.1 후속: 테스트 개선 (2026-01-13)
+- app/__tests__/agent.integration.test.tsx: global.fetch 누수 문제 수정 – 2026-01-13
+  - global.fetch = ... 직접 할당 → vi.stubGlobal('fetch', fetchMock) 사용
+  - afterEach에 vi.unstubAllGlobals() 추가하여 테스트 격리 보장
+  - vitest 공식 권장 API 사용으로 테스트 간 상태 누수 방지
+- 전체 테스트 실행 결과: 13/16 파일 통과, 83/91 테스트 통과 ✅ – 2026-01-13
+  - components/agent/* 테스트 모두 통과 (ClusterResultPanel, SearchBar, ProgressIndicator)
+  - lib/hooks/__tests__/useAgentQuery.test.ts 모두 통과
+- 커밋 ID: 5c92227 – 2026-01-13
+
+### 남은 이슈: 테스트 메모리 부족
+- 상태: 보류 (우선순위 Low) – 2026-01-13
+- 증상: 전체 테스트 실행 시 heap out of memory 발생 (exit code 137)
+- 영향: app/__tests__/agent.integration.test.tsx가 메모리 부족으로 실행되지 못함 (3 worker errors)
+- 원인: vitest worker 프로세스가 메모리 한계 도달
+- 해결 방안 (나중에 필요 시):
+  1. package.json 테스트 스크립트에 NODE_OPTIONS='--max-old-space-size=4096' 추가
+  2. vitest.config.ts에서 poolOptions.threads.maxThreads 조정
+  3. 테스트 파일을 더 작은 단위로 분할
+- 참고: 코드 수정은 올바르게 완료됨, 테스트 환경 문제일 뿐
