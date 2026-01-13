@@ -5,6 +5,10 @@ import { Bell } from "lucide-react";
 import { NotionCalendar } from "@/components/calendar/NotionCalendar";
 import { FlowBoard } from "@/components/flow/FlowBoard";
 import { Sidebar } from "@/components/layout/Sidebar";
+import { SearchBar } from "@/components/agent/SearchBar";
+import { ProgressIndicator } from "@/components/agent/ProgressIndicator";
+import { ClusterResultPanel } from "@/components/agent/ClusterResultPanel";
+import { useAgentQuery } from "@/lib/hooks/useAgentQuery";
 
 export default function Home() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -12,6 +16,9 @@ export default function Home() {
   const [isDragging, setIsDragging] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date()); // Shared date state
   const mainRef = useRef<HTMLElement>(null);
+
+  // Agent query state
+  const { phase, data, error, executeQuery, retry } = useAgentQuery();
 
   useEffect(() => {
     if (!isDragging) return;
@@ -70,10 +77,20 @@ export default function Home() {
         </div>
 
         <div
-          className="h-full flex flex-col bg-[#f9fafb] min-w-0 flex-none"
+          className="h-full flex flex-col bg-[#f9fafb] min-w-0 flex-none overflow-hidden"
           style={{ width: `${(1 - splitRatio) * 100}%` }}
         >
-          <FlowBoard selectedDate={selectedDate} />
+          {/* Agent Section */}
+          <div className="flex-shrink-0 bg-white border-b border-[#ececeb] p-4 space-y-4">
+            <SearchBar onSearch={executeQuery} />
+            <ProgressIndicator phase={phase} error={error ?? undefined} onRetry={retry} />
+            {phase === "done" && data && <ClusterResultPanel data={data} />}
+          </div>
+
+          {/* FlowBoard Section */}
+          <div className="flex-1 overflow-auto">
+            <FlowBoard selectedDate={selectedDate} />
+          </div>
         </div>
 
         <div
