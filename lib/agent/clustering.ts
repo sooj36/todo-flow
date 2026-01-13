@@ -1,5 +1,7 @@
 // lib/agent/clustering.ts
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { ClusterResultSchema } from './schema';
+import type { ClusterResult } from './schema';
 
 export interface KeywordPage {
   pageId: string;
@@ -7,21 +9,7 @@ export interface KeywordPage {
   keywords: string[];
 }
 
-export interface ClusterResult {
-  meta: {
-    totalPages: number;
-    clustersFound: number;
-  };
-  clusters: Array<{
-    name: string;
-    keywords: string[];
-    pageRefs: string[];
-  }>;
-  topKeywords: Array<{
-    keyword: string;
-    count: number;
-  }>;
-}
+export type { ClusterResult };
 
 export async function clusterKeywords(pages: KeywordPage[]): Promise<ClusterResult> {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -50,7 +38,10 @@ export async function clusterKeywords(pages: KeywordPage[]): Promise<ClusterResu
   const text = response.text();
 
   // Parse JSON response
-  const clusterResult: ClusterResult = JSON.parse(text);
+  const rawData = JSON.parse(text);
+
+  // Validate with zod schema - throws ZodError if invalid
+  const clusterResult = ClusterResultSchema.parse(rawData);
 
   return clusterResult;
 }

@@ -1,28 +1,31 @@
-import { z } from "zod";
+// lib/agent/schema.ts
+import { z } from 'zod';
 
-export const PageRefSchema = z.object({
-  pageId: z.string(),
-  title: z.string(),
-});
-
+// Schema for individual cluster
 export const ClusterSchema = z.object({
-  label: z.string(),
+  name: z.string(),
   keywords: z.array(z.string()),
-  pageRefs: z.array(PageRefSchema),
+  pageRefs: z.array(z.string()),
 });
 
+// Schema for top keyword frequency
 export const TopKeywordSchema = z.object({
   keyword: z.string(),
   count: z.number(),
 });
 
+// Schema for meta information
+export const MetaSchema = z.object({
+  totalPages: z.number(),
+  clustersFound: z.number(),
+});
+
+// Main schema for cluster result
 export const ClusterResultSchema = z.object({
-  meta: z.object({
-    totalPages: z.number(),
-    totalKeywords: z.number(),
-  }),
+  meta: MetaSchema,
   clusters: z.array(ClusterSchema),
   topKeywords: z.array(TopKeywordSchema),
 });
 
+// Type inference from schema
 export type ClusterResult = z.infer<typeof ClusterResultSchema>;
