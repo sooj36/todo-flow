@@ -227,21 +227,24 @@ describe('getCompletedKeywordPages', () => {
 
   it('should throw error when NOTION_KEYWORD_DB_ID is not set', async () => {
     const originalDbId = process.env.NOTION_KEYWORD_DB_ID;
-    delete process.env.NOTION_KEYWORD_DB_ID;
 
-    const mockClient = {
-      databases: {
-        query: vi.fn(),
-      },
-    } as unknown as ReturnType<typeof notionClient.getNotionClient>;
+    try {
+      delete process.env.NOTION_KEYWORD_DB_ID;
 
-    vi.spyOn(notionClient, 'getNotionClient').mockReturnValue(mockClient);
+      const mockClient = {
+        databases: {
+          query: vi.fn(),
+        },
+      } as unknown as ReturnType<typeof notionClient.getNotionClient>;
 
-    await expect(getCompletedKeywordPages()).rejects.toThrow(
-      'NOTION_KEYWORD_DB_ID environment variable is not set'
-    );
+      vi.spyOn(notionClient, 'getNotionClient').mockReturnValue(mockClient);
 
-    // Restore original value
-    process.env.NOTION_KEYWORD_DB_ID = originalDbId;
+      await expect(getCompletedKeywordPages()).rejects.toThrow(
+        'NOTION_KEYWORD_DB_ID environment variable is not set'
+      );
+    } finally {
+      // Restore original value even if assertion fails
+      process.env.NOTION_KEYWORD_DB_ID = originalDbId;
+    }
   });
 });
