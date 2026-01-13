@@ -42,13 +42,13 @@ describe('Agent UI Integration', () => {
         const mockResult = {
             meta: {
                 totalPages: 5,
-                totalKeywords: 20,
+                clustersFound: 1,
             },
             clusters: [
                 {
-                    label: '테스트 클러스터',
+                    name: '테스트 클러스터',
                     keywords: ['키워드1', '키워드2'],
-                    pageRefs: [{ pageId: 'page1', title: '테스트 페이지' }],
+                    pageRefs: ['page1'],
                 },
             ],
             topKeywords: [
@@ -96,8 +96,8 @@ describe('Agent UI Integration', () => {
         // Verify result panel displays
         expect(screen.getByText('분석된 페이지:')).toBeInTheDocument();
         expect(screen.getByText('5개')).toBeInTheDocument();
-        expect(screen.getByText('총 키워드:')).toBeInTheDocument();
-        expect(screen.getByText('20개')).toBeInTheDocument();
+        expect(screen.getByText('클러스터 수:')).toBeInTheDocument();
+        expect(screen.getByText('1개')).toBeInTheDocument();
         expect(screen.getByText('테스트 클러스터')).toBeInTheDocument();
         expect(screen.getByText('키워드1')).toBeInTheDocument();
     });
@@ -129,13 +129,13 @@ describe('Agent UI Integration', () => {
         const mockResult = {
             meta: {
                 totalPages: 1,
-                totalKeywords: 3,
+                clustersFound: 1,
             },
             clusters: [
                 {
-                    label: '재시도 클러스터',
+                    name: '재시도 클러스터',
                     keywords: ['재시도'],
-                    pageRefs: [{ pageId: 'retry1', title: '재시도 페이지' }],
+                    pageRefs: ['retry1'],
                 },
             ],
             topKeywords: [{ keyword: '재시도', count: 1 }],

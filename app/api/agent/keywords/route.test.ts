@@ -99,6 +99,30 @@ describe('POST /api/agent/keywords', () => {
     expect(notionKeywords.getCompletedKeywordPages).toHaveBeenCalledWith('');
   });
 
+  it('should return empty result without calling LLM when no pages found', async () => {
+    // Mock Notion query to return empty array
+    vi.spyOn(notionKeywords, 'getCompletedKeywordPages').mockResolvedValue([]);
+
+    // Spy on clustering to ensure it's NOT called
+    const clusterKeywordsSpy = vi.spyOn(clustering, 'clusterKeywords');
+
+    const request = new Request('http://localhost:3000/api/agent/keywords', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ queryText: 'no results' }),
+    });
+
+    const response = await POST(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data.meta.totalPages).toBe(0);
+    expect(data.meta.clustersFound).toBe(0);
+    expect(data.clusters).toEqual([]);
+    expect(data.topKeywords).toEqual([]);
+    expect(clusterKeywordsSpy).not.toHaveBeenCalled(); // LLM should NOT be called
+  });
+
   it('should return 400 on malformed JSON', async () => {
     const request = new Request('http://localhost:3000/api/agent/keywords', {
       method: 'POST',

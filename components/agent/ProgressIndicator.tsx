@@ -46,7 +46,7 @@ export const ProgressIndicator: React.FC<ProgressIndicatorProps> = ({
   if (phase === "done") {
     return (
       <div className="flex items-center gap-2 p-4 bg-green-50 border border-green-200 rounded-md">
-        <CheckCircle2 className="w-5 h-5 text-green-600" aria-label="완료" />
+        <CheckCircle2 className="w-5 h-5 text-green-600" role="img" aria-label="완료" />
         <p className="text-green-700">{PHASE_MESSAGES[phase]}</p>
       </div>
     );

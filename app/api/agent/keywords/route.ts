@@ -29,6 +29,11 @@ export async function POST(req: Request) {
     // Phase 13.2: Fetch completed keyword pages from Notion
     const pages = await getCompletedKeywordPages(queryText);
 
+    // Early return if no pages found (skip LLM call)
+    if (pages.length === 0) {
+      return NextResponse.json(buildFallbackResult([]));
+    }
+
     // Phase 13.3: Attempt Gemini clustering with 1 retry
     let clusterResult;
     let lastError;
