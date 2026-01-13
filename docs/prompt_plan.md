@@ -42,21 +42,25 @@
 - queryText 전달 방식: 사용자 입력 → `{ queryText }` body로 POST → API에서 Notion 필터(title/keywords 부분 일치)에 전달
 - 반환값: `{ phase, data, error, executeQuery: (text: string) => Promise<void>, retry: () => Promise<void> }`
 - retry 동작: 내부에 마지막 queryText를 useRef로 보관, retry 호출 시 저장된 값 재사용
+- retry 예외 처리: lastQueryText가 비어있으면 no-op (early return), console.warn으로 "재시도할 검색어가 없습니다" 경고
 - [ ] Test: 초기 상태 phase="idle", executeQuery 호출 시 phase="fetch"로 변경
 - [ ] Impl: useState로 phase, data, error 관리 + useRef로 lastQueryText 보관
 - [ ] Impl: executeQuery 내부에서 lastQueryText.current 업데이트 + phase 단계별 업데이트 (fetch → normalize → cluster → done)
-- [ ] Impl: retry 함수는 lastQueryText.current를 사용하여 executeQuery 재호출
+- [ ] Impl: retry 함수는 lastQueryText.current 체크 후, 비어있으면 early return + console.warn
 - [ ] Impl: POST /api/agent/keywords 호출, body: `{ queryText }`
 - [ ] Test: 성공 시 phase="done" + 데이터 저장, 실패 시 phase="error"
 - [ ] Test: retry 호출 시 마지막 queryText로 executeQuery 재실행 확인
+- [ ] Test: lastQueryText 없을 때 retry 호출 → no-op 확인
 - [ ] 커밋: `feat(agent): add useAgentQuery hook with phase tracking and retry`
 
 #### 13.1.3 진행 단계 표시 (ProgressIndicator)
 - 파일: `components/agent/ProgressIndicator.tsx`
 - 상태값 타입: `phase: "idle" | "fetch" | "normalize" | "cluster" | "done" | "error"`
 - Error UX 기준: phase="error" 시 에러 메시지 표시 + "다시 시도" 버튼 포함, onRetry prop 전달
+- 메시지 관리: 컴포넌트 상단에 `PHASE_MESSAGES` 상수 객체로 정의 (예: `{ fetch: "Notion에서...", normalize: "키워드 정규화 중..." }`)
 - [ ] Test: phase="fetch"일 때 "Notion에서 완료 페이지 조회 중..." 렌더링
-- [ ] Impl: phase prop 받아서 단계별 메시지 표시
+- [ ] Impl: phase prop 받아서 PHASE_MESSAGES[phase]로 메시지 표시
+- [ ] Impl: 컴포넌트 상단에 PHASE_MESSAGES 상수 정의
 - [ ] Test: phase="normalize" → "키워드 정규화 중...", phase="cluster" → "클러스터링 중..." 렌더링 확인
 - [ ] Test: phase="error" → 에러 메시지 + "다시 시도" 버튼 렌더링, 버튼 클릭 시 onRetry 호출 확인
 - [ ] Test: phase="done" 상태 메시지 렌더링 확인
@@ -83,10 +87,13 @@
 
 #### 13.2.1 Notion Query 함수
 - 파일: `lib/notion/keywords.ts`
+- queryText 필터 규칙: 대소문자 무시(case-insensitive), 공백 trim 후 부분 일치(contains), title OR keywords 속성 검색
+- limit: 20 제한 근거: Gemini Free Tier TPM 한도(32k) + 페이지당 평균 150 tokens 가정 = 안전 마진 확보 + 3~5초 응답 시간 목표
 - [ ] Test: getCompletedKeywordPages 호출 시 필터 조건 확인
 - [ ] Impl: Notion API query, 필터: `키워드 추출 == true`
 - [ ] Impl: 정렬: 최근 업데이트 순, limit: 20
-- [ ] Test: queryText 있을 때 title/keywords 부분 일치 필터 확인
+- [ ] Impl: queryText 필터 적용 (trim, toLowerCase, contains 검색)
+- [ ] Test: queryText 있을 때 title/keywords 대소문자 무시 부분 일치 확인
 - [ ] 커밋: `feat(notion): add getCompletedKeywordPages query`
 
 #### 13.2.2 데이터 정규화
