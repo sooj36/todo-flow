@@ -115,11 +115,11 @@
 
 #### 13.3.2 Gemini 클러스터링 함수
 - 파일: `lib/agent/clustering.ts`
-- [ ] Test: 페이지 배열 입력 → 클러스터 JSON 출력 확인
-- [ ] Impl: Gemini API 호출, 프롬프트: 동의어 통일 + 5~8개 클러스터
-- [ ] Impl: 구조화 출력 설정 (JSON mode)
-- [ ] Test: 응답이 고정 스키마 형태인지 확인
-- [ ] 커밋: `feat(agent): add Gemini clustering function`
+- [x] Test: 페이지 배열 입력 → 클러스터 JSON 출력 확인
+- [x] Impl: Gemini API 호출, 프롬프트: 동의어 통일 + 5~8개 클러스터
+- [x] Impl: 구조화 출력 설정 (JSON mode)
+- [x] Test: 응답이 고정 스키마 형태인지 확인
+- [x] 커밋: `feat(agent): add Gemini clustering function`
 
 #### 13.3.3 스키마 검증 (zod)
 - 파일: `lib/agent/schema.ts`
