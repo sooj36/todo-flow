@@ -118,7 +118,7 @@ describe("NotionCalendar", () => {
     const day15 = screen.getByTestId("calendar-day-15");
 
     // Day 8 (Selected) should have bold border
-    expect(day8).toHaveClass("border-4");
+    expect(day8).toHaveClass("border-2");
     expect(day8).toHaveClass("border-black");
     expect(day8).toHaveClass("bg-blue-50");
 

@@ -309,7 +309,7 @@ const CalendarDay: React.FC<CalendarDayProps> = ({ day, data, loading, isToday, 
 
   // Priority: isSelected > isToday
   const borderClass = isSelected
-    ? "border-4 border-black"  // Selected: prominent
+    ? "border-2 border-black"  // Selected: prominent
     : (isToday ? "border-2 border-green-500" : "border border-[#ececeb]");  // Today: subtle
 
   const selectedBg = isSelected ? "bg-blue-50" : bgColor;
