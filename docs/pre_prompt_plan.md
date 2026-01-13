@@ -420,6 +420,12 @@
 - [x] Console 에러 없음
 - [x] 커밋: docs: mark Phase 11 complete
 
+## Phase 12 Tasks (Interactive Calendar Day Clicks)
+- 목표: Calendar day 클릭 시 selectedDate 변경 및 FlowBoard 동기화
+- 파일: components/calendar/NotionCalendar.tsx, app/page.tsx
+- 원칙: 클릭 시 즉시 반응 (Optimistic UI 느낌), 명확한 상태 전파 (Calendar -> Parent -> Flow)
+- UI/UX 결정: 클릭 시 포커스 강제 이동은 생략하되, 선택 스타일(isSelected)로 시각적 피드백 제공
+
 ### 12.1 Implement Click Handler in CalendarDay
 - [x] `CalendarDayProps`에 `onClick` 핸들러 추가
 - [x] `CalendarDay` 컴포넌트의 root div에 `onClick` 연결

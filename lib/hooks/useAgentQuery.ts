@@ -1,25 +1,7 @@
 import { useState, useRef } from 'react';
+import { ClusterResultSchema, type ClusterResult } from '@/lib/agent/schema';
 
 export type Phase = 'idle' | 'fetch' | 'normalize' | 'cluster' | 'done' | 'error';
-
-export interface ClusterResult {
-  meta: {
-    totalPages: number;
-    totalKeywords: number;
-  };
-  clusters: Array<{
-    label: string;
-    keywords: string[];
-    pageRefs: Array<{
-      pageId: string;
-      title: string;
-    }>;
-  }>;
-  topKeywords: Array<{
-    keyword: string;
-    count: number;
-  }>;
-}
 
 export interface UseAgentQueryReturn {
   phase: Phase;
@@ -53,7 +35,13 @@ export function useAgentQuery(): UseAgentQueryReturn {
 
       setPhase('normalize');
 
-      const result = await response.json();
+      const rawResult = await response.json();
+
+      // Validate response with zod schema
+      const parseResult = ClusterResultSchema.safeParse(rawResult);
+      if (!parseResult.success) {
+        throw new Error(`Invalid API response: ${parseResult.error.message}`);
+      }
 
       setPhase('cluster');
 
@@ -61,7 +49,7 @@ export function useAgentQuery(): UseAgentQueryReturn {
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       setPhase('done');
-      setData(result);
+      setData(parseResult.data);
     } catch (err) {
       setPhase('error');
       setError(err instanceof Error ? err.message : 'Unknown error');

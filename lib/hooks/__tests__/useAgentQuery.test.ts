@@ -42,15 +42,25 @@ describe('useAgentQuery', () => {
     // Resolve the fetch to clean up
     resolveFetch!({
       ok: true,
-      json: async () => ({ meta: { totalPages: 1 }, clusters: [], topKeywords: [] }),
+      json: async () => ({
+        meta: { totalPages: 1, totalKeywords: 0 },
+        clusters: [],
+        topKeywords: []
+      }),
     });
   });
 
   it('should update phase through fetch → normalize → cluster → done on success', async () => {
     const mockResponse = {
-      meta: { totalPages: 2 },
-      clusters: [{ label: 'Test', keywords: ['test'], pageRefs: [] }],
-      topKeywords: ['test'],
+      meta: { totalPages: 2, totalKeywords: 5 },
+      clusters: [
+        {
+          label: 'Test',
+          keywords: ['test'],
+          pageRefs: [{ pageId: 'page1', title: 'Test Page' }]
+        }
+      ],
+      topKeywords: [{ keyword: 'test', count: 3 }],
     };
 
     (global.fetch as any).mockResolvedValueOnce({
@@ -89,7 +99,7 @@ describe('useAgentQuery', () => {
 
   it('should send POST request to /api/agent/keywords with queryText in body', async () => {
     const mockResponse = {
-      meta: { totalPages: 1 },
+      meta: { totalPages: 1, totalKeywords: 0 },
       clusters: [],
       topKeywords: [],
     };
@@ -112,7 +122,7 @@ describe('useAgentQuery', () => {
 
   it('should retry with last queryText when retry is called', async () => {
     const mockResponse = {
-      meta: { totalPages: 1 },
+      meta: { totalPages: 1, totalKeywords: 0 },
       clusters: [],
       topKeywords: [],
     };

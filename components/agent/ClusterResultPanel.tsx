@@ -1,30 +1,6 @@
 import React, { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
-
-interface PageRef {
-  pageId: string;
-  title: string;
-}
-
-interface Cluster {
-  label: string;
-  keywords: string[];
-  pageRefs: PageRef[];
-}
-
-interface TopKeyword {
-  keyword: string;
-  count: number;
-}
-
-export interface ClusterResult {
-  meta: {
-    totalPages: number;
-    totalKeywords: number;
-  };
-  clusters: Cluster[];
-  topKeywords: TopKeyword[];
-}
+import type { ClusterResult } from "@/lib/agent/schema";
 
 interface ClusterResultPanelProps {
   data: ClusterResult;
@@ -91,43 +67,42 @@ export const ClusterResultPanel: React.FC<ClusterResultPanelProps> = ({
               </button>
 
               {/* Cluster Content */}
-              {isExpanded && (
-                <div
-                  id={`cluster-content-${index}`}
-                  className="p-4 bg-white flex flex-col gap-3"
-                >
-                  {/* Keywords */}
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">
-                      키워드
-                    </h4>
-                    <div className="flex flex-wrap gap-2">
-                      {cluster.keywords.map((keyword, i) => (
-                        <span
-                          key={i}
-                          className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm"
-                        >
-                          {keyword}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Page References */}
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">
-                      관련 페이지
-                    </h4>
-                    <ul className="flex flex-col gap-1">
-                      {cluster.pageRefs.map((ref) => (
-                        <li key={ref.pageId} className="text-sm text-gray-600">
-                          • {ref.title}
-                        </li>
-                      ))}
-                    </ul>
+              <div
+                id={`cluster-content-${index}`}
+                className="p-4 bg-white flex flex-col gap-3"
+                hidden={!isExpanded}
+              >
+                {/* Keywords */}
+                <div>
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">
+                    키워드
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {cluster.keywords.map((keyword, i) => (
+                      <span
+                        key={i}
+                        className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm"
+                      >
+                        {keyword}
+                      </span>
+                    ))}
                   </div>
                 </div>
-              )}
+
+                {/* Page References */}
+                <div>
+                  <h4 className="text-sm font-medium text-gray-700 mb-2">
+                    관련 페이지
+                  </h4>
+                  <ul className="flex flex-col gap-1">
+                    {cluster.pageRefs.map((ref) => (
+                      <li key={ref.pageId} className="text-sm text-gray-600">
+                        • {ref.title}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
             </div>
           );
         })}

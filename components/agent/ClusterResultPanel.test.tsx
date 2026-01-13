@@ -86,20 +86,21 @@ describe("ClusterResultPanel", () => {
     render(<ClusterResultPanel data={mockData} />);
 
     // Initially, unique keyword "사용자 경험" should be visible
-    expect(screen.getByText("사용자 경험")).toBeInTheDocument();
+    const keyword = screen.getByText("사용자 경험");
+    expect(keyword).toBeVisible();
 
     // Click to collapse
     const uiUxHeader = screen.getByText("UI/UX");
     await user.click(uiUxHeader);
 
-    // Keywords should be hidden
-    expect(screen.queryByText("사용자 경험")).not.toBeInTheDocument();
+    // Keywords should be hidden (still in DOM but hidden attribute)
+    expect(keyword).not.toBeVisible();
 
     // Click again to expand
     await user.click(uiUxHeader);
 
     // Keywords should be visible again
-    expect(screen.getByText("사용자 경험")).toBeInTheDocument();
+    expect(keyword).toBeVisible();
   });
 
   it("has proper accessibility attributes on cluster toggles", () => {
