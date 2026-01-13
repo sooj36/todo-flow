@@ -52,13 +52,13 @@
 - 상태값 타입: `phase: "idle" | "fetch" | "normalize" | "cluster" | "done" | "error"`
 - Error UX 기준: phase="error" 시 에러 메시지 표시 + "다시 시도" 버튼 포함, onRetry prop 전달
 - 메시지 관리: 컴포넌트 상단에 `PHASE_MESSAGES` 상수 객체로 정의 (예: `{ fetch: "Notion에서...", normalize: "키워드 정규화 중..." }`)
-- [ ] Test: phase="fetch"일 때 "Notion에서 완료 페이지 조회 중..." 렌더링
-- [ ] Impl: phase prop 받아서 PHASE_MESSAGES[phase]로 메시지 표시
-- [ ] Impl: 컴포넌트 상단에 PHASE_MESSAGES 상수 정의
-- [ ] Test: phase="normalize" → "키워드 정규화 중...", phase="cluster" → "클러스터링 중..." 렌더링 확인
-- [ ] Test: phase="error" → 에러 메시지 + "다시 시도" 버튼 렌더링, 버튼 클릭 시 onRetry 호출 확인
-- [ ] Test: phase="done" 상태 메시지 렌더링 확인
-- [ ] 커밋: `feat(agent): add ProgressIndicator with phase-based messaging and retry`
+- [x] Test: phase="fetch"일 때 "Notion에서 완료 페이지 조회 중..." 렌더링
+- [x] Impl: phase prop 받아서 PHASE_MESSAGES[phase]로 메시지 표시
+- [x] Impl: 컴포넌트 상단에 PHASE_MESSAGES 상수 정의
+- [x] Test: phase="normalize" → "키워드 정규화 중...", phase="cluster" → "클러스터링 중..." 렌더링 확인
+- [x] Test: phase="error" → 에러 메시지 + "다시 시도" 버튼 렌더링, 버튼 클릭 시 onRetry 호출 확인
+- [x] Test: phase="done" 상태 메시지 렌더링 확인
+- [x] 커밋: `feat(agent): add ProgressIndicator with phase-based messaging and retry`
 
 #### 13.1.4 결과 패널 (ClusterResultPanel)
 - 파일: `components/agent/ClusterResultPanel.tsx`
