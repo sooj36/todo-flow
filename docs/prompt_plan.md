@@ -146,9 +146,9 @@
 
 #### 13.4.1 pageRefs 포함
 - 파일: `lib/agent/clustering.ts` (프롬프트 수정)
-- [ ] Test: 각 클러스터에 pageRefs 최소 1개 포함 확인
-- [ ] Impl: 프롬프트에 "각 클러스터마다 pageId 포함" 명시
-- [ ] 커밋: `feat(agent): include pageRefs in cluster output`
+- [x] Test: 각 클러스터에 pageRefs 최소 1개 포함 확인
+- [x] Impl: 프롬프트에 "각 클러스터마다 pageId 포함" 명시
+- [x] 커밋: `feat(agent): include pageRefs in cluster output`
 
 #### 13.4.2 근거 표시 UI
 - 파일: `components/agent/ClusterResultPanel.tsx`

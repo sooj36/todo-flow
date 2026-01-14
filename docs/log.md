@@ -12,6 +12,15 @@
 - lib/notion/keywords.test.ts: 5개 테스트 모두 통과
 - 커밋 ID: 23aaabe
 
+### Phase 13.4.1: pageRefs 포함 (2026-01-14)
+- lib/agent/schema.ts: ClusterSchema에 pageRefs.min(1) 제약 추가
+- lib/agent/clustering.test.ts: 2개 테스트 추가
+  - 각 클러스터에 pageRefs 최소 1개 포함 확인
+  - 빈 pageRefs 배열 시 ZodError throw 확인
+- 기존 프롬프트에 이미 "at least 1 per cluster" 명시되어 있음
+- lib/agent/*.test.ts: 22개 테스트 모두 통과
+- 커밋 ID: 113da3e
+
 ## 테스트 결과
 - NotionCalendar.test.tsx: 현재 월/Phase/일자 렌더링 통과 (데이터 연동 포함) – 2026-01-07
 - FlowBoard.test.tsx: 연결 전 상태 UI 렌더링 통과 – 2026-01-07
