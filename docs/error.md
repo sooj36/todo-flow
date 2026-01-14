@@ -63,7 +63,8 @@ test: {
 NODE_OPTIONS="--max-old-space-size=8192" pnpm test:run
 ```
 
-#### Option D: threads 모드 사용 (메모리 공유)
+#### Option D: threads 모드 사용 (오버헤드 완화, 힙 공유 아님)
+threads는 프로세스보다 오버헤드는 줄지만 워커별 힙은 분리되어 메모리를 공유하지 않습니다.
 ```typescript
 test: {
   pool: 'threads',
@@ -79,4 +80,4 @@ test: {
 
 **참고**:
 - 개별 폴더 테스트는 정상: `pnpm test:run lib/agent/`
-- 전체 테스트 (120개) 자체는 모두 통과, worker 크래시만 발생
+- 전체 테스트는 로직 통과하더라도 워커가 OOM으로 종료될 수 있음
