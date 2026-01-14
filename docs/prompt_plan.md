@@ -154,7 +154,7 @@
 - 파일: `components/agent/ClusterResultPanel.tsx`
 - [x] Test: pageRefs 렌더링 시 페이지 타이틀 표시
 - [x] Impl: 각 클러스터 내 pageRefs 리스트 렌더링
-- [ ] 커밋: `feat(agent): display pageRefs as evidence`
+- [x] 커밋: `feat(agent): display pageRefs as evidence`
 
 ### 13.5 Verification & Integration
 

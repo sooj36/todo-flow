@@ -48,7 +48,7 @@ describe('Agent UI Integration', () => {
                 {
                     name: '테스트 클러스터',
                     keywords: ['키워드1', '키워드2'],
-                    pageRefs: ['page1'],
+                    pageRefs: [{ pageId: 'page1', title: '테스트 페이지' }],
                 },
             ],
             topKeywords: [
@@ -135,7 +135,7 @@ describe('Agent UI Integration', () => {
                 {
                     name: '재시도 클러스터',
                     keywords: ['재시도'],
-                    pageRefs: ['retry1'],
+                    pageRefs: [{ pageId: 'retry1', title: '재시도 페이지' }],
                 },
             ],
             topKeywords: [{ keyword: '재시도', count: 1 }],

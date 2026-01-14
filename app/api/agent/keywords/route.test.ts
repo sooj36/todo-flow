@@ -155,7 +155,7 @@ describe('POST /api/agent/keywords', () => {
     // Mock clustering to fail first, then succeed
     const mockClusterResult = {
       meta: { totalPages: 1, clustersFound: 1 },
-      clusters: [{ name: 'Test', keywords: ['react'], pageRefs: ['page-1'] }],
+      clusters: [{ name: 'Test', keywords: ['react'], pageRefs: [{ pageId: 'page-1', title: 'Test Page' }] }],
       topKeywords: [{ keyword: 'react', count: 2 }],
     };
 
