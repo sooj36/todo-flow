@@ -1,7 +1,7 @@
 # prompt_plan.md - Implementation Roadmap Checklist
 
 ## Instructions for AI
-- Read @spec.md, @prd.md first.
+- Read @spec.md, @PRD.md first.
 - Execute tasks sequentially. After each, verify with tests (pnpm lint, pnpm test).
 - If unclear, ask questions in [ ] format.
 - Mark done with [x], update this file.
@@ -138,9 +138,9 @@
 
 #### 13.3.5 성능/비용 메모
 - 파일: `docs/plan_b.md` (추가 섹션)
-- [ ] 문서: 20페이지 기준 2k~4k tokens, 3~5초 목표 명시
-- [ ] 문서: Gemini Free Tier 한도 (RPM/TPM) 기록
-- [ ] 커밋: `docs: add performance and cost notes for agent`
+- [x] 문서: 20페이지 기준 2k~4k tokens, 3~5초 목표 명시
+- [x] 문서: Gemini Free Tier 한도 (RPM/TPM) 기록
+- [x] 커밋: `docs: add performance and cost notes for agent`
 
 ### 13.4 UX & Evidence
 
