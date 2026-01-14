@@ -3,6 +3,7 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { POST } from './route';
 import * as notionKeywords from '@/lib/notion/keywords';
 import * as clustering from '@/lib/agent/clustering';
+import { ConfigError } from '@/lib/agent/errors';
 
 describe('POST /api/agent/keywords', () => {
   beforeEach(() => {
@@ -216,5 +217,36 @@ describe('POST /api/agent/keywords', () => {
     // Verify fallback result has frequency-based topKeywords
     expect(data.topKeywords[0]).toHaveProperty('keyword');
     expect(data.topKeywords[0]).toHaveProperty('count');
+  });
+
+  it('should fail fast with 500 on ConfigError without retry or fallback', async () => {
+    const mockPages = [
+      {
+        pageId: 'page-1',
+        title: 'Test Page',
+        keywords: ['react', 'typescript'],
+      },
+    ];
+
+    // Mock Notion query to succeed
+    vi.spyOn(notionKeywords, 'getCompletedKeywordPages').mockResolvedValue(mockPages);
+
+    // Mock clustering to throw ConfigError
+    const clusterKeywordsSpy = vi
+      .spyOn(clustering, 'clusterKeywords')
+      .mockRejectedValue(new ConfigError('GEMINI_API_KEY is not configured'));
+
+    const request = new Request('http://localhost:3000/api/agent/keywords', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ queryText: 'test' }),
+    });
+
+    const response = await POST(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(500);
+    expect(data.error).toBe('Failed to process keywords');
+    expect(clusterKeywordsSpy).toHaveBeenCalledTimes(1); // No retry on ConfigError
   });
 });

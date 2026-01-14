@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { getCompletedKeywordPages } from '@/lib/notion/keywords';
 import { clusterKeywords } from '@/lib/agent/clustering';
 import { buildFallbackResult } from '@/lib/agent/fallback';
+import { ConfigError } from '@/lib/agent/errors';
 
 export async function POST(req: Request) {
   try {
@@ -43,6 +44,11 @@ export async function POST(req: Request) {
         clusterResult = await clusterKeywords(pages);
         break; // Success, exit retry loop
       } catch (error) {
+        // Fail fast on configuration errors - do NOT retry or fallback
+        if (error instanceof ConfigError) {
+          throw error;
+        }
+
         lastError = error;
         console.warn(`Clustering attempt ${attempt + 1} failed:`, error);
       }

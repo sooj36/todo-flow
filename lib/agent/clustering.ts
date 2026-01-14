@@ -2,6 +2,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { ClusterResultSchema } from './schema';
 import type { ClusterResult } from './schema';
+import { ConfigError } from './errors';
 
 export interface KeywordPage {
   pageId: string;
@@ -14,7 +15,7 @@ export type { ClusterResult };
 export async function clusterKeywords(pages: KeywordPage[]): Promise<ClusterResult> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    throw new Error('GEMINI_API_KEY is not configured');
+    throw new ConfigError('GEMINI_API_KEY is not configured');
   }
 
   // Initialize Gemini client

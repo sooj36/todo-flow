@@ -2,6 +2,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { clusterKeywords } from './clustering';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { ConfigError } from './errors';
 
 // Mock the entire module
 vi.mock('@google/generative-ai');
@@ -129,5 +130,13 @@ describe('clusterKeywords', () => {
     }) as any);
 
     await expect(clusterKeywords(mockPages)).rejects.toThrow('API Error');
+  });
+
+  it('should throw ConfigError when GEMINI_API_KEY is missing', async () => {
+    // Remove API key from environment
+    delete process.env.GEMINI_API_KEY;
+
+    await expect(clusterKeywords(mockPages)).rejects.toThrow(ConfigError);
+    await expect(clusterKeywords(mockPages)).rejects.toThrow('GEMINI_API_KEY is not configured');
   });
 });
