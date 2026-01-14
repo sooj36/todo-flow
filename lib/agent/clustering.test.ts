@@ -139,4 +139,86 @@ describe('clusterKeywords', () => {
     await expect(clusterKeywords(mockPages)).rejects.toThrow(ConfigError);
     await expect(clusterKeywords(mockPages)).rejects.toThrow('GEMINI_API_KEY is not configured');
   });
+
+  it('should ensure each cluster has at least 1 pageRef', async () => {
+    const mockResponse = {
+      meta: {
+        totalPages: 3,
+        clustersFound: 3,
+      },
+      clusters: [
+        {
+          name: 'React Development',
+          keywords: ['react', 'hooks'],
+          pageRefs: ['page-1', 'page-3'],
+        },
+        {
+          name: 'Vue Development',
+          keywords: ['vue'],
+          pageRefs: ['page-2'],
+        },
+        {
+          name: 'Testing',
+          keywords: ['vitest'],
+          pageRefs: ['page-1'],
+        },
+      ],
+      topKeywords: [{ keyword: 'react', count: 2 }],
+    };
+
+    const mockGenerateContent = vi.fn().mockResolvedValue({
+      response: {
+        text: () => JSON.stringify(mockResponse),
+      },
+    });
+
+    const mockGetGenerativeModel = vi.fn().mockReturnValue({
+      generateContent: mockGenerateContent,
+    });
+
+    vi.mocked(GoogleGenerativeAI).mockImplementation((function(this: any) {
+      this.getGenerativeModel = mockGetGenerativeModel;
+    }) as any);
+
+    const result = await clusterKeywords(mockPages);
+
+    // Verify each cluster has at least 1 pageRef
+    result.clusters.forEach((cluster) => {
+      expect(cluster.pageRefs.length).toBeGreaterThanOrEqual(1);
+    });
+  });
+
+  it('should reject cluster with empty pageRefs via schema validation', async () => {
+    const invalidResponse = {
+      meta: {
+        totalPages: 3,
+        clustersFound: 1,
+      },
+      clusters: [
+        {
+          name: 'Empty Cluster',
+          keywords: ['test'],
+          pageRefs: [], // Invalid: empty pageRefs
+        },
+      ],
+      topKeywords: [],
+    };
+
+    const mockGenerateContent = vi.fn().mockResolvedValue({
+      response: {
+        text: () => JSON.stringify(invalidResponse),
+      },
+    });
+
+    const mockGetGenerativeModel = vi.fn().mockReturnValue({
+      generateContent: mockGenerateContent,
+    });
+
+    vi.mocked(GoogleGenerativeAI).mockImplementation((function(this: any) {
+      this.getGenerativeModel = mockGetGenerativeModel;
+    }) as any);
+
+    // Should throw ZodError due to empty pageRefs
+    await expect(clusterKeywords(mockPages)).rejects.toThrow();
+  });
 });

@@ -5,7 +5,7 @@ import { z } from 'zod';
 export const ClusterSchema = z.object({
   name: z.string(),
   keywords: z.array(z.string()),
-  pageRefs: z.array(z.string()),
+  pageRefs: z.array(z.string()).min(1, 'Each cluster must have at least 1 pageRef'),
 });
 
 // Schema for top keyword frequency
