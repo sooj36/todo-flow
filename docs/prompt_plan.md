@@ -152,8 +152,8 @@
 
 #### 13.4.2 근거 표시 UI
 - 파일: `components/agent/ClusterResultPanel.tsx`
-- [ ] Test: pageRefs 렌더링 시 페이지 타이틀 표시
-- [ ] Impl: 각 클러스터 내 pageRefs 리스트 렌더링
+- [x] Test: pageRefs 렌더링 시 페이지 타이틀 표시
+- [x] Impl: 각 클러스터 내 pageRefs 리스트 렌더링
 - [ ] 커밋: `feat(agent): display pageRefs as evidence`
 
 ### 13.5 Verification & Integration

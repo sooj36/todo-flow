@@ -69,8 +69,9 @@ export const ClusterResultPanel: React.FC<ClusterResultPanelProps> = ({
               {/* Cluster Content */}
               <div
                 id={`cluster-content-${index}`}
-                className="p-4 bg-white flex flex-col gap-3"
+                className="p-4 bg-white flex flex-col gap-4"
                 hidden={!isExpanded}
+                aria-label={`${cluster.name} 클러스터 상세`}
               >
                 {/* Keywords */}
                 <div>
@@ -91,13 +92,23 @@ export const ClusterResultPanel: React.FC<ClusterResultPanelProps> = ({
 
                 {/* Page References */}
                 <div>
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">
-                    관련 페이지
+                  <h4 className="text-sm font-medium text-gray-700 mb-1">
+                    근거 페이지
                   </h4>
-                  <ul className="flex flex-col gap-1">
-                    {cluster.pageRefs.map((pageId) => (
-                      <li key={pageId} className="text-sm text-gray-600">
-                        • {pageId}
+                  <p className="text-xs text-gray-500 mb-2">
+                    LLM이 이 클러스터를 만든 근거가 된 Notion 페이지입니다.
+                  </p>
+                  <ul
+                    className="flex flex-col gap-2"
+                    aria-label={`${cluster.name} 클러스터 근거 페이지`}
+                  >
+                    {cluster.pageRefs.map((pageRef) => (
+                      <li
+                        key={pageRef.pageId}
+                        className="text-sm text-gray-700 flex items-start gap-2"
+                      >
+                        <span className="mt-1 h-2 w-2 rounded-full bg-gray-300" />
+                        <span className="leading-5">{pageRef.title}</span>
                       </li>
                     ))}
                   </ul>

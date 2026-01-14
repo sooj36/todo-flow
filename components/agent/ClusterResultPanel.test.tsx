@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
+import { render, screen, cleanup, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ClusterResultPanel } from "./ClusterResultPanel";
 
@@ -17,12 +17,17 @@ describe("ClusterResultPanel", () => {
       {
         name: "UI/UX",
         keywords: ["디자인", "사용자 경험", "인터페이스"],
-        pageRefs: ["page1", "page2"],
+        pageRefs: [
+          { pageId: "page1", title: "디자인 시스템 구축" },
+          { pageId: "page2", title: "사용자 리서치 결과" },
+        ],
       },
       {
         name: "Backend",
         keywords: ["API", "데이터베이스", "서버"],
-        pageRefs: ["page3"],
+        pageRefs: [
+          { pageId: "page3", title: "API 설계 문서" },
+        ],
       },
     ],
     topKeywords: [
@@ -59,12 +64,25 @@ describe("ClusterResultPanel", () => {
     expect(screen.getAllByText("API").length).toBeGreaterThan(0);
   });
 
-  it("renders page references with pageIds", () => {
+  it("renders page references with titles instead of pageIds", () => {
     render(<ClusterResultPanel data={mockData} />);
 
-    expect(screen.getByText(/page1/)).toBeInTheDocument();
-    expect(screen.getByText(/page2/)).toBeInTheDocument();
-    expect(screen.getByText(/page3/)).toBeInTheDocument();
+    const uiUxCluster = screen.getByLabelText("UI/UX 클러스터 상세");
+    const backendCluster = screen.getByLabelText("Backend 클러스터 상세");
+    expect(
+      within(uiUxCluster).getByLabelText("UI/UX 클러스터 근거 페이지")
+    ).toBeInTheDocument();
+    expect(
+      within(backendCluster).getByLabelText("Backend 클러스터 근거 페이지")
+    ).toBeInTheDocument();
+
+    // Should display page titles, not pageIds (use regex for partial matching)
+    expect(within(uiUxCluster).getByText(/디자인 시스템 구축/)).toBeInTheDocument();
+    expect(within(uiUxCluster).getByText(/사용자 리서치 결과/)).toBeInTheDocument();
+    expect(within(backendCluster).getByText(/API 설계 문서/)).toBeInTheDocument();
+
+    // pageIds should not be directly visible
+    expect(screen.queryByText("page1")).not.toBeInTheDocument();
   });
 
   it("renders top keywords with counts", () => {
