@@ -1,11 +1,17 @@
 // lib/agent/schema.ts
 import { z } from 'zod';
 
+// Schema for page reference with title
+export const PageRefSchema = z.object({
+  pageId: z.string(),
+  title: z.string(),
+});
+
 // Schema for individual cluster
 export const ClusterSchema = z.object({
   name: z.string(),
   keywords: z.array(z.string()),
-  pageRefs: z.array(z.string()).min(1, 'Each cluster must have at least 1 pageRef'),
+  pageRefs: z.array(PageRefSchema).min(1, 'Each cluster must have at least 1 pageRef'),
 });
 
 // Schema for top keyword frequency

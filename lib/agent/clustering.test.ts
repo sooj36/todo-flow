@@ -47,12 +47,17 @@ describe('clusterKeywords', () => {
         {
           name: 'React Development',
           keywords: ['react', 'hooks', 'context'],
-          pageRefs: ['page-1', 'page-3'],
+          pageRefs: [
+            { pageId: 'page-1', title: 'React Hooks Guide' },
+            { pageId: 'page-3', title: 'React Context' },
+          ],
         },
         {
           name: 'Vue Development',
           keywords: ['vue', 'composition'],
-          pageRefs: ['page-2'],
+          pageRefs: [
+            { pageId: 'page-2', title: 'Vue Composition API' },
+          ],
         },
       ],
       topKeywords: [
@@ -80,7 +85,8 @@ describe('clusterKeywords', () => {
     expect(result).toBeDefined();
     expect(result.meta.totalPages).toBe(3);
     expect(result.clusters).toHaveLength(2);
-    expect(result.clusters[0].pageRefs).toContain('page-1');
+    expect(result.clusters[0].pageRefs[0].pageId).toBe('page-1');
+    expect(result.clusters[0].pageRefs[0].title).toBe('React Hooks Guide');
     expect(mockGenerateContent).toHaveBeenCalledTimes(1);
   });
 
@@ -150,17 +156,24 @@ describe('clusterKeywords', () => {
         {
           name: 'React Development',
           keywords: ['react', 'hooks'],
-          pageRefs: ['page-1', 'page-3'],
+          pageRefs: [
+            { pageId: 'page-1', title: 'React Hooks Guide' },
+            { pageId: 'page-3', title: 'React Context' },
+          ],
         },
         {
           name: 'Vue Development',
           keywords: ['vue'],
-          pageRefs: ['page-2'],
+          pageRefs: [
+            { pageId: 'page-2', title: 'Vue Composition API' },
+          ],
         },
         {
           name: 'Testing',
           keywords: ['vitest'],
-          pageRefs: ['page-1'],
+          pageRefs: [
+            { pageId: 'page-1', title: 'React Hooks Guide' },
+          ],
         },
       ],
       topKeywords: [{ keyword: 'react', count: 2 }],

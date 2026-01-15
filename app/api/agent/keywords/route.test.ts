@@ -246,7 +246,7 @@ describe('POST /api/agent/keywords', () => {
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data.error).toBe('Failed to process keywords');
+    expect(data.error).toBe('GEMINI_API_KEY is not configured');
     expect(clusterKeywordsSpy).toHaveBeenCalledTimes(1); // No retry on ConfigError
   });
 });

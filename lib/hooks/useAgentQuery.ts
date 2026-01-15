@@ -30,7 +30,8 @@ export function useAgentQuery(): UseAgentQueryReturn {
       });
 
       if (!response.ok) {
-        throw new Error(response.statusText || 'API request failed');
+        const errorBody = await response.json().catch(() => ({}));
+        throw new Error(errorBody.error || response.statusText || 'API request failed');
       }
 
       setPhase('normalize');

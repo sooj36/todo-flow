@@ -57,7 +57,7 @@ describe('useAgentQuery', () => {
         {
           name: 'Test',
           keywords: ['test'],
-          pageRefs: ['page1']
+          pageRefs: [{ pageId: 'page1', title: 'Test Page' }]
         }
       ],
       topKeywords: [{ keyword: 'test', count: 3 }],

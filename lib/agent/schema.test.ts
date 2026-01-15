@@ -14,12 +14,17 @@ describe('ClusterResultSchema', () => {
         {
           name: 'Web Development',
           keywords: ['react', 'nextjs', 'typescript'],
-          pageRefs: ['page-1', 'page-2'],
+          pageRefs: [
+            { pageId: 'page-1', title: 'React Basics' },
+            { pageId: 'page-2', title: 'Next.js Guide' },
+          ],
         },
         {
           name: 'Backend',
           keywords: ['nodejs', 'express', 'api'],
-          pageRefs: ['page-3'],
+          pageRefs: [
+            { pageId: 'page-3', title: 'API Design' },
+          ],
         },
       ],
       topKeywords: [
@@ -94,7 +99,27 @@ describe('ClusterResultSchema', () => {
         {
           name: 'Test',
           keywords: ['keyword1'],
-          pageRefs: [123, 456], // should be string[]
+          pageRefs: ['page-1', 'page-2'], // should be { pageId, title }[]
+        },
+      ],
+      topKeywords: [],
+    };
+
+    const result = ClusterResultSchema.safeParse(invalidData);
+    expect(result.success).toBe(false);
+  });
+
+  it('should reject pageRefs with missing title', () => {
+    const invalidData = {
+      meta: {
+        totalPages: 10,
+        clustersFound: 1,
+      },
+      clusters: [
+        {
+          name: 'Test',
+          keywords: ['keyword1'],
+          pageRefs: [{ pageId: 'page-1' }], // missing title
         },
       ],
       topKeywords: [],
@@ -157,7 +182,11 @@ describe('ClusterResultSchema', () => {
         {
           name: 'Mixed',
           keywords: ['a', 'b', 'c'],
-          pageRefs: ['id-1', 'id-2', 'id-3'],
+          pageRefs: [
+            { pageId: 'id-1', title: 'Page A' },
+            { pageId: 'id-2', title: 'Page B' },
+            { pageId: 'id-3', title: 'Page C' },
+          ],
         },
       ],
       topKeywords: [

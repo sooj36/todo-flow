@@ -159,9 +159,9 @@
 ### 13.5 Verification & Integration
 
 #### 13.5.1 Manual Testing
-- [ ] Manual: 검색 입력 → 로딩 → 결과 렌더링 E2E 확인
-- [ ] Manual: 완료 페이지 0개 시나리오 → 안내 메시지 표시 확인
-- [ ] Manual: 키워드 없음 시나리오 → 가이드 문구 표시 확인
+- [x] Manual: 검색 입력 → 로딩 → 결과 렌더링 E2E 확인
+- [x] Manual: 완료 페이지 0개 시나리오 → 안내 메시지 표시 확인
+- [x] Manual: 키워드 없음 시나리오 → 가이드 문구 표시 확인
 
 #### 13.5.2 Unit Tests
 - [ ] Test: Notion query 필터 조건 (lib/notion/keywords.test.ts)

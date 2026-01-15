@@ -63,8 +63,9 @@ export async function POST(req: Request) {
     return NextResponse.json(clusterResult);
   } catch (error) {
     console.error('Error in keywords agent:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Failed to process keywords';
     return NextResponse.json(
-      { error: 'Failed to process keywords' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

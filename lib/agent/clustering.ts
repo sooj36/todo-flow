@@ -65,7 +65,7 @@ Requirements:
 3. Each cluster must include:
    - name: A descriptive cluster name
    - keywords: Unified list of keywords in this cluster
-   - pageRefs: Array of pageId values that contain these keywords (at least 1 per cluster)
+   - pageRefs: Array of objects with pageId and title for pages that contain these keywords (at least 1 per cluster)
 4. Calculate top 10 most frequent keywords across all pages
 5. Return exact JSON schema:
 
@@ -78,7 +78,9 @@ Requirements:
     {
       "name": "<cluster name>",
       "keywords": ["<keyword1>", "<keyword2>"],
-      "pageRefs": ["<pageId1>", "<pageId2>"]
+      "pageRefs": [
+        { "pageId": "<pageId>", "title": "<page title>" }
+      ]
     }
   ],
   "topKeywords": [
