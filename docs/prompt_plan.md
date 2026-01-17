@@ -169,11 +169,11 @@
 - [x] Test: 빈도 집계 fallback 동작 (lib/agent/clustering.test.ts)
 
 #### 13.5.3 Integration Tests
-- Mock 전략: MSW (Mock Service Worker) 사용, POST /api/agent/keywords 핸들러 등록
-- [ ] Test: UI 통합 (검색 → 로딩 → 결과) (app/__tests__/agent.test.tsx)
-  - MSW로 성공/실패 시나리오 mock 응답 설정
+- Mock 전략: vi.stubGlobal('fetch') 사용, POST /api/agent/keywords 응답 mock
+- [x] Test: UI 통합 (검색 → 로딩 → 결과) (app/__tests__/agent.test.tsx)
+  - fetch mock으로 성공/실패 시나리오 응답 설정
   - userEvent로 검색창 입력 → Enter → phase 변화 → 결과 렌더링 확인
-- [ ] Test: API 라우트 E2E (app/api/agent/keywords/route.test.ts)
+- [x] Test: API 라우트 E2E (app/api/agent/keywords/route.test.ts)
   - Notion/Gemini 호출은 vi.spyOn으로 mock, 실제 라우트 핸들러 호출
 
 #### 13.5.4 Final Commit
