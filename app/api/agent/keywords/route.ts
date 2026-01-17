@@ -63,7 +63,27 @@ export async function POST(req: Request) {
     return NextResponse.json(clusterResult);
   } catch (error) {
     console.error('Error in keywords agent:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Failed to process keywords';
+
+    // Whitelist user-safe error messages; hide internal/third-party details
+    const userSafeMessages = [
+      '완료된 키워드 추출 페이지가 없습니다',
+      '키워드가 하나도 없습니다',
+      'NOTION_KEYWORD_DB_ID environment variable is not set',
+    ];
+
+    let errorMessage = '키워드 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+
+    if (error instanceof ConfigError) {
+      // ConfigError messages are safe to expose (e.g., API key not configured)
+      errorMessage = error.message;
+    } else if (error instanceof Error) {
+      // Check if error message starts with any user-safe prefix
+      const isSafe = userSafeMessages.some((safe) => error.message.startsWith(safe));
+      if (isSafe) {
+        errorMessage = error.message;
+      }
+    }
+
     return NextResponse.json(
       { error: errorMessage },
       { status: 500 }

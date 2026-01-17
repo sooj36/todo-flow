@@ -83,7 +83,8 @@ describe('useAgentQuery', () => {
     const errorMessage = 'API Error';
     (global.fetch as any).mockResolvedValueOnce({
       ok: false,
-      statusText: errorMessage,
+      statusText: 'Internal Server Error',
+      json: async () => ({ error: errorMessage }),
     });
 
     const { result } = renderHook(() => useAgentQuery());
