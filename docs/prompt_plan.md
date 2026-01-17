@@ -164,9 +164,9 @@
 - [x] Manual: 키워드 없음 시나리오 → 가이드 문구 표시 확인
 
 #### 13.5.2 Unit Tests
-- [ ] Test: Notion query 필터 조건 (lib/notion/keywords.test.ts)
-- [ ] Test: zod 스키마 검증 실패 → fallback (lib/agent/schema.test.ts)
-- [ ] Test: 빈도 집계 fallback 동작 (lib/agent/clustering.test.ts)
+- [x] Test: Notion query 필터 조건 (lib/notion/keywords.test.ts)
+- [x] Test: zod 스키마 검증 실패 → fallback (lib/agent/schema.test.ts)
+- [x] Test: 빈도 집계 fallback 동작 (lib/agent/clustering.test.ts)
 
 #### 13.5.3 Integration Tests
 - Mock 전략: MSW (Mock Service Worker) 사용, POST /api/agent/keywords 핸들러 등록
