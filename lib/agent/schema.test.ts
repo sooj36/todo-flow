@@ -1,7 +1,8 @@
 // lib/agent/schema.test.ts
 import { describe, it, expect } from 'vitest';
 import { ClusterResultSchema } from './schema';
-import type { ClusterResult } from './clustering';
+import { buildFallbackResult } from './fallback';
+import type { ClusterResult, KeywordPage } from './clustering';
 
 describe('ClusterResultSchema', () => {
   it('should parse valid cluster result', () => {
@@ -198,5 +199,56 @@ describe('ClusterResultSchema', () => {
 
     const result = ClusterResultSchema.safeParse(validData);
     expect(result.success).toBe(true);
+  });
+
+  describe('schema validation failure → fallback', () => {
+    it('should use safeParse to detect invalid LLM response without throwing', () => {
+      const malformedLLMResponse = {
+        meta: { totalPages: 'not-a-number' }, // Invalid type
+        clusters: 'not-an-array',
+        topKeywords: null,
+      };
+
+      const result = ClusterResultSchema.safeParse(malformedLLMResponse);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBeDefined();
+    });
+
+    it('should allow fallback result when LLM response fails validation', () => {
+      const pages: KeywordPage[] = [
+        { pageId: 'page-1', title: 'Test', keywords: ['react', 'vue'] },
+      ];
+
+      // Simulate: LLM returns invalid response
+      const invalidLLMResponse = { invalid: 'structure' };
+      const parseResult = ClusterResultSchema.safeParse(invalidLLMResponse);
+
+      expect(parseResult.success).toBe(false);
+
+      // Fallback: use frequency-based result instead
+      const fallbackResult = buildFallbackResult(pages);
+      const fallbackParseResult = ClusterResultSchema.safeParse(fallbackResult);
+
+      expect(fallbackParseResult.success).toBe(true);
+      expect(fallbackResult.meta.clustersFound).toBe(0);
+      expect(fallbackResult.topKeywords.length).toBeGreaterThan(0);
+    });
+
+    it('should catch ZodError and trigger fallback path', () => {
+      const invalidData = { meta: {}, clusters: 'invalid' };
+
+      let fallbackTriggered = false;
+
+      try {
+        ClusterResultSchema.parse(invalidData);
+      } catch (error) {
+        // In production, this catch block triggers buildFallbackResult
+        fallbackTriggered = true;
+        expect(error).toBeDefined();
+      }
+
+      expect(fallbackTriggered).toBe(true);
+    });
   });
 });

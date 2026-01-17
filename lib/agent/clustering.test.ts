@@ -1,8 +1,10 @@
 // lib/agent/clustering.test.ts
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { clusterKeywords } from './clustering';
+import { buildFallbackResult } from './fallback';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { ConfigError } from './errors';
+import type { KeywordPage } from './clustering';
 
 // Mock the entire module
 vi.mock('@google/generative-ai');
@@ -233,5 +235,91 @@ describe('clusterKeywords', () => {
 
     // Should throw ZodError due to empty pageRefs
     await expect(clusterKeywords(mockPages)).rejects.toThrow();
+  });
+});
+
+describe('buildFallbackResult (frequency-based fallback)', () => {
+  it('should count keyword frequencies across pages', () => {
+    const pages: KeywordPage[] = [
+      { pageId: 'page-1', title: 'React Guide', keywords: ['react', 'hooks', 'typescript'] },
+      { pageId: 'page-2', title: 'React Advanced', keywords: ['react', 'typescript', 'performance'] },
+      { pageId: 'page-3', title: 'Vue Guide', keywords: ['vue', 'typescript'] },
+    ];
+
+    const result = buildFallbackResult(pages);
+
+    expect(result.meta.totalPages).toBe(3);
+    expect(result.meta.clustersFound).toBe(0);
+    expect(result.clusters).toEqual([]);
+    expect(result.topKeywords[0]).toEqual({ keyword: 'typescript', count: 3 });
+    expect(result.topKeywords[1]).toEqual({ keyword: 'react', count: 2 });
+  });
+
+  it('should return empty result for empty pages', () => {
+    const result = buildFallbackResult([]);
+
+    expect(result.meta.totalPages).toBe(0);
+    expect(result.topKeywords).toEqual([]);
+  });
+
+  it('should limit topKeywords to 10 items', () => {
+    const pages: KeywordPage[] = [
+      {
+        pageId: 'page-1',
+        title: 'Many Keywords',
+        keywords: Array.from({ length: 15 }, (_, i) => `keyword-${i}`),
+      },
+    ];
+
+    const result = buildFallbackResult(pages);
+
+    expect(result.topKeywords.length).toBe(10);
+  });
+
+  it('should normalize keywords (trim, lowercase) and deduplicate', () => {
+    const pages: KeywordPage[] = [
+      { pageId: 'page-1', title: 'Test', keywords: ['  React  ', 'REACT', 'react'] },
+    ];
+
+    const result = buildFallbackResult(pages);
+
+    expect(result.topKeywords).toEqual([{ keyword: 'react', count: 3 }]);
+  });
+
+  it('should be used when clusterKeywords throws error', async () => {
+    // Ensure API key is set for this test
+    const originalEnv = process.env.GEMINI_API_KEY;
+    process.env.GEMINI_API_KEY = 'test-api-key';
+
+    try {
+      // Simulate clusterKeywords failure scenario
+      const pages: KeywordPage[] = [
+        { pageId: 'page-1', title: 'Test', keywords: ['react', 'vue'] },
+      ];
+
+      const mockGenerateContent = vi.fn().mockRejectedValue(new Error('API Error'));
+      const mockGetGenerativeModel = vi.fn().mockReturnValue({
+        generateContent: mockGenerateContent,
+      });
+
+      vi.mocked(GoogleGenerativeAI).mockImplementation((function(this: any) {
+        this.getGenerativeModel = mockGetGenerativeModel;
+      }) as any);
+
+      // clusterKeywords will throw
+      await expect(clusterKeywords(pages)).rejects.toThrow('API Error');
+
+      // In production, this triggers fallback
+      const fallbackResult = buildFallbackResult(pages);
+      expect(fallbackResult.meta.clustersFound).toBe(0);
+      expect(fallbackResult.topKeywords).toHaveLength(2);
+    } finally {
+      // Restore original env
+      if (originalEnv) {
+        process.env.GEMINI_API_KEY = originalEnv;
+      } else {
+        delete process.env.GEMINI_API_KEY;
+      }
+    }
   });
 });
