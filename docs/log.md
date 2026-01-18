@@ -1,5 +1,30 @@
 # log.md
 
+## Phase 14 작업 기록 (Calendar + Button → Create Template/Steps/Instance)
+
+### Phase 14.1: 스키마·밸리데이션 확정 (2026-01-18)
+- lib/schema/templates.ts: Zod 스키마 정의 (프런트/백 공유)
+  - TaskColorSchema: 6가지 색상 whitelist (blue, green, yellow, red, purple, gray)
+  - IconSchema: Lucide 아이콘 이름 + 단일 이모지 허용
+  - FrequencySchema: daily, weekly, custom
+  - WeekdaySchema: 월~일 (한국어)
+  - RepeatOptionsSchema: frequency, weekdays, repeatEnd, repeatLimit
+  - FlowStepInputSchema + FlowStepsInputSchema: 최대 20개 step, order 자동 할당
+  - CreateTaskTemplateSchema: 템플릿 생성 API 요청 스키마
+  - CreateTaskResponseSchema: API 응답 스키마 (cleanupIds, partialCleanup 포함)
+- lib/utils/dateTransform.ts: 날짜/타임존 변환 유틸
+  - formatLocalDate: Date → YYYY-MM-DD (로컬)
+  - parseLocalDateString: YYYY-MM-DD → Date (로컬)
+  - localDateToUTC: YYYY-MM-DD → ISO UTC 00:00:00
+  - notionDateToLocal: Notion date → YYYY-MM-DD
+  - isValidDateString, compareDateStrings, addDays, isDateInWeekdays 등
+- types/index.ts: 스키마에서 타입 re-export (Single Source of Truth)
+  - TaskTemplate 인터페이스에 repeatOptions 필드 추가
+- lib/schema/templates.test.ts: 42개 테스트 통과
+- lib/utils/dateTransform.test.ts: 25개 테스트 통과
+- pnpm lint: 통과
+- pnpm test:run: 202개 테스트 통과
+
 ## Phase 13 작업 기록 (AI Agent MVP: Keyword Clustering)
 
 ### Phase 13.2.1-13.2.2: Notion Query 함수 및 데이터 정규화 (2026-01-13)

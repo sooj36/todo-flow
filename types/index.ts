@@ -1,6 +1,45 @@
 // types/index.ts
 
 // ============================================
+// Re-export from Schema (Single Source of Truth)
+// ============================================
+export {
+  // Constants
+  TASK_COLORS,
+  ALLOWED_LUCIDE_ICONS,
+  FREQUENCIES,
+  WEEKDAYS,
+  WEEKDAYS_EN,
+  DEFAULT_ICON,
+  DEFAULT_COLOR,
+  // Schemas
+  TaskColorSchema,
+  IconSchema,
+  FrequencySchema,
+  WeekdaySchema,
+  WeekdayEnSchema,
+  RepeatOptionsSchema,
+  FlowStepInputSchema,
+  FlowStepsInputSchema,
+  CreateTaskTemplateSchema,
+  CreateTaskResponseSchema,
+  // Helpers
+  isValidColor,
+  isValidIcon,
+  validateRepeatOptions,
+  assignStepOrders,
+  // Types (from Zod inference)
+  type TaskColor,
+  type Frequency,
+  type Weekday,
+  type WeekdayEn,
+  type RepeatOptions,
+  type FlowStepInput,
+  type CreateTaskTemplateInput,
+  type CreateTaskResponse,
+} from '@/lib/schema/templates';
+
+// ============================================
 // Task Template - 반복 Task의 설계도
 // ============================================
 export interface TaskTemplate {
@@ -10,12 +49,10 @@ export interface TaskTemplate {
   color: TaskColor;
   isRepeating: boolean;
   defaultFrequency: Frequency;
+  repeatOptions?: RepeatOptions;   // Phase 14: 반복 옵션 추가
   active: boolean;
   flowSteps: FlowStep[];
 }
-
-export type TaskColor = 'blue' | 'green' | 'yellow' | 'red' | 'purple' | 'gray';
-export type Frequency = 'daily' | 'weekly' | 'custom';
 
 // ============================================
 // Flow Step - Task 내부의 단계
