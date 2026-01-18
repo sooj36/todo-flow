@@ -58,9 +58,14 @@
   - lib/utils/dateTransform.test.ts: 25개 테스트 통과
 
 ### 14.2 API 설계/구현
-- [ ] API: 단일 POST로 Task Template → Flow Steps → Task Instance 순서로 생성 (기본값: 아이콘 📋, 색상 gray, Status todo, 날짜는 클릭한 셀). 중간 실패 시 생성된 페이지를 즉시 보상 트랜잭션으로 archive 처리(steps 실패 시 template만, instance 실패 시 template+steps) 또는 Active=false 업데이트하여 누수 방지하고, 응답에 cleanupIds/partialCleanup 플래그 포함해 재시도 UX 제공.
-- [ ] API 요청/응답 스펙 명세: payload(날짜 `YYYY-MM-DD`, 템플릿 필드, FlowStep 배열, 반복 옵션 직렬화 구조)와 응답 확정 및 문서화. 응답 예시 `{ templateId, stepIds: [], instanceId, cleanupIds: [], partialCleanup: boolean }`로 고정(steps 정보는 미포함, 템플릿/스텝 반영은 refetch로 처리).
-- [ ] API 스펙 테스트 초안: 단일 POST happy path, 기본값 적용, 중간 실패 시 cleanupIds/partialCleanup 반환 시나리오 유닛 테스트를 명세 기반으로 설계.
+- [x] API: 단일 POST로 Task Template → Flow Steps → Task Instance 순서로 생성 (기본값: 아이콘 📋, 색상 gray, Status todo, 날짜는 클릭한 셀). 중간 실패 시 생성된 페이지를 즉시 보상 트랜잭션으로 archive 처리(steps 실패 시 template만, instance 실패 시 template+steps) 또는 Active=false 업데이트하여 누수 방지하고, 응답에 cleanupIds/partialCleanup 플래그 포함해 재시도 UX 제공.
+  - lib/notion/create-task-with-template.ts: createTaskWithTemplate() 함수 구현
+  - app/api/notion/create-task/route.ts: POST 라우트 구현
+- [x] API 요청/응답 스펙 명세: payload(날짜 `YYYY-MM-DD`, 템플릿 필드, FlowStep 배열, 반복 옵션 직렬화 구조)와 응답 확정 및 문서화. 응답 예시 `{ templateId, stepIds: [], instanceId, cleanupIds: [], partialCleanup: boolean }`로 고정(steps 정보는 미포함, 템플릿/스텝 반영은 refetch로 처리).
+  - docs/log.md에 API 스펙 문서화 완료
+- [x] API 스펙 테스트 초안: 단일 POST happy path, 기본값 적용, 중간 실패 시 cleanupIds/partialCleanup 반환 시나리오 유닛 테스트를 명세 기반으로 설계.
+  - lib/notion/create-task-with-template.test.ts: 14개 테스트
+  - app/api/notion/create-task/route.test.ts: 14개 테스트
 
 ### 14.3 프런트 다이얼로그/입력 검증
 - [ ] Calendar day `+` opens creation dialog (필드: 템플릿명, 색상 select, 아이콘 select, 반복 toggle/frequency/요일/end/limit, 스텝 리스트 입력)

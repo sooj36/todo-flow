@@ -2,6 +2,76 @@
 
 ## Phase 14 작업 기록 (Calendar + Button → Create Template/Steps/Instance)
 
+### Phase 14.2: API 설계/구현 (2026-01-18)
+
+#### API Endpoint: `POST /api/notion/create-task`
+
+**Request Payload:**
+```json
+{
+  "name": "string (1-100 chars, required)",
+  "icon": "string (Lucide icon name or single emoji, default: 📋)",
+  "color": "blue | green | yellow | red | purple | gray (default: gray)",
+  "isRepeating": "boolean (default: false)",
+  "repeatOptions": {
+    "frequency": "daily | weekly | custom (required if isRepeating)",
+    "weekdays": ["월", "화", ...] (required if frequency === 'custom'),
+    "repeatEnd": "YYYY-MM-DD (optional)",
+    "repeatLimit": "number 1-365 (optional)"
+  },
+  "steps": [
+    { "name": "string (1-100 chars)" }
+  ],
+  "instanceDate": "YYYY-MM-DD (required, 인스턴스 생성 날짜)"
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "templateId": "notion-page-id",
+  "stepIds": ["step-1-id", "step-2-id"],
+  "instanceId": "instance-page-id",
+  "cleanupIds": [],
+  "partialCleanup": false
+}
+```
+
+**Error Response (4xx/5xx):**
+```json
+{
+  "error": "Error message",
+  "cleanupIds": ["id1", "id2"],
+  "partialCleanup": true
+}
+```
+
+**트랜잭션 보상 정책:**
+1. Template 생성 실패 → 즉시 에러 반환 (정리 대상 없음)
+2. Steps 생성 중 실패 → Template archive 처리, cleanupIds에 template ID 포함
+3. Instance 생성 실패 → Template + Steps archive 처리, cleanupIds에 모든 ID 포함
+4. Archive 실패 시 partialCleanup=true로 표시
+
+**생성 순서:** Task Template → Flow Steps (order 1..n) → Task Instance
+
+**기본값 적용:**
+- icon: 📋
+- color: gray
+- status: todo
+- FlowStep.done: false
+- FlowStep.order: 입력 순서 1..n 자동 할당
+
+**구현 파일:**
+- lib/notion/create-task-with-template.ts: 트랜잭션 로직 (Template → Steps → Instance, 보상 트랜잭션)
+- app/api/notion/create-task/route.ts: POST API 라우트
+- lib/notion/create-task-with-template.test.ts: 트랜잭션 유닛 테스트 (14개)
+- app/api/notion/create-task/route.test.ts: API 라우트 테스트 (14개)
+
+**테스트 결과:**
+- lib/notion/create-task-with-template.test.ts: 14개 통과
+- app/api/notion/create-task/route.test.ts: 14개 통과
+- pnpm lint: 통과
+
 ### Phase 14.1: 스키마·밸리데이션 확정 (2026-01-18)
 - lib/schema/templates.ts: Zod 스키마 정의 (프런트/백 공유)
   - TaskColorSchema: 6가지 색상 whitelist (blue, green, yellow, red, purple, gray)
