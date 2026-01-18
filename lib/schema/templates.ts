@@ -158,19 +158,61 @@ export type WeekdayEn = z.infer<typeof WeekdayEnSchema>;
 // 날짜 포맷 정규식 (YYYY-MM-DD)
 const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 
-// 반복 옵션 스키마
+/**
+ * 날짜 문자열이 실제로 유효한 날짜인지 검사 (포맷 + 실존 여부)
+ * 예: 2024-02-30 → false (2월 30일 없음)
+ */
+export function isValidDateString(dateStr: string): boolean {
+  if (!DATE_REGEX.test(dateStr)) {
+    return false;
+  }
+
+  const [year, month, day] = dateStr.split('-').map(Number);
+
+  // 기본 범위 검사
+  if (month < 1 || month > 12) return false;
+  if (day < 1 || day > 31) return false;
+  if (year < 1900 || year > 2100) return false;
+
+  // Date 객체로 실제 유효성 검사
+  const date = new Date(year, month - 1, day);
+  return (
+    date.getFullYear() === year &&
+    date.getMonth() === month - 1 &&
+    date.getDate() === day
+  );
+}
+
+// 유효한 날짜 스키마 (포맷 + 실존 여부 검사)
+const ValidDateSchema = z.string()
+  .regex(DATE_REGEX, 'Date must be in YYYY-MM-DD format')
+  .refine(isValidDateString, {
+    message: 'Invalid date (e.g., 2024-02-30 does not exist)',
+  });
+
+// 반복 옵션 스키마 (비즈니스 규칙 포함)
 export const RepeatOptionsSchema = z.object({
   frequency: FrequencySchema,
   weekdays: z.array(WeekdaySchema).optional(), // custom frequency일 때 사용
-  repeatEnd: z.string()
-    .regex(DATE_REGEX, 'Date must be in YYYY-MM-DD format')
-    .optional(), // 반복 종료일 (optional)
+  repeatEnd: ValidDateSchema.optional(), // 반복 종료일 (optional)
   repeatLimit: z.number()
     .int('Must be an integer')
     .positive('Must be positive')
     .max(365, 'Cannot exceed 365')
     .optional(), // 반복 횟수 제한 (optional)
-});
+}).refine(
+  (data) => {
+    // custom frequency일 때 weekdays 필수
+    if (data.frequency === 'custom') {
+      return data.weekdays && data.weekdays.length > 0;
+    }
+    return true;
+  },
+  {
+    message: 'Custom frequency requires at least one weekday',
+    path: ['weekdays'],
+  }
+);
 
 export type RepeatOptions = z.infer<typeof RepeatOptionsSchema>;
 
@@ -212,15 +254,23 @@ export const CreateTaskTemplateSchema = z.object({
 
   isRepeating: z.boolean().default(false),
 
-  // 반복 옵션 (isRepeating=true일 때만 유효)
+  // 반복 옵션 (isRepeating=true일 때 필수)
   repeatOptions: RepeatOptionsSchema.optional(),
 
   // FlowStep 입력 (순서대로 order 1..n 자동 할당)
   steps: FlowStepsInputSchema.default([]),
 
-  // 인스턴스 생성 날짜 (YYYY-MM-DD 로컬 기준)
-  instanceDate: z.string()
-    .regex(DATE_REGEX, 'Date must be in YYYY-MM-DD format'),
+  // 인스턴스 생성 날짜 (YYYY-MM-DD 로컬 기준, 실존 여부 검사 포함)
+  instanceDate: ValidDateSchema,
+}).superRefine((data, ctx) => {
+  // isRepeating=true일 때 repeatOptions 필수
+  if (data.isRepeating && !data.repeatOptions) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'repeatOptions is required when isRepeating is true',
+      path: ['repeatOptions'],
+    });
+  }
 });
 
 export type CreateTaskTemplateInput = z.infer<typeof CreateTaskTemplateSchema>;
@@ -259,25 +309,18 @@ export function isValidIcon(icon: string): boolean {
 }
 
 /**
- * 반복 옵션 유효성 검사 (비즈니스 로직 포함)
+ * 반복 옵션 유효성 검사 (프로그래매틱 사용용)
+ * 참고: RepeatOptionsSchema가 이미 .refine()으로 동일 규칙을 적용함
+ * @deprecated 스키마 검증 사용 권장: RepeatOptionsSchema.safeParse()
  */
 export function validateRepeatOptions(options: RepeatOptions): { valid: boolean; errors: string[] } {
-  const errors: string[] = [];
-
-  // custom frequency일 때 weekdays 필수
-  if (options.frequency === 'custom' && (!options.weekdays || options.weekdays.length === 0)) {
-    errors.push('Custom frequency requires at least one weekday');
+  const result = RepeatOptionsSchema.safeParse(options);
+  if (result.success) {
+    return { valid: true, errors: [] };
   }
-
-  // daily frequency일 때 weekdays 불필요 (경고)
-  if (options.frequency === 'daily' && options.weekdays && options.weekdays.length > 0) {
-    // 무시하거나 경고 로그 - 여기서는 허용하되 무시
-  }
-
-  // repeatEnd와 repeatLimit 동시 설정 검사 (둘 다 있어도 OK, 먼저 도달한 조건에서 종료)
-
+  // Zod 4.x uses 'issues' instead of 'errors'
   return {
-    valid: errors.length === 0,
-    errors,
+    valid: false,
+    errors: result.error.issues.map(e => e.message),
   };
 }

@@ -401,4 +401,41 @@ describe('CreateTaskTemplateSchema', () => {
       expect(result.data.icon).toBe('calendar');
     }
   });
+
+  it('should require repeatOptions when isRepeating is true', () => {
+    const result = CreateTaskTemplateSchema.safeParse({
+      name: 'My Task',
+      isRepeating: true,
+      instanceDate: '2024-01-15',
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('should accept isRepeating true with valid repeatOptions', () => {
+    const result = CreateTaskTemplateSchema.safeParse({
+      name: 'My Task',
+      isRepeating: true,
+      repeatOptions: { frequency: 'daily' },
+      instanceDate: '2024-01-15',
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('should reject isRepeating true with custom frequency but no weekdays', () => {
+    const result = CreateTaskTemplateSchema.safeParse({
+      name: 'My Task',
+      isRepeating: true,
+      repeatOptions: { frequency: 'custom' },
+      instanceDate: '2024-01-15',
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('should reject non-existent instanceDate', () => {
+    const result = CreateTaskTemplateSchema.safeParse({
+      name: 'My Task',
+      instanceDate: '2024-02-30', // Feb 30 doesn't exist
+    });
+    expect(result.success).toBe(false);
+  });
 });

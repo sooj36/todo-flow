@@ -2,6 +2,32 @@
 // Phase 14.1: 날짜/타임존 변환 유틸리티
 // 정책: 캘린더 클릭 로컬 날짜 → API payload `YYYY-MM-DD`(로컬 기준) → 서버에서 UTC 00:00으로 변환
 
+const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
+ * 날짜 문자열 유효성 검사 (포맷 + 실존 여부)
+ */
+export function isValidDateString(dateStr: string): boolean {
+  if (!DATE_REGEX.test(dateStr)) {
+    return false;
+  }
+
+  const [year, month, day] = dateStr.split('-').map(Number);
+
+  // 기본 범위 검사
+  if (month < 1 || month > 12) return false;
+  if (day < 1 || day > 31) return false;
+  if (year < 1900 || year > 2100) return false;
+
+  // Date 객체로 실제 유효성 검사
+  const date = new Date(year, month - 1, day);
+  return (
+    date.getFullYear() === year &&
+    date.getMonth() === month - 1 &&
+    date.getDate() === day
+  );
+}
+
 /**
  * 로컬 Date 객체를 YYYY-MM-DD 문자열로 변환 (로컬 기준)
  * 캘린더 클릭 시 사용
@@ -16,8 +42,12 @@ export function formatLocalDate(date: Date): string {
 /**
  * YYYY-MM-DD 문자열을 로컬 Date 객체로 파싱
  * 로컬 타임존의 00:00:00으로 설정
+ * @throws Error if dateStr is invalid format or non-existent date
  */
 export function parseLocalDateString(dateStr: string): Date {
+  if (!isValidDateString(dateStr)) {
+    throw new Error(`Invalid date: ${dateStr}. Expected valid YYYY-MM-DD`);
+  }
   const [year, month, day] = dateStr.split('-').map(Number);
   return new Date(year, month - 1, day);
 }
@@ -25,15 +55,16 @@ export function parseLocalDateString(dateStr: string): Date {
 /**
  * YYYY-MM-DD 문자열(로컬 기준)을 UTC 00:00:00 ISO 문자열로 변환
  * 서버에서 Notion Date 저장 시 사용
+ * @throws Error if localDateStr is invalid format or non-existent date
  *
  * @example
  * // 한국(KST, UTC+9)에서 2024-01-15 입력 시
  * // 반환: '2024-01-15T00:00:00.000Z' (UTC 기준)
  */
 export function localDateToUTC(localDateStr: string): string {
-  // 유효성 검사
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(localDateStr)) {
-    throw new Error(`Invalid date format: ${localDateStr}. Expected YYYY-MM-DD`);
+  // 유효성 검사 (포맷 + 실존 여부)
+  if (!isValidDateString(localDateStr)) {
+    throw new Error(`Invalid date: ${localDateStr}. Expected valid YYYY-MM-DD (e.g., 2024-02-30 does not exist)`);
   }
 
   // YYYY-MM-DD를 UTC 00:00:00으로 직접 변환
@@ -65,30 +96,6 @@ export function notionDateToLocal(notionDate: string | null | undefined): string
 }
 
 /**
- * 날짜 문자열 유효성 검사
- */
-export function isValidDateString(dateStr: string): boolean {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-    return false;
-  }
-
-  const [year, month, day] = dateStr.split('-').map(Number);
-
-  // 기본 범위 검사
-  if (month < 1 || month > 12) return false;
-  if (day < 1 || day > 31) return false;
-  if (year < 1900 || year > 2100) return false;
-
-  // Date 객체로 실제 유효성 검사
-  const date = new Date(year, month - 1, day);
-  return (
-    date.getFullYear() === year &&
-    date.getMonth() === month - 1 &&
-    date.getDate() === day
-  );
-}
-
-/**
  * 두 날짜 문자열 비교 (YYYY-MM-DD 형식)
  * @returns -1 if a < b, 0 if a === b, 1 if a > b
  */
@@ -107,6 +114,7 @@ export function getTodayString(): string {
 
 /**
  * 날짜에 일수를 더함
+ * @throws Error if dateStr is invalid
  */
 export function addDays(dateStr: string, days: number): string {
   const date = parseLocalDateString(dateStr);
@@ -116,6 +124,7 @@ export function addDays(dateStr: string, days: number): string {
 
 /**
  * 요일 인덱스 반환 (0=일, 1=월, ..., 6=토)
+ * @throws Error if dateStr is invalid
  */
 export function getDayOfWeek(dateStr: string): number {
   const date = parseLocalDateString(dateStr);
@@ -146,6 +155,7 @@ export function jsWeekdayToKorIndex(jsWeekday: number): number {
 
 /**
  * 특정 날짜가 주어진 요일 목록에 포함되는지 확인
+ * @throws Error if dateStr is invalid
  */
 export function isDateInWeekdays(dateStr: string, weekdays: string[]): boolean {
   const jsWeekday = getDayOfWeek(dateStr);

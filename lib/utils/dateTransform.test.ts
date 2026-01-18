@@ -52,6 +52,17 @@ describe('parseLocalDateString', () => {
     expect(date.getMinutes()).toBe(0);
     expect(date.getSeconds()).toBe(0);
   });
+
+  it('should throw error for invalid format', () => {
+    expect(() => parseLocalDateString('01-15-2024')).toThrow('Invalid date');
+    expect(() => parseLocalDateString('2024/01/15')).toThrow('Invalid date');
+    expect(() => parseLocalDateString('')).toThrow('Invalid date');
+  });
+
+  it('should throw error for non-existent dates', () => {
+    expect(() => parseLocalDateString('2024-02-30')).toThrow('Invalid date');
+    expect(() => parseLocalDateString('2024-13-01')).toThrow('Invalid date');
+  });
 });
 
 // ============================================
@@ -64,9 +75,15 @@ describe('localDateToUTC', () => {
   });
 
   it('should throw error for invalid format', () => {
-    expect(() => localDateToUTC('01-15-2024')).toThrow('Invalid date format');
-    expect(() => localDateToUTC('2024/01/15')).toThrow('Invalid date format');
-    expect(() => localDateToUTC('')).toThrow('Invalid date format');
+    expect(() => localDateToUTC('01-15-2024')).toThrow('Invalid date');
+    expect(() => localDateToUTC('2024/01/15')).toThrow('Invalid date');
+    expect(() => localDateToUTC('')).toThrow('Invalid date');
+  });
+
+  it('should throw error for non-existent dates', () => {
+    expect(() => localDateToUTC('2024-02-30')).toThrow('Invalid date');
+    expect(() => localDateToUTC('2024-13-01')).toThrow('Invalid date');
+    expect(() => localDateToUTC('2023-02-29')).toThrow('Invalid date'); // not leap year
   });
 
   it('should handle edge dates', () => {
