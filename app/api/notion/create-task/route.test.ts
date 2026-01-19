@@ -67,6 +67,19 @@ describe('POST /api/notion/create-task', () => {
       process.env.NOTION_INSTANCE_DB_ID = 'instance-db-id';
     });
 
+    it('should return 400 for invalid JSON body', async () => {
+      const request = new NextRequest('http://localhost:3000/api/notion/create-task', {
+        method: 'POST',
+        body: 'not valid json {',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const response = await POST(request);
+      const data = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(data.error).toBe('Invalid JSON in request body');
+    });
+
     it('should return 400 if name is missing', async () => {
       const request = new NextRequest('http://localhost:3000/api/notion/create-task', {
         method: 'POST',

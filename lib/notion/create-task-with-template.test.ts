@@ -170,6 +170,93 @@ describe('createTaskWithTemplate', () => {
         })
       );
     });
+
+    it('should convert instance date to UTC format', async () => {
+      mockPageCreate
+        .mockResolvedValueOnce({ id: 'template-123' })
+        .mockResolvedValueOnce({ id: 'instance-456' });
+
+      const input: CreateTaskTemplateInput = {
+        name: 'Test Task',
+        instanceDate: '2026-01-18',
+      };
+
+      await createTaskWithTemplate(mockClient, mockDbIds, input);
+
+      // Check instance creation call - date should be UTC ISO format
+      expect(mockPageCreate).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          properties: expect.objectContaining({
+            Date: { date: { start: '2026-01-18T00:00:00.000Z' } },
+          }),
+        })
+      );
+    });
+
+    it('should map repeat options to individual Notion fields', async () => {
+      mockPageCreate
+        .mockResolvedValueOnce({ id: 'template-123' })
+        .mockResolvedValueOnce({ id: 'instance-456' });
+
+      const input: CreateTaskTemplateInput = {
+        name: 'Weekly Workout',
+        instanceDate: '2026-01-18',
+        isRepeating: true,
+        repeatOptions: {
+          frequency: 'custom',
+          weekdays: ['월', '수', '금'],
+          repeatEnd: '2026-06-30',
+          repeatLimit: 24,
+        },
+      };
+
+      await createTaskWithTemplate(mockClient, mockDbIds, input);
+
+      // Check template creation call - repeat options mapped to individual fields
+      expect(mockPageCreate).toHaveBeenNthCalledWith(
+        1,
+        expect.objectContaining({
+          properties: expect.objectContaining({
+            // frequency → select
+            frequency: { select: { name: 'custom' } },
+            // weekdays → multi-select
+            weekdays: {
+              multi_select: [{ name: '월' }, { name: '수' }, { name: '금' }],
+            },
+            // repeat_end → date (UTC)
+            repeat_end: { date: { start: '2026-06-30T00:00:00.000Z' } },
+            // repeat_limit → number
+            repeat_limit: { number: 24 },
+          }),
+        })
+      );
+    });
+
+    it('should not include optional repeat fields when not provided', async () => {
+      mockPageCreate
+        .mockResolvedValueOnce({ id: 'template-123' })
+        .mockResolvedValueOnce({ id: 'instance-456' });
+
+      const input: CreateTaskTemplateInput = {
+        name: 'Daily Task',
+        instanceDate: '2026-01-18',
+        isRepeating: true,
+        repeatOptions: {
+          frequency: 'daily',
+        },
+      };
+
+      await createTaskWithTemplate(mockClient, mockDbIds, input);
+
+      // Check template creation call
+      const templateCall = mockPageCreate.mock.calls[0][0];
+      expect(templateCall.properties.frequency).toEqual({ select: { name: 'daily' } });
+      // Optional fields should not be present
+      expect(templateCall.properties.weekdays).toBeUndefined();
+      expect(templateCall.properties.repeat_end).toBeUndefined();
+      expect(templateCall.properties.repeat_limit).toBeUndefined();
+    });
   });
 
   describe('Compensating Transaction', () => {

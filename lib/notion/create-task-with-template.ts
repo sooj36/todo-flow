@@ -5,11 +5,9 @@ import { Client } from '@notionhq/client';
 import type {
   CreateTaskTemplateInput,
   CreateTaskResponse,
-  TaskColor,
-  Frequency,
-  RepeatOptions,
 } from '@/lib/schema/templates';
 import { assignStepOrders, DEFAULT_ICON, DEFAULT_COLOR } from '@/lib/schema/templates';
+import { localDateToUTC } from '@/lib/utils/dateTransform';
 
 /**
  * Database IDs required for create-task operation
@@ -66,6 +64,49 @@ async function archivePages(
 }
 
 /**
+ * Build Notion properties for repeat options
+ * Maps to individual Notion fields: frequency (select), weekdays (multi-select),
+ * repeat_end (date), repeat_limit (number)
+ */
+function buildRepeatOptionsProperties(
+  repeatOptions: CreateTaskTemplateInput['repeatOptions']
+): Record<string, unknown> {
+  if (!repeatOptions) {
+    return {};
+  }
+
+  const properties: Record<string, unknown> = {
+    // frequency → select
+    frequency: {
+      select: { name: repeatOptions.frequency },
+    },
+  };
+
+  // weekdays → multi-select (optional, required for custom frequency)
+  if (repeatOptions.weekdays && repeatOptions.weekdays.length > 0) {
+    properties['weekdays'] = {
+      multi_select: repeatOptions.weekdays.map((day) => ({ name: day })),
+    };
+  }
+
+  // repeat_end → date (optional)
+  if (repeatOptions.repeatEnd) {
+    properties['repeat_end'] = {
+      date: { start: localDateToUTC(repeatOptions.repeatEnd) },
+    };
+  }
+
+  // repeat_limit → number (optional)
+  if (repeatOptions.repeatLimit !== undefined) {
+    properties['repeat_limit'] = {
+      number: repeatOptions.repeatLimit,
+    };
+  }
+
+  return properties;
+}
+
+/**
  * Create Task Template in Notion
  */
 async function createTemplate(
@@ -76,10 +117,8 @@ async function createTemplate(
   const icon = input.icon ?? DEFAULT_ICON;
   const color = input.color ?? DEFAULT_COLOR;
 
-  // Serialize repeatOptions for Notion storage
-  const repeatOptionsJson = input.repeatOptions
-    ? JSON.stringify(input.repeatOptions)
-    : undefined;
+  // Build repeat options properties for individual Notion fields
+  const repeatOptionsProperties = buildRepeatOptionsProperties(input.repeatOptions);
 
   const response = await client.pages.create({
     parent: { database_id: databaseId },
@@ -102,11 +141,8 @@ async function createTemplate(
       Active: {
         checkbox: true,
       },
-      ...(repeatOptionsJson && {
-        'Repeat Options': {
-          rich_text: [{ text: { content: repeatOptionsJson } }],
-        },
-      }),
+      // Spread individual repeat option fields
+      ...repeatOptionsProperties,
     },
   });
 
@@ -146,6 +182,7 @@ async function createFlowStep(
 
 /**
  * Create Task Instance in Notion
+ * Converts local date (YYYY-MM-DD) to UTC 00:00 for Notion storage
  */
 async function createInstance(
   client: Client,
@@ -154,6 +191,9 @@ async function createInstance(
   templateName: string,
   date: string
 ): Promise<PageCreationResult> {
+  // Convert local date to UTC 00:00 for Notion storage
+  const utcDate = localDateToUTC(date);
+
   const response = await client.pages.create({
     parent: { database_id: databaseId },
     properties: {
@@ -164,7 +204,7 @@ async function createInstance(
         relation: [{ id: templateId }],
       },
       Date: {
-        date: { start: date },
+        date: { start: utcDate },
       },
       Status: {
         select: { name: 'todo' },

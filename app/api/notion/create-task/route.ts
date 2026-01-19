@@ -29,8 +29,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Parse and validate request body
-    const body = await request.json();
+    // Parse request body (handle malformed JSON)
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        { error: 'Invalid JSON in request body' },
+        { status: 400 }
+      );
+    }
+
+    // Validate request body against schema
     const parseResult = CreateTaskTemplateSchema.safeParse(body);
 
     if (!parseResult.success) {
