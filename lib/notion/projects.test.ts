@@ -83,6 +83,7 @@ describe('projects Notion helpers', () => {
             },
           },
         ],
+        has_more: false,
       })
       // Toggle children
       .mockResolvedValueOnce({
@@ -96,6 +97,7 @@ describe('projects Notion helpers', () => {
             paragraph: { rich_text: [{ plain_text: '첫 줄' }] }, // duplicate to be deduped
           },
         ],
+        has_more: false,
       });
 
     const mockClient = {
@@ -109,6 +111,7 @@ describe('projects Notion helpers', () => {
     const first = await getProjectPageContent(page);
     expect(first.source).toBe('toggle');
     expect(first.text).toBe('첫 줄');
+    expect(first.rawLength).toBe('첫 줄\n첫 줄'.length);
     expect(mockList).toHaveBeenCalledTimes(2);
 
     // Cached second call should not call Notion again
@@ -125,6 +128,7 @@ describe('projects Notion helpers', () => {
           paragraph: { rich_text: [] },
         },
       ],
+      has_more: false,
     });
 
     const mockClient = {
@@ -138,5 +142,76 @@ describe('projects Notion helpers', () => {
     const result = await getProjectPageContent(page);
     expect(result.source).toBe('summary');
     expect(result.text).toBe('요약 텍스트');
+  });
+
+  it('paginates blocks and toggle children to avoid truncation and reports raw length before compression', async () => {
+    const mockList = vi
+      .fn()
+      // Root blocks page 1
+      .mockResolvedValueOnce({
+        results: [
+          {
+            id: 'toggle-1',
+            type: 'toggle',
+            toggle: { rich_text: [{ plain_text: '공고' }] },
+          },
+        ],
+        has_more: true,
+        next_cursor: 'root-next',
+      })
+      // Root blocks page 2
+      .mockResolvedValueOnce({
+        results: [
+          {
+            type: 'paragraph',
+            paragraph: { rich_text: [{ plain_text: '루트 마지막' }] },
+          },
+        ],
+        has_more: false,
+      })
+      // Toggle children page 1
+      .mockResolvedValueOnce({
+        results: [
+          {
+            type: 'paragraph',
+            paragraph: { rich_text: [{ plain_text: 'line1' }] },
+          },
+        ],
+        has_more: true,
+        next_cursor: 'child-next',
+      })
+      // Toggle children page 2
+      .mockResolvedValueOnce({
+        results: [
+          {
+            type: 'paragraph',
+            paragraph: { rich_text: [{ plain_text: 'line2' }] },
+          },
+        ],
+        has_more: false,
+      });
+
+    const mockClient = {
+      blocks: { children: { list: mockList } },
+    } as unknown as ReturnType<typeof notionClient.getNotionClient>;
+
+    vi.spyOn(notionClient, 'getNotionClient').mockReturnValue(mockClient);
+
+    const page = { pageId: 'page-3', title: '테스트', summary: '' };
+
+    const result = await getProjectPageContent(page);
+
+    expect(mockList).toHaveBeenCalledTimes(4);
+    expect(result.text).toBe('line1\nline2');
+    expect(result.rawLength).toBe('line1\nline2'.length);
+    // ensure pagination cursors were used
+    expect(mockList).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ block_id: 'page-3', start_cursor: 'root-next' })
+    );
+    expect(mockList).toHaveBeenNthCalledWith(
+      4,
+      expect.objectContaining({ block_id: 'toggle-1', start_cursor: 'child-next' })
+    );
   });
 });

@@ -5,6 +5,7 @@ import { ConfigError } from './errors';
 import { ProjectSummarySchema, type ProjectSummary } from './schema';
 
 const TOKEN_LIMIT = 120;
+const MAX_BULLET_CHARS = 300;
 const INPUT_CLIP = 4000;
 
 const LlmResponseSchema = z.object({
@@ -30,6 +31,7 @@ export async function summarizeQualifications(
     generationConfig: {
       responseMimeType: 'application/json',
       temperature: 0.2,
+      maxOutputTokens: TOKEN_LIMIT,
     },
   });
 
@@ -41,6 +43,17 @@ export async function summarizeQualifications(
 
   const text = result.response.text();
   const parsed = LlmResponseSchema.parse(JSON.parse(text));
+  const normalizedBullets = parsed.bullets
+    .map((bullet) => {
+      const trimmed = bullet.trim();
+      if (!trimmed) return '';
+      return trimmed.slice(0, MAX_BULLET_CHARS);
+    })
+    .filter(Boolean);
+
+  if (normalizedBullets.length === 0) {
+    throw new Error('LLM returned empty bullets');
+  }
 
   return ProjectSummarySchema.parse({
     pageId,
@@ -49,7 +62,7 @@ export async function summarizeQualifications(
       from: source,
     },
     summary: {
-      bullets: parsed.bullets,
+      bullets: normalizedBullets,
       model: 'gemini-2.0-flash-exp',
       tokenLimit: TOKEN_LIMIT,
     },

@@ -85,13 +85,10 @@ export async function getProjectPageContent(page: ProjectPage): Promise<Extracte
   const notion = getNotionClient();
 
   // Fetch top-level blocks
-  const root = await notion.blocks.children.list({
-    block_id: page.pageId,
-    page_size: 100,
-  });
+  const rootBlocks = await fetchAllBlocks(notion, page.pageId, 100);
 
   // Try 공고 toggle first
-  const toggleBlock = root.results.find(
+  const toggleBlock = rootBlocks.find(
     (block: any) =>
       block.type === 'toggle' &&
       block.toggle &&
@@ -100,17 +97,15 @@ export async function getProjectPageContent(page: ProjectPage): Promise<Extracte
   );
 
   if (toggleBlock) {
-    const toggleChildren = await notion.blocks.children.list({
-      block_id: (toggleBlock as any).id,
-      page_size: 200,
-    });
-
-    const toggleText = compressText(collectPlainText(toggleChildren.results));
+    const toggleChildren = await fetchAllBlocks(notion, (toggleBlock as any).id, 100);
+    const toggleLines = collectPlainText(toggleChildren);
+    const toggleText = compressText(toggleLines);
+    const rawLength = computeRawLength(toggleLines);
     if (toggleText) {
       const result: ExtractedContent = {
         text: toggleText,
         source: 'toggle',
-        rawLength: toggleText.length,
+        rawLength,
       };
       contentCache.set(page.pageId, result);
       return result;
@@ -118,12 +113,14 @@ export async function getProjectPageContent(page: ProjectPage): Promise<Extracte
   }
 
   // Fallback: entire page text
-  const pageText = compressText(collectPlainText(root.results));
+  const pageLines = collectPlainText(rootBlocks);
+  const pageText = compressText(pageLines);
+  const rawLength = computeRawLength(pageLines);
   if (pageText) {
     const result: ExtractedContent = {
       text: pageText,
       source: 'page',
-      rawLength: pageText.length,
+      rawLength,
     };
     contentCache.set(page.pageId, result);
     return result;
@@ -131,10 +128,11 @@ export async function getProjectPageContent(page: ProjectPage): Promise<Extracte
 
   // Fallback: 요약 property
   if (page.summary) {
-    const trimmed = page.summary.trim().slice(0, MAX_CHARS);
+    const trimmed = page.summary.trim();
     if (trimmed) {
+      const clipped = trimmed.slice(0, MAX_CHARS);
       const result: ExtractedContent = {
-        text: trimmed,
+        text: clipped,
         source: 'summary',
         rawLength: trimmed.length,
       };
@@ -191,4 +189,37 @@ function compressText(lines: string[]): string {
   const joined = deduped.join('\n');
   if (joined.length <= MAX_CHARS) return joined;
   return joined.slice(0, MAX_CHARS);
+}
+
+/**
+ * Calculate raw length before deduplication/truncation.
+ */
+function computeRawLength(lines: string[]): number {
+  if (lines.length === 0) return 0;
+  return lines.map((line) => line.trim()).filter(Boolean).join('\n').length;
+}
+
+/**
+ * Paginate through all children blocks for a given block id.
+ */
+async function fetchAllBlocks(
+  notion: ReturnType<typeof getNotionClient>,
+  blockId: string,
+  pageSize: number
+): Promise<any[]> {
+  const results: any[] = [];
+  let cursor: string | undefined = undefined;
+
+  do {
+    const page = await notion.blocks.children.list({
+      block_id: blockId,
+      page_size: pageSize,
+      start_cursor: cursor,
+    });
+
+    results.push(...page.results);
+    cursor = page.has_more ? page.next_cursor ?? undefined : undefined;
+  } while (cursor);
+
+  return results;
 }
