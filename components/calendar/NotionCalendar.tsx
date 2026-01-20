@@ -3,7 +3,10 @@
 import React, { useMemo, useState, useCallback, useEffect, useRef } from "react";
 import { ChevronLeft, ChevronRight, Plus, MoreHorizontal, Link2, Loader2, AlertCircle, RefreshCw } from "lucide-react";
 import { useTaskInstances } from "@/hooks/useTaskInstances";
+import { useTaskTemplates } from "@/hooks/useTaskTemplates";
+import { useCreateTask } from "@/hooks/useCreateTask";
 import { CalendarDayData } from "@/types";
+import { CreateTaskDialog } from "./CreateTaskDialog";
 
 const days1To15 = Array.from({ length: 15 }, (_, i) => i + 1);
 const days16To31 = Array.from({ length: 16 }, (_, i) => i + 16);
@@ -26,6 +29,12 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
   }).format(selectedDate); // Use selectedDate for display
 
   const { instances, loading, error, refetch } = useTaskInstances();
+  const { refetch: refetchTemplates } = useTaskTemplates();
+  const { createTask } = useCreateTask();
+
+  // Dialog state
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [createDialogDate, setCreateDialogDate] = useState<Date>(new Date());
 
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncSuccess, setSyncSuccess] = useState(false);
@@ -82,6 +91,21 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
     const newDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), day);
     onDateChange(newDate);
   }, [selectedDate, onDateChange]);
+
+  const handleOpenCreateDialog = useCallback((day: number) => {
+    const newDate = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), day);
+    setCreateDialogDate(newDate);
+    setIsCreateDialogOpen(true);
+  }, [selectedDate]);
+
+  const handleCloseCreateDialog = useCallback(() => {
+    setIsCreateDialogOpen(false);
+  }, []);
+
+  const handleCreateSuccess = useCallback(async () => {
+    // Refetch both instances and templates after successful creation
+    await Promise.all([refetch(), refetchTemplates()]);
+  }, [refetch, refetchTemplates]);
 
   useEffect(() => {
     return () => {
@@ -236,6 +260,7 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
                   isToday={isToday}
                   isSelected={isSelected}
                   onClick={handleDayClick}
+                  onAddClick={handleOpenCreateDialog}
                 />
               );
             })}
@@ -274,12 +299,22 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
                   isToday={isToday}
                   isSelected={isSelected}
                   onClick={handleDayClick}
+                  onAddClick={handleOpenCreateDialog}
                 />
               );
             })}
           </div>
         </section>
       </div>
+
+      {/* Create Task Dialog */}
+      <CreateTaskDialog
+        isOpen={isCreateDialogOpen}
+        selectedDate={createDialogDate}
+        onClose={handleCloseCreateDialog}
+        onSubmit={createTask}
+        onSuccess={handleCreateSuccess}
+      />
     </div>
   );
 };
@@ -292,9 +327,10 @@ interface CalendarDayProps {
   isToday?: boolean;
   isSelected?: boolean;
   onClick?: (day: number) => void;
+  onAddClick?: (day: number) => void;
 }
 
-const CalendarDay: React.FC<CalendarDayProps> = ({ day, data, loading, isToday, isSelected, onClick }) => {
+const CalendarDay: React.FC<CalendarDayProps> = ({ day, data, loading, isToday, isSelected, onClick, onAddClick }) => {
   const completionRate = data && data.totalTasks > 0
     ? data.completedTasks / data.totalTasks
     : 0;
@@ -340,7 +376,14 @@ const CalendarDay: React.FC<CalendarDayProps> = ({ day, data, loading, isToday, 
       )}
       <div className="flex items-center justify-between mb-2">
         <span className="text-xs font-bold text-[#37352f]/40">{day}</span>
-        <button className="opacity-0 group-hover:opacity-100 p-0.5 hover:bg-[#efefed] rounded transition-all">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onAddClick?.(day);
+          }}
+          className="opacity-0 group-hover:opacity-100 p-0.5 hover:bg-[#efefed] rounded transition-all"
+          aria-label={`Add task for day ${day}`}
+        >
           <Plus size={14} className="text-[#37352f]/40" />
         </button>
       </div>

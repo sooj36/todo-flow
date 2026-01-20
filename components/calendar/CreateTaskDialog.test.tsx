@@ -1,0 +1,188 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { CreateTaskDialog } from "./CreateTaskDialog";
+
+const mockOnClose = vi.fn();
+const mockOnSubmit = vi.fn();
+const mockOnSuccess = vi.fn();
+
+const defaultProps = {
+  isOpen: true,
+  selectedDate: new Date(2026, 0, 20),
+  onClose: mockOnClose,
+  onSubmit: mockOnSubmit,
+  onSuccess: mockOnSuccess,
+};
+
+describe("CreateTaskDialog", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockOnSubmit.mockResolvedValue({ success: true, templateId: "t1", stepIds: [], instanceId: "i1" });
+  });
+
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  describe("Rendering", () => {
+    it("should not render when isOpen is false", () => {
+      render(<CreateTaskDialog {...defaultProps} isOpen={false} />);
+      expect(screen.queryByText("새 태스크 만들기")).not.toBeInTheDocument();
+    });
+
+    it("should render dialog when open", () => {
+      render(<CreateTaskDialog {...defaultProps} />);
+      expect(screen.getAllByText("새 태스크 만들기").length).toBeGreaterThan(0);
+    });
+
+    it("should render date label", () => {
+      render(<CreateTaskDialog {...defaultProps} />);
+      expect(screen.getAllByText("2026년 1월 20일").length).toBeGreaterThan(0);
+    });
+  });
+
+  describe("Form Validation", () => {
+    it("should disable submit button when name is empty", () => {
+      render(<CreateTaskDialog {...defaultProps} />);
+      const submitButtons = screen.getAllByText("태스크 생성");
+      expect(submitButtons[0].closest("button")).toBeDisabled();
+    });
+
+    it("should enable submit button when name is filled", async () => {
+      const user = userEvent.setup();
+      render(<CreateTaskDialog {...defaultProps} />);
+
+      const nameInputs = screen.getAllByPlaceholderText(/아침 루틴/);
+      await user.type(nameInputs[0], "Test Task");
+
+      await waitFor(() => {
+        const submitButtons = screen.getAllByText("태스크 생성");
+        expect(submitButtons[0].closest("button")).not.toBeDisabled();
+      });
+    });
+  });
+
+  describe("Submission", () => {
+    it("should show loading state while submitting", async () => {
+      const user = userEvent.setup();
+      mockOnSubmit.mockImplementation(() => new Promise(() => {}));
+
+      render(<CreateTaskDialog {...defaultProps} />);
+
+      const nameInputs = screen.getAllByPlaceholderText(/아침 루틴/);
+      await user.type(nameInputs[0], "Test Task");
+
+      const submitButtons = screen.getAllByText("태스크 생성");
+      await user.click(submitButtons[0]);
+
+      await waitFor(() => {
+        expect(screen.getAllByText("생성 중...").length).toBeGreaterThan(0);
+      });
+    });
+
+    it("should call onSuccess and onClose on successful submit", async () => {
+      const user = userEvent.setup();
+      render(<CreateTaskDialog {...defaultProps} />);
+
+      const nameInputs = screen.getAllByPlaceholderText(/아침 루틴/);
+      await user.type(nameInputs[0], "Test Task");
+
+      const submitButtons = screen.getAllByText("태스크 생성");
+      await user.click(submitButtons[0]);
+
+      await waitFor(() => {
+        expect(mockOnClose).toHaveBeenCalled();
+        expect(mockOnSuccess).toHaveBeenCalled();
+      });
+    });
+
+    it("should show error message on failed submit", async () => {
+      const user = userEvent.setup();
+      mockOnSubmit.mockResolvedValue({ success: false, error: "Server error" });
+
+      render(<CreateTaskDialog {...defaultProps} />);
+
+      const nameInputs = screen.getAllByPlaceholderText(/아침 루틴/);
+      await user.type(nameInputs[0], "Test Task");
+
+      const submitButtons = screen.getAllByText("태스크 생성");
+      await user.click(submitButtons[0]);
+
+      await waitFor(() => {
+        expect(screen.getAllByText("Server error").length).toBeGreaterThan(0);
+      });
+    });
+
+    it("should prevent multiple submissions", async () => {
+      const user = userEvent.setup();
+      mockOnSubmit.mockImplementation(() => new Promise(() => {}));
+
+      render(<CreateTaskDialog {...defaultProps} />);
+
+      const nameInputs = screen.getAllByPlaceholderText(/아침 루틴/);
+      await user.type(nameInputs[0], "Test Task");
+
+      const submitButtons = screen.getAllByText("태스크 생성");
+      await user.click(submitButtons[0]);
+      await user.click(submitButtons[0]);
+
+      expect(mockOnSubmit).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("Partial Failure", () => {
+    it("should show partial failure message", async () => {
+      const user = userEvent.setup();
+      mockOnSubmit.mockResolvedValue({
+        success: false,
+        error: "Instance creation failed",
+        cleanupIds: ["id1", "id2"],
+        partialCleanup: true,
+      });
+
+      render(<CreateTaskDialog {...defaultProps} />);
+
+      const nameInputs = screen.getAllByPlaceholderText(/아침 루틴/);
+      await user.type(nameInputs[0], "Test Task");
+
+      const submitButtons = screen.getAllByText("태스크 생성");
+      await user.click(submitButtons[0]);
+
+      await waitFor(() => {
+        expect(screen.getAllByText("부분 생성 오류").length).toBeGreaterThan(0);
+      });
+    });
+
+    it("should show retry button on partial failure", async () => {
+      const user = userEvent.setup();
+      mockOnSubmit.mockResolvedValue({
+        success: false,
+        error: "Failed",
+        cleanupIds: ["id1"],
+        partialCleanup: true,
+      });
+
+      render(<CreateTaskDialog {...defaultProps} />);
+
+      const nameInputs = screen.getAllByPlaceholderText(/아침 루틴/);
+      await user.type(nameInputs[0], "Test Task");
+
+      const submitButtons = screen.getAllByText("태스크 생성");
+      await user.click(submitButtons[0]);
+
+      await waitFor(() => {
+        expect(screen.getAllByText("다시 시도").length).toBeGreaterThan(0);
+      });
+    });
+  });
+
+  describe("Dialog Interactions", () => {
+    it("should close on Escape key when not submitting", () => {
+      render(<CreateTaskDialog {...defaultProps} />);
+      fireEvent.keyDown(document, { key: "Escape" });
+      expect(mockOnClose).toHaveBeenCalled();
+    });
+  });
+});

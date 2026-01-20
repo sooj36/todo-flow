@@ -68,10 +68,21 @@
   - app/api/notion/create-task/route.test.ts: 14개 테스트
 
 ### 14.3 프런트 다이얼로그/입력 검증
-- [ ] Calendar day `+` opens creation dialog (필드: 템플릿명, 색상 select, 아이콘 select, 반복 toggle/frequency/요일/end/limit, 스텝 리스트 입력)
-- [ ] Template/FlowStep 생성 필드 매핑: 색상(TaskColor whitelist)·아이콘 허용값 검증, Is Repeating/Default Frequency 기본값 적용, FlowStep done=false, Order auto-assign(입력 순 1..n), Parent Template relation 필수. 허용값 밖 입력은 제출 전 차단/보정.
-- [ ] 에러/로딩 UX 정리: 제출 시 버튼 disable + 로딩 표시, 실패 메시지 노출, refetch 중 상태 표시. 부분 실패 시 “일부 생성물 정리됨/남음” 안내 문구 예시 포함, 다시 시도/중단 선택지 제공, 중복 제출 방지.
-- [ ] UI 통합 테스트 계획: 모달 필수 입력/허용값 밸리데이션, 중복 제출 방지(버튼 disable/재활성), 부분 실패 메시지 렌더링 플로우 사전 정의.
+- [x] Calendar day `+` opens creation dialog (필드: 템플릿명, 색상 select, 아이콘 select, 반복 toggle/frequency/요일/end/limit, 스텝 리스트 입력)
+  - components/calendar/CreateTaskDialog.tsx: 다이얼로그 컴포넌트 구현
+  - NotionCalendar.tsx: + 버튼 클릭 시 다이얼로그 열림 연결
+  - hooks/useCreateTask.ts: API 호출 훅 구현
+- [x] Template/FlowStep 생성 필드 매핑: 색상(TaskColor whitelist)·아이콘 허용값 검증, Is Repeating/Default Frequency 기본값 적용, FlowStep done=false, Order auto-assign(입력 순 1..n), Parent Template relation 필수. 허용값 밖 입력은 제출 전 차단/보정.
+  - CreateTaskTemplateSchema Zod 검증으로 제출 전 차단
+  - 아이콘/색상 버튼 UI로 허용값만 선택 가능
+  - 스텝 order 1..n 자동 할당 (입력 순서)
+- [x] 에러/로딩 UX 정리: 제출 시 버튼 disable + 로딩 표시, 실패 메시지 노출, refetch 중 상태 표시. 부분 실패 시 "일부 생성물 정리됨/남음" 안내 문구 예시 포함, 다시 시도/중단 선택지 제공, 중복 제출 방지.
+  - isSubmitting 상태로 버튼 disable + "생성 중..." 로딩 표시
+  - partialFailure 상태로 부분 실패 메시지 + 다시 시도/취소 버튼
+  - cleanupIds, partialCleanup 플래그로 정리 결과 표시
+- [x] UI 통합 테스트 계획: 모달 필수 입력/허용값 밸리데이션, 중복 제출 방지(버튼 disable/재활성), 부분 실패 메시지 렌더링 플로우 사전 정의.
+  - components/calendar/CreateTaskDialog.test.tsx: 12개 테스트 통과
+  - 렌더링, 폼 검증, 제출 방지, 부분 실패 메시지, 다이얼로그 인터랙션 테스트
 
 ### 14.4 데이터 반영/동기화
 - [ ] Frontend: 제출 시 Notion 생성 → 성공하면 캘린더(`useTaskInstances` all) + FlowBoard(`useTaskInstances(date)` + `useTaskTemplates`) refetch를 모두 호출(steps 응답 미포함이므로 refetch 강제). 클릭한 날짜를 payload에 포함, 중복 제출 방지 플래그/로딩 상태 관리, refetch 중 상태 표시와 실패 메시지/재시도 제공.
