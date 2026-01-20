@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import {
   Zap,
   Cpu,
@@ -29,9 +29,10 @@ import { FlowBoardHeader } from "./FlowBoardHeader";
 
 interface FlowBoardProps {
   selectedDate?: Date;
+  refreshTrigger?: number;
 }
 
-export const FlowBoard: React.FC<FlowBoardProps> = ({ selectedDate = new Date() }) => {
+export const FlowBoard: React.FC<FlowBoardProps> = ({ selectedDate = new Date(), refreshTrigger }) => {
   // Helper function to format Date to YYYY-MM-DD
   const formatDateString = (date: Date): string => {
     const year = date.getFullYear();
@@ -66,6 +67,16 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({ selectedDate = new Date() 
     setSyncSuccess,
     setSyncErrorMessage,
   });
+
+  // Refetch templates when triggered by parent (e.g., after task creation in calendar)
+  const prevRefreshTrigger = useRef(refreshTrigger);
+  useEffect(() => {
+    if (refreshTrigger !== undefined && refreshTrigger !== prevRefreshTrigger.current) {
+      prevRefreshTrigger.current = refreshTrigger;
+      refetchTemplates();
+      refetchInstances();
+    }
+  }, [refreshTrigger, refetchTemplates, refetchInstances]);
 
   const loading = instancesLoading || templatesLoading;
   const error = instancesError || templatesError;

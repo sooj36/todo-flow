@@ -15,6 +15,7 @@ export default function Home() {
   const [splitRatio, setSplitRatio] = useState(0.5);
   const [isDragging, setIsDragging] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date()); // Shared date state
+  const [flowBoardRefreshTrigger, setFlowBoardRefreshTrigger] = useState(0);
   const mainRef = useRef<HTMLElement>(null);
 
   // Agent query state
@@ -73,6 +74,7 @@ export default function Home() {
           <NotionCalendar
             selectedDate={selectedDate}
             onDateChange={setSelectedDate}
+            onTaskCreated={() => setFlowBoardRefreshTrigger(prev => prev + 1)}
           />
         </div>
 
@@ -89,7 +91,7 @@ export default function Home() {
 
           {/* FlowBoard Section */}
           <div className="flex-1 overflow-auto">
-            <FlowBoard selectedDate={selectedDate} />
+            <FlowBoard selectedDate={selectedDate} refreshTrigger={flowBoardRefreshTrigger} />
           </div>
         </div>
 

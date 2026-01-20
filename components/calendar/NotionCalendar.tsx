@@ -13,11 +13,13 @@ const days16To31 = Array.from({ length: 16 }, (_, i) => i + 16);
 interface NotionCalendarProps {
   selectedDate: Date;
   onDateChange: (date: Date) => void;
+  onTaskCreated?: () => void;
 }
 
 export const NotionCalendar: React.FC<NotionCalendarProps> = ({
   selectedDate,
-  onDateChange
+  onDateChange,
+  onTaskCreated,
 }) => {
   const now = new Date(); // Actual current date for "today" highlighting
 
@@ -102,9 +104,10 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
 
   const handleCreateSuccess = useCallback(async () => {
     // Refetch instances after successful creation
-    // FlowBoard manages its own template data and will sync via its own refetch
     await refetch();
-  }, [refetch]);
+    // Notify parent to trigger FlowBoard templates refetch
+    onTaskCreated?.();
+  }, [refetch, onTaskCreated]);
 
   useEffect(() => {
     return () => {
