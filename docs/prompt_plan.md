@@ -93,4 +93,8 @@
   - useFlowSync 훅에서 refetch 로직 관리, 보상 실패와 무관하게 refetch 수행
 
 ### 14.5 테스트
-- [ ] 테스트: a) API 라우트 유닛(기본값 적용, 생성 순서, 중간 실패 보상/cleanupIds 포함), b) 반복 옵션 파싱/직렬화/검증(요일/limit), c) 다이얼로그 렌더/밸리데이션/제출/중복 제출 차단, d) 성공 후 캘린더+FlowBoard refetch 두 곳 모두 호출되는 통합 테스트(버튼 재활성 시점 포함).
+- [x] 테스트: a) API 라우트 유닛(기본값 적용, 생성 순서, 중간 실패 보상/cleanupIds 포함), b) 반복 옵션 파싱/직렬화/검증(요일/limit), c) 다이얼로그 렌더/밸리데이션/제출/중복 제출 차단, d) 성공 후 캘린더+FlowBoard refetch 두 곳 모두 호출되는 통합 테스트(버튼 재활성 시점 포함).
+  - a) lib/notion/create-task-with-template.test.ts (14개) + app/api/notion/create-task/route.test.ts (15개): 기본값 적용, 생성 순서, 중간 실패 보상/cleanupIds 테스트 포함
+  - b) lib/schema/templates.test.ts (42개): 반복 옵션 파싱/직렬화/검증(요일/limit) 테스트 포함
+  - c) components/calendar/CreateTaskDialog.test.tsx (17개): 다이얼로그 렌더/밸리데이션/제출/중복 제출 차단 테스트 포함
+  - d) components/calendar/CreateTaskIntegration.test.tsx (9개) + components/flow/FlowBoardRefetch.test.tsx (9개): 성공 후 캘린더+FlowBoard refetch 통합 테스트 (버튼 재활성 시점 포함)
