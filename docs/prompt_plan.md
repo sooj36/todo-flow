@@ -105,6 +105,15 @@
 - [x] lib/notion/parsers.test.ts: ISO 입력 정규화 테스트 추가, 통과
 
 ### 14.7 체크리스트(FlowStep 토글) 클릭 시 진행률/퍼센트 UI가 즉시 반영되지 않는 문제
+- [x] 원인/재현: FlowBoard 체크리스트 토글 시 stepOverrides로 체크 상태는 낙관적 업데이트되지만 진행률/퍼센트 계산이 template.flowSteps 원본 done 값을 그대로 사용해 refetch 이후에만 갱신(토글 실패 시 롤백돼도 진행률은 그대로 남음).
+- [x] 즉시 반영: utils/flowNodes.ts에서 done/total 계산 시 stepOverrides를 반영해 progress(완료 n/N, %) 값을 생성해 CustomFlowNode로 전달, 기존 진행률/퍼센트 UI가 토글 직후에 재계산되도록 한다(네트워크 대기 없이 반영).
+- [x] 상태 일관성: hooks/useFlowSteps.ts의 롤백 시 progress 계산도 함께 복원되도록 하고, stepUpdating 중에는 퍼센트가 튀지 않도록 중복 토글/동시 계산 차단(낙관적 업데이트는 한 번만).
+- [x] 테스트: components/flow/FlowBoard.flow-step-toggle.test.tsx 또는 신규 테스트에서 a) 토글 직후 퍼센트/바가 즉시 갱신, b) fetch 실패 시 퍼센트 롤백, c) 연속 토글 시 누적 반영, d) stepUpdating=true일 때 진행률 값이 중복 변하지 않는지 검증.
+- [x] 캘린더 퍼센트 연동 계획(요구사항 반영: 날짜별 인스턴스 완료율, 일자별 5개 인스턴스 중 1개 완료 시 20%, 모든 step 완료 시 해당 인스턴스 100%):
+  - [x] 계산 규칙 명시: `NotionCalendar` 퍼센트는 `selectedDate`의 인스턴스 상태 기준(`done`/`total`). 한 인스턴스의 `status`를 `done`으로 전환하는 조건을 “해당 날짜의 모든 flow step 완료”로 정의.
+  - [x] 상태 전파: FlowBoard 토글 성공 시 현재 날짜(`selectedDate`)의 해당 템플릿 인스턴스가 모든 step 완료이면 상태를 `done`/`doing`/`todo`로 낙관적 세팅하고 `instanceStatusOverrides`를 통해 로컬 캐시 공유. 실패 시 상태/퍼센트 롤백.
+  - [x] 이벤트 연결: FlowBoard → 캘린더로 shared overrides 전달. 토글 성공 시 즉시 반영 + 서버 refetch와 무관하게 UI 동기화, 실패 시 원복. 중복 트리거 방지.
+  - [x] 테스트: a) 날짜별 인스턴스가 step 완료 시 `completedTasks/totalTasks`가 1/N씩 상승(5개 중 1개=20%), b) 모든 step 완료 시 해당 인스턴스 100%로 표시되고 캘린더 퍼센트 업데이트, c) 토글 실패 시 퍼센트 롤백, d) 동일 날짜 다중 토글 시 퍼센트 누적 반영, e) 다른 날짜 퍼센트는 영향 없음. (components/calendar/CalendarFlowPercent.integration.test.tsx)
 
 ### 14.8 Dialog로 태스크 생성 시 선택한 아이콘·색상이 실제 생성 결과에 반영되지 않는 문제
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Bell } from "lucide-react";
 import { NotionCalendar } from "@/components/calendar/NotionCalendar";
 import { FlowBoard } from "@/components/flow/FlowBoard";
@@ -9,6 +9,7 @@ import { SearchBar } from "@/components/agent/SearchBar";
 import { ProgressIndicator } from "@/components/agent/ProgressIndicator";
 import { QualificationPanel } from "@/components/agent/QualificationPanel";
 import { useAgentQuery } from "@/lib/hooks/useAgentQuery";
+import { TaskStatus } from "@/types";
 
 export default function Home() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -16,6 +17,7 @@ export default function Home() {
   const [isDragging, setIsDragging] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date()); // Shared date state
   const [flowBoardRefreshTrigger, setFlowBoardRefreshTrigger] = useState(0);
+  const [instanceStatusOverrides, setInstanceStatusOverrides] = useState<Record<string, TaskStatus>>({});
   const mainRef = useRef<HTMLElement>(null);
 
   // Agent query state
@@ -56,6 +58,19 @@ export default function Home() {
     window.localStorage.setItem("layout:splitRatio", String(splitRatio));
   }, [splitRatio]);
 
+  const handleInstanceStatusChange = useCallback(
+    (updates: Array<{ instanceId: string; status: TaskStatus }>) => {
+      setInstanceStatusOverrides((prev) => {
+        const next = { ...prev };
+        updates.forEach(({ instanceId, status }) => {
+          next[instanceId] = status;
+        });
+        return next;
+      });
+    },
+    []
+  );
+
   return (
     <div className="flex h-screen w-full bg-[#f4f5f7] overflow-hidden selection:bg-blue-100">
       <Sidebar
@@ -75,6 +90,7 @@ export default function Home() {
             selectedDate={selectedDate}
             onDateChange={setSelectedDate}
             onTaskCreated={() => setFlowBoardRefreshTrigger(prev => prev + 1)}
+            instanceStatusOverrides={instanceStatusOverrides}
           />
         </div>
 
@@ -91,7 +107,12 @@ export default function Home() {
 
           {/* FlowBoard Section */}
           <div className="flex-1 overflow-auto">
-            <FlowBoard selectedDate={selectedDate} refreshTrigger={flowBoardRefreshTrigger} />
+            <FlowBoard
+              selectedDate={selectedDate}
+              refreshTrigger={flowBoardRefreshTrigger}
+              instanceStatusOverrides={instanceStatusOverrides}
+              onInstanceStatusChange={handleInstanceStatusChange}
+            />
           </div>
         </div>
 

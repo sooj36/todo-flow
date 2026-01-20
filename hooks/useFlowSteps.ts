@@ -25,9 +25,9 @@ export function useFlowSteps({
     stepId: string,
     nextDone: boolean,
     previousDone: boolean
-  ) => {
+  ): Promise<boolean> => {
     // Prevent duplicate toggles (race condition protection)
-    if (stepUpdatingRef.current[stepId]) return;
+    if (stepUpdatingRef.current[stepId]) return false;
 
     if (syncTimeoutRef.current) {
       clearTimeout(syncTimeoutRef.current);
@@ -52,6 +52,12 @@ export function useFlowSteps({
         const data = await response.json().catch(() => ({}));
         throw new Error(data.error || "Failed to sync flow step");
       }
+
+      setSyncSuccess(true);
+      syncTimeoutRef.current = setTimeout(() => {
+        setSyncSuccess(false);
+      }, 5000);
+      return true;
     } catch (err) {
       // Rollback on failure
       setStepOverrides((prev) => ({ ...prev, [stepId]: previousDone }));
@@ -65,6 +71,7 @@ export function useFlowSteps({
         setSyncError(false);
         setSyncErrorMessage("");
       }, 5000);
+      return false;
     } finally {
       stepUpdatingRef.current[stepId] = false;
       setStepUpdating((prev) => ({ ...prev, [stepId]: false }));

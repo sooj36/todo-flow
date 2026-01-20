@@ -3,6 +3,25 @@ import { Node, Edge } from "reactflow";
 import { TaskInstance, TaskTemplate } from "@/types";
 import { loadNodePositions } from "./nodePositions";
 
+export function calculateTemplateProgress(
+  template: TaskTemplate,
+  stepOverrides: Record<string, boolean>
+) {
+  const totals = template.flowSteps.reduce(
+    (acc, step) => {
+      const done = stepOverrides[step.id] ?? step.done;
+      if (done) acc.done += 1;
+      return acc;
+    },
+    { done: 0, total: template.flowSteps.length }
+  );
+
+  const percent =
+    totals.total > 0 ? Math.round((totals.done / totals.total) * 100) : 0;
+
+  return { ...totals, percent };
+}
+
 export interface CreateFlowNodesProps {
   loading: boolean;
   error: string | null;
@@ -11,7 +30,7 @@ export interface CreateFlowNodesProps {
   stepOverrides: Record<string, boolean>;
   stepUpdating: Record<string, boolean>;
   isConnected: boolean;
-  handleToggleFlowStep: (stepId: string, nextDone: boolean, previousDone: boolean) => void;
+  handleToggleFlowStep: (stepId: string, nextDone: boolean, previousDone: boolean) => void | Promise<void | boolean>;
   icons: {
     trigger: ReactNode;
     aiAgent: ReactNode;
@@ -79,6 +98,7 @@ export function createFlowNodes({
       const status = templateInstances.some(inst => inst.status === 'doing') ? 'running' : 'idle';
 
       const nodeId = `notion-${template.id}`;
+
       const tasks = template.flowSteps.map((step) => {
         const done = stepOverrides[step.id] ?? step.done;
         return {
@@ -88,6 +108,8 @@ export function createFlowNodes({
           isUpdating: Boolean(stepUpdating[step.id]),
         };
       });
+
+      const progressTotals = calculateTemplateProgress(template, stepOverrides);
 
       nodes.push({
         id: nodeId,
@@ -100,6 +122,11 @@ export function createFlowNodes({
           type: "Notion DB",
           isSyncable: true,
           syncState,
+          progress: {
+            done: progressTotals.done,
+            total: progressTotals.total,
+            percent: progressTotals.percent,
+          },
           tasks,
           onToggleFlowStep: isConnected ? handleToggleFlowStep : undefined,
         },

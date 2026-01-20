@@ -21,6 +21,11 @@ export interface CustomNodeData {
     done: boolean;
     isUpdating?: boolean;
   }>;
+  progress?: {
+    done: number;
+    total: number;
+    percent: number;
+  };
   isSyncable?: boolean;
   syncState?: "idle" | "loading" | "success";
   onToggleFlowStep?: (stepId: string, nextDone: boolean, previousDone: boolean) => void;
@@ -34,6 +39,7 @@ export const CustomFlowNode: React.FC<{ data: CustomNodeData }> = ({ data }) => 
     type,
     description,
     tasks,
+    progress,
     isSyncable,
     syncState,
     onToggleFlowStep,
@@ -146,6 +152,25 @@ export const CustomFlowNode: React.FC<{ data: CustomNodeData }> = ({ data }) => 
             {syncState === "success" && (
               <ArrowRight size={10} className="text-gray-300" />
             )}
+          </div>
+        )}
+
+        {progress && progress.total > 0 && (
+          <div className="mt-3 pt-3 border-t border-dashed border-gray-200 space-y-1.5" data-testid="flow-progress">
+            <div className="flex items-center justify-between text-[10px] font-bold text-gray-500">
+              <span>Progress</span>
+              <span>{progress.done}/{progress.total}</span>
+            </div>
+            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+              <div
+                className="h-2 bg-blue-500 transition-all"
+                style={{ width: `${progress.percent}%` }}
+                data-testid="flow-progress-bar"
+              />
+            </div>
+            <div className="text-[9px] text-gray-400 text-right font-bold" data-testid="flow-progress-percent">
+              {progress.percent}%
+            </div>
           </div>
         )}
       </div>

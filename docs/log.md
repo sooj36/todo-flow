@@ -350,3 +350,7 @@
   2. vitest.config.ts에서 poolOptions.threads.maxThreads 조정
   3. 테스트 파일을 더 작은 단위로 분할
 - 참고: 코드 수정은 올바르게 완료됨, 테스트 환경 문제일 뿐
+
+## Phase 14.7 캘린더 진행률 연동 – 2026-01-20
+- components/calendar/CalendarFlowPercent.integration.test.tsx: 3/3 테스트 통과 ✅ – 2026-01-20
+- components/flow/__tests__/FlowBoard.flow-step-toggle.test.tsx: 7/7 테스트 통과 ✅ – 2026-01-20

@@ -20,19 +20,28 @@ import "reactflow/dist/style.css";
 import { useTaskInstances } from "@/hooks/useTaskInstances";
 import { useTaskTemplates } from "@/hooks/useTaskTemplates";
 import { loadNodePositions, saveNodePositions } from "@/utils/nodePositions";
-import { createFlowNodes } from "@/utils/flowNodes";
+import { applyInstanceStatusOverrides } from "@/utils/taskInstances";
+import { createFlowNodes, calculateTemplateProgress } from "@/utils/flowNodes";
 import { useFlowSync } from "@/hooks/useFlowSync";
 import { useFlowSteps } from "@/hooks/useFlowSteps";
 import { CustomFlowNode } from "./CustomFlowNode";
 import { FlowBoardHeader } from "./FlowBoardHeader";
+import { TaskStatus } from "@/types";
 
 
 interface FlowBoardProps {
   selectedDate?: Date;
   refreshTrigger?: number;
+  instanceStatusOverrides?: Record<string, TaskStatus>;
+  onInstanceStatusChange?: (updates: Array<{ instanceId: string; status: TaskStatus }>) => void;
 }
 
-export const FlowBoard: React.FC<FlowBoardProps> = ({ selectedDate = new Date(), refreshTrigger }) => {
+export const FlowBoard: React.FC<FlowBoardProps> = ({
+  selectedDate = new Date(),
+  refreshTrigger,
+  instanceStatusOverrides,
+  onInstanceStatusChange,
+}) => {
   // Helper function to format Date to YYYY-MM-DD
   const formatDateString = (date: Date): string => {
     const year = date.getFullYear();
@@ -82,24 +91,67 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({ selectedDate = new Date(),
   const error = instancesError || templatesError;
   const isConnected = !loading && !error;
 
+  const effectiveInstances = useMemo(
+    () => applyInstanceStatusOverrides(instances, instanceStatusOverrides),
+    [instances, instanceStatusOverrides]
+  );
+
+  const handleFlowStepToggleWithStatus = useCallback(
+    async (stepId: string, nextDone: boolean, previousDone: boolean) => {
+      const success = await handleToggleFlowStep(stepId, nextDone, previousDone);
+      if (!success) return;
+
+      const template = templates.find((tpl) =>
+        tpl.flowSteps.some((step) => step.id === stepId)
+      );
+      if (!template || !onInstanceStatusChange) return;
+
+      const progress = calculateTemplateProgress(template, {
+        ...stepOverrides,
+        [stepId]: nextDone,
+      });
+
+      const status: TaskStatus =
+        progress.done === progress.total
+          ? "done"
+          : progress.done > 0
+          ? "doing"
+          : "todo";
+
+      const relatedInstances = effectiveInstances.filter(
+        (instance) => instance.templateId === template.id
+      );
+
+      if (relatedInstances.length === 0) return;
+
+      onInstanceStatusChange(
+        relatedInstances.map((instance) => ({
+          instanceId: instance.id,
+          status,
+        }))
+      );
+    },
+    [handleToggleFlowStep, templates, onInstanceStatusChange, stepOverrides, effectiveInstances]
+  );
+
   // Create nodes and edges for React Flow
   const { nodes: initialNodes, edges: initialEdges } = useMemo(() => {
     return createFlowNodes({
       loading,
       error,
-      instances,
+      instances: effectiveInstances,
       templates,
       stepOverrides,
       stepUpdating,
       isConnected,
-      handleToggleFlowStep,
+      handleToggleFlowStep: handleFlowStepToggleWithStatus,
       icons: {
         trigger: <Zap className="text-orange-500" size={16} />,
         aiAgent: <Cpu className="text-purple-500" size={16} />,
         notionDb: <Briefcase className="text-blue-500" size={16} />,
       },
     });
-  }, [loading, error, instances, templates, stepOverrides, stepUpdating, isConnected, handleToggleFlowStep]);
+  }, [loading, error, effectiveInstances, templates, stepOverrides, stepUpdating, isConnected, handleFlowStepToggleWithStatus]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);

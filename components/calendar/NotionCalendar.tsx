@@ -4,8 +4,9 @@ import React, { useMemo, useState, useCallback, useEffect, useRef } from "react"
 import { ChevronLeft, ChevronRight, Plus, MoreHorizontal, Link2, Loader2, AlertCircle, RefreshCw } from "lucide-react";
 import { useTaskInstances } from "@/hooks/useTaskInstances";
 import { useCreateTask } from "@/hooks/useCreateTask";
-import { CalendarDayData } from "@/types";
+import { CalendarDayData, TaskStatus } from "@/types";
 import { CreateTaskDialog } from "./CreateTaskDialog";
+import { applyInstanceStatusOverrides } from "@/utils/taskInstances";
 
 const days1To15 = Array.from({ length: 15 }, (_, i) => i + 1);
 const days16To31 = Array.from({ length: 16 }, (_, i) => i + 16);
@@ -14,12 +15,14 @@ interface NotionCalendarProps {
   selectedDate: Date;
   onDateChange: (date: Date) => void;
   onTaskCreated?: () => void;
+  instanceStatusOverrides?: Record<string, TaskStatus>;
 }
 
 export const NotionCalendar: React.FC<NotionCalendarProps> = ({
   selectedDate,
   onDateChange,
   onTaskCreated,
+  instanceStatusOverrides,
 }) => {
   const now = new Date(); // Actual current date for "today" highlighting
 
@@ -117,6 +120,11 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
     };
   }, []);
 
+  const effectiveInstances = useMemo(
+    () => applyInstanceStatusOverrides(instances, instanceStatusOverrides),
+    [instances, instanceStatusOverrides]
+  );
+
   const calendarData = useMemo(() => {
     const year = selectedDate.getFullYear();
     const month = selectedDate.getMonth();
@@ -125,7 +133,7 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
 
     for (let day = 1; day <= daysInMonth; day++) {
       const date = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-      const dayInstances = instances.filter(inst => inst.date === date);
+      const dayInstances = effectiveInstances.filter(inst => inst.date === date);
       dataMap.set(date, {
         date,
         totalTasks: dayInstances.length,
@@ -135,7 +143,7 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
     }
 
     return dataMap;
-  }, [instances, selectedDate]); // Changed: now -> selectedDate
+  }, [effectiveInstances, selectedDate]); // Changed: now -> selectedDate
 
   const isConnected = !loading && !error;
 
