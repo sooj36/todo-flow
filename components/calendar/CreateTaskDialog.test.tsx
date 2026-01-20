@@ -185,4 +185,151 @@ describe("CreateTaskDialog", () => {
       expect(mockOnClose).toHaveBeenCalled();
     });
   });
+
+  describe("Repeat Options Validation", () => {
+    it("should require weekdays when custom frequency is selected", async () => {
+      const user = userEvent.setup();
+      render(<CreateTaskDialog {...defaultProps} />);
+
+      // Fill required name
+      const nameInputs = screen.getAllByPlaceholderText(/아침 루틴/);
+      await user.type(nameInputs[0], "Test Task");
+
+      // Enable repeat
+      const toggleButtons = screen.getAllByRole("button");
+      const toggle = toggleButtons.find(btn =>
+        btn.classList.contains("bg-gray-300") || btn.classList.contains("bg-blue-500")
+      );
+      if (toggle) await user.click(toggle);
+
+      // Select custom frequency
+      await waitFor(() => {
+        expect(screen.getAllByText("사용자 지정").length).toBeGreaterThan(0);
+      });
+      await user.click(screen.getAllByText("사용자 지정")[0]);
+
+      // Submit should be disabled without weekdays
+      await waitFor(() => {
+        const submitButtons = screen.getAllByText("태스크 생성");
+        expect(submitButtons[0].closest("button")).toBeDisabled();
+      });
+    });
+
+    it("should enable submit when weekday is selected for custom frequency", async () => {
+      const user = userEvent.setup();
+      render(<CreateTaskDialog {...defaultProps} />);
+
+      // Fill required name
+      const nameInputs = screen.getAllByPlaceholderText(/아침 루틴/);
+      await user.type(nameInputs[0], "Test Task");
+
+      // Enable repeat
+      const toggleButtons = screen.getAllByRole("button");
+      const toggle = toggleButtons.find(btn =>
+        btn.classList.contains("bg-gray-300") || btn.classList.contains("bg-blue-500")
+      );
+      if (toggle) await user.click(toggle);
+
+      // Select custom frequency
+      await waitFor(() => {
+        expect(screen.getAllByText("사용자 지정").length).toBeGreaterThan(0);
+      });
+      await user.click(screen.getAllByText("사용자 지정")[0]);
+
+      // Select a weekday
+      await waitFor(() => {
+        expect(screen.getAllByRole("button", { name: "월" }).length).toBeGreaterThan(0);
+      });
+      await user.click(screen.getAllByRole("button", { name: "월" })[0]);
+
+      // Submit should be enabled
+      await waitFor(() => {
+        const submitButtons = screen.getAllByText("태스크 생성");
+        expect(submitButtons[0].closest("button")).not.toBeDisabled();
+      });
+    });
+
+    it("should accept valid repeatLimit within bounds (1-365)", async () => {
+      const user = userEvent.setup();
+      render(<CreateTaskDialog {...defaultProps} />);
+
+      // Fill required name
+      const nameInputs = screen.getAllByPlaceholderText(/아침 루틴/);
+      await user.type(nameInputs[0], "Test Task");
+
+      // Enable repeat
+      const toggleButtons = screen.getAllByRole("button");
+      const toggle = toggleButtons.find(btn =>
+        btn.classList.contains("bg-gray-300") || btn.classList.contains("bg-blue-500")
+      );
+      if (toggle) await user.click(toggle);
+
+      // Enter valid repeatLimit
+      await waitFor(() => {
+        expect(screen.getAllByPlaceholderText("최대 365").length).toBeGreaterThan(0);
+      });
+      const limitInputs = screen.getAllByPlaceholderText("최대 365");
+      await user.type(limitInputs[0], "30");
+
+      // Submit should be enabled
+      await waitFor(() => {
+        const submitButtons = screen.getAllByText("태스크 생성");
+        expect(submitButtons[0].closest("button")).not.toBeDisabled();
+      });
+    });
+  });
+
+  describe("Step Validation", () => {
+    it("should show step count and allow adding steps", async () => {
+      const user = userEvent.setup();
+      render(<CreateTaskDialog {...defaultProps} />);
+
+      // Initial state: 0/20
+      expect(screen.getAllByText("플로우 스텝 (0/20)").length).toBeGreaterThan(0);
+
+      // Add a step
+      const stepInput = screen.getAllByPlaceholderText("새 스텝 이름")[0];
+      await user.type(stepInput, "First Step");
+      await user.keyboard("{Enter}");
+
+      // Count should update to 1/20
+      await waitFor(() => {
+        expect(screen.getAllByText("플로우 스텝 (1/20)").length).toBeGreaterThan(0);
+      });
+
+      // Add another step
+      await user.type(stepInput, "Second Step");
+      await user.keyboard("{Enter}");
+
+      // Count should update to 2/20
+      await waitFor(() => {
+        expect(screen.getAllByText("플로우 스텝 (2/20)").length).toBeGreaterThan(0);
+      });
+    });
+
+    it("should add and remove steps correctly", async () => {
+      const user = userEvent.setup();
+      render(<CreateTaskDialog {...defaultProps} />);
+
+      const stepInput = screen.getAllByPlaceholderText("새 스텝 이름")[0];
+
+      // Add a step
+      await user.type(stepInput, "Test Step");
+      await user.keyboard("{Enter}");
+
+      await waitFor(() => {
+        expect(screen.getAllByText("Test Step").length).toBeGreaterThan(0);
+        expect(screen.getAllByText("플로우 스텝 (1/20)").length).toBeGreaterThan(0);
+      });
+
+      // Remove the step
+      const removeButtons = screen.getAllByLabelText(/Remove step/);
+      await user.click(removeButtons[0]);
+
+      await waitFor(() => {
+        expect(screen.queryByText("Test Step")).not.toBeInTheDocument();
+        expect(screen.getAllByText("플로우 스텝 (0/20)").length).toBeGreaterThan(0);
+      });
+    });
+  });
 });

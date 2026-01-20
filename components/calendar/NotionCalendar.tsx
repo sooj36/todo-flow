@@ -3,7 +3,6 @@
 import React, { useMemo, useState, useCallback, useEffect, useRef } from "react";
 import { ChevronLeft, ChevronRight, Plus, MoreHorizontal, Link2, Loader2, AlertCircle, RefreshCw } from "lucide-react";
 import { useTaskInstances } from "@/hooks/useTaskInstances";
-import { useTaskTemplates } from "@/hooks/useTaskTemplates";
 import { useCreateTask } from "@/hooks/useCreateTask";
 import { CalendarDayData } from "@/types";
 import { CreateTaskDialog } from "./CreateTaskDialog";
@@ -29,7 +28,6 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
   }).format(selectedDate); // Use selectedDate for display
 
   const { instances, loading, error, refetch } = useTaskInstances();
-  const { refetch: refetchTemplates } = useTaskTemplates();
   const { createTask } = useCreateTask();
 
   // Dialog state
@@ -103,9 +101,10 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
   }, []);
 
   const handleCreateSuccess = useCallback(async () => {
-    // Refetch both instances and templates after successful creation
-    await Promise.all([refetch(), refetchTemplates()]);
-  }, [refetch, refetchTemplates]);
+    // Refetch instances after successful creation
+    // FlowBoard manages its own template data and will sync via its own refetch
+    await refetch();
+  }, [refetch]);
 
   useEffect(() => {
     return () => {
