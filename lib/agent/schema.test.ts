@@ -1,6 +1,6 @@
 // lib/agent/schema.test.ts
 import { describe, it, expect } from 'vitest';
-import { ClusterResultSchema } from './schema';
+import { ClusterResultSchema, ProjectSummarySchema } from './schema';
 import { buildFallbackResult } from './fallback';
 import type { ClusterResult, KeywordPage } from './clustering';
 
@@ -250,5 +250,39 @@ describe('ClusterResultSchema', () => {
 
       expect(fallbackTriggered).toBe(true);
     });
+  });
+});
+
+describe('ProjectSummarySchema', () => {
+  it('parses valid summary result', () => {
+    const data = {
+      pageId: 'page-1',
+      title: '뱅크샐러드',
+      source: { from: 'toggle', rawLength: 120 },
+      summary: {
+        bullets: ['조건1', '조건2'],
+        model: 'gemini-2.0-flash-exp',
+        tokenLimit: 120,
+      },
+    };
+
+    const result = ProjectSummarySchema.safeParse(data);
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects missing bullets', () => {
+    const invalid = {
+      pageId: 'page-1',
+      title: '테스트',
+      source: { from: 'page' },
+      summary: {
+        bullets: [],
+        model: 'gemini-2.0-flash-exp',
+        tokenLimit: 120,
+      },
+    };
+
+    const result = ProjectSummarySchema.safeParse(invalid);
+    expect(result.success).toBe(false);
   });
 });

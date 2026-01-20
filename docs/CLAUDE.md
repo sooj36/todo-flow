@@ -65,9 +65,3 @@ components/
 - [ ] FlowBoard 데이터 바인딩
 - [ ] E2E 테스트 추가 및 유지
 
-## Docs
-
-@docs/PRD.md
-@docs/DATA_MODEL.md
-@docs/COMPONENTS.md
-@docs/log.md

@@ -3,9 +3,9 @@ import { CheckCircle2 } from "lucide-react";
 
 const PHASE_MESSAGES = {
   idle: "",
-  fetch: "Notion에서 완료 페이지 조회 중...",
-  normalize: "키워드 정규화 중...",
-  cluster: "클러스터링 중...",
+  fetch: "Project DB 조회 중...",
+  normalize: "공고 텍스트 정리 중...",
+  cluster: "지원자격 요약 중...",
   done: "완료",
   error: "",
 } as const;

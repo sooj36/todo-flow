@@ -103,4 +103,29 @@
 - [x] Notion Date start 값(ISO/UTC)을 캘린더 키(YYYY-MM-DD)로 정규화해 인스턴스 누락 방지 (notionDateToLocal 사용)
 - [x] lib/notion/parsers.ts: extractDate/nullable가 ISO 문자열을 YYYY-MM-DD로 변환
 - [x] lib/notion/parsers.test.ts: ISO 입력 정규화 테스트 추가, 통과
-- [x] 테스트: pnpm test lib/notion/parsers.test.ts
+
+### 14.7 체크리스트(FlowStep 토글) 클릭 시 진행률/퍼센트 UI가 즉시 반영되지 않는 문제
+
+### 14.8 Dialog로 태스크 생성 시 선택한 아이콘·색상이 실제 생성 결과에 반영되지 않는 문제
+
+### 14.9 캘린더/FlowBoard 사이 분할 바가 Dialog가 열려도 그대로 보여서 오버레이를 가리지 못하는 UI 문제
+
+### 14.10 Dialog에서 FlowStep 입력 중 Enter 치면 마지막 음절이 다음 스텝으로 밀려 내려가는 입력 처리 버그
+
+### 14.11 Dialog의 “반복 횟수(선택)” 필드 용도/동작을 명확히 정의·표기해야 하는 문제
+
+## phase 15 
+
+### phase 15.1 검색창 DB (KEYWORD DB -> PROJECT DB) 구현
+- [ ] Notion Project DB 조회 함수 추가: `getProjectPages(queryText)` → 제목 contains 필터(한글 포함), page_size 20, 상태/레벨 필터 없음(default 전체). 실패 시 “프로젝트 DB에 일치하는 페이지가 없습니다” 반환.
+- [ ] 검색 엔트리 흐름 교체: `/api/agent/keywords` → `/api/agent/project` (신규)로 연결, env는 `NOTION_PROJECT_DB_ID` 사용. queryText 미입력 시 400.
+- [ ] 페이지 본문 최소 추출: 찾은 첫 페이지의 블록 children 중 토글 “공고” 우선 → plain text만 모으고 link/pdf 등 비텍스트는 건너뛰기. 토글 없으면 heading/paragraph 전체를 3~4k chars로 컷.
+- [ ] 토큰 절약 전처리: 연속 paragraph 병합, trim/중복 문장 제거, 빈 라인 제거. 캐시: 동일 pageId 재조회 시 블록 재호출 없이 메모리/kv 반환.
+- [ ] 에러/빈 데이터 UX: 공고 토글 없거나 텍스트 0자면 “공고 내용이 비어있습니다” 메시지로 안내, 재시도/다른 페이지 검색 유도.
+- [ ] 테스트: a) query payload에 contains 필터 포함, b) 공고 토글 선택/없을 때 fallback, c) 빈 결과 에러 메시지, d) 캐시 사용 시 블록 호출 1회만 되는지.
+
+### phase 15.2 지원자격 요약/응답
+- [ ] 요약 프롬프트 확정: “입력은 plain text. 지원자격/요구사항만 5 bullets, 한국어, 120 tokens 이내, 불필요한 서론 금지.”로 고정.
+- [ ] 파이프라인: 검색어에 “지원자격/요구/조건” 포함 시 공고 텍스트 → LLM 요약 → UI 결과 패널에 bullet 렌더. 토글 텍스트 없으면 DB `요약` 필드 사용(없으면 에러 반환).
+- [ ] UI 문구: 결과 패널 상단에 “프로젝트 DB·공고 토글 기반 요약” 메타 표시, 실패 시 명확한 원인(페이지 없음/공고 비어 있음/LLM 실패).
+- [ ] 테스트: 요약 프롬프트에 투입되는 텍스트 길이 제한 적용, 지원자격 키워드 입력 시 LLM 호출 1회, fallback(요약 필드) 시에도 bullet 출력 확인.

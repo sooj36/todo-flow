@@ -35,3 +35,21 @@ export const ClusterResultSchema = z.object({
 
 // Type inference from schema
 export type ClusterResult = z.infer<typeof ClusterResultSchema>;
+
+// Project summary (지원자격 요약) schema
+export const ProjectSummarySchema = z.object({
+  pageId: z.string(),
+  title: z.string(),
+  source: z.object({
+    from: z.enum(['toggle', 'page', 'summary']),
+    note: z.string().optional(),
+    rawLength: z.number().optional(),
+  }),
+  summary: z.object({
+    bullets: z.array(z.string()).min(1),
+    model: z.string(),
+    tokenLimit: z.number(),
+  }),
+});
+
+export type ProjectSummary = z.infer<typeof ProjectSummarySchema>;

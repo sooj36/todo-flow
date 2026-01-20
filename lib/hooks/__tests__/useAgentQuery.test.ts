@@ -43,24 +43,24 @@ describe('useAgentQuery', () => {
     resolveFetch!({
       ok: true,
       json: async () => ({
-        meta: { totalPages: 1, clustersFound: 0 },
-        clusters: [],
-        topKeywords: []
+        pageId: 'page-1',
+        title: '테스트',
+        source: { from: 'toggle' },
+        summary: { bullets: ['a'], model: 'gemini-2.0-flash-exp', tokenLimit: 120 },
       }),
     });
   });
 
   it('should update phase through fetch → normalize → cluster → done on success', async () => {
     const mockResponse = {
-      meta: { totalPages: 2, clustersFound: 1 },
-      clusters: [
-        {
-          name: 'Test',
-          keywords: ['test'],
-          pageRefs: [{ pageId: 'page1', title: 'Test Page' }]
-        }
-      ],
-      topKeywords: [{ keyword: 'test', count: 3 }],
+      pageId: 'page-1',
+      title: '테스트',
+      source: { from: 'toggle' },
+      summary: {
+        bullets: ['조건1', '조건2'],
+        model: 'gemini-2.0-flash-exp',
+        tokenLimit: 120,
+      },
     };
 
     (global.fetch as any).mockResolvedValueOnce({
@@ -98,11 +98,12 @@ describe('useAgentQuery', () => {
     });
   });
 
-  it('should send POST request to /api/agent/keywords with queryText in body', async () => {
+  it('should send POST request to /api/agent/project with queryText in body', async () => {
     const mockResponse = {
-      meta: { totalPages: 1, clustersFound: 0 },
-      clusters: [],
-      topKeywords: [],
+      pageId: 'page-1',
+      title: '테스트',
+      source: { from: 'toggle' },
+      summary: { bullets: ['a'], model: 'gemini-2.0-flash-exp', tokenLimit: 120 },
     };
 
     (global.fetch as any).mockResolvedValueOnce({
@@ -114,7 +115,7 @@ describe('useAgentQuery', () => {
 
     await result.current.executeQuery('search term');
 
-    expect(global.fetch).toHaveBeenCalledWith('/api/agent/keywords', {
+    expect(global.fetch).toHaveBeenCalledWith('/api/agent/project', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ queryText: 'search term' }),
@@ -123,9 +124,10 @@ describe('useAgentQuery', () => {
 
   it('should retry with last queryText when retry is called', async () => {
     const mockResponse = {
-      meta: { totalPages: 1, clustersFound: 0 },
-      clusters: [],
-      topKeywords: [],
+      pageId: 'page-1',
+      title: '테스트',
+      source: { from: 'toggle' },
+      summary: { bullets: ['a'], model: 'gemini-2.0-flash-exp', tokenLimit: 120 },
     };
 
     (global.fetch as any).mockResolvedValue({
@@ -142,7 +144,7 @@ describe('useAgentQuery', () => {
     await result.current.retry();
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith('/api/agent/keywords', {
+      expect(global.fetch).toHaveBeenCalledWith('/api/agent/project', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ queryText: 'original query' }),

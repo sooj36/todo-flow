@@ -7,7 +7,7 @@ import { FlowBoard } from "@/components/flow/FlowBoard";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { SearchBar } from "@/components/agent/SearchBar";
 import { ProgressIndicator } from "@/components/agent/ProgressIndicator";
-import { ClusterResultPanel } from "@/components/agent/ClusterResultPanel";
+import { QualificationPanel } from "@/components/agent/QualificationPanel";
 import { useAgentQuery } from "@/lib/hooks/useAgentQuery";
 
 export default function Home() {
@@ -86,7 +86,7 @@ export default function Home() {
           <div className="flex-shrink-0 bg-white border-b border-[#ececeb] p-4 space-y-4">
             <SearchBar onSearch={executeQuery} />
             <ProgressIndicator phase={phase} error={error ?? undefined} onRetry={retry} />
-            {phase === "done" && data && <ClusterResultPanel data={data} />}
+            {phase === "done" && data && <QualificationPanel data={data} />}
           </div>
 
           {/* FlowBoard Section */}

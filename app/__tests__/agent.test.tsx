@@ -5,9 +5,8 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { SearchBar } from '@/components/agent/SearchBar';
 import { ProgressIndicator } from '@/components/agent/ProgressIndicator';
-import { ClusterResultPanel } from '@/components/agent/ClusterResultPanel';
+import { QualificationPanel } from '@/components/agent/QualificationPanel';
 import { useAgentQuery } from '@/lib/hooks/useAgentQuery';
-import type { ClusterResult } from '@/lib/agent/schema';
 
 // Test wrapper component that mimics the agent section of Home
 function AgentSection() {
@@ -17,7 +16,7 @@ function AgentSection() {
     <div>
       <SearchBar onSearch={executeQuery} />
       <ProgressIndicator phase={phase} error={error ?? undefined} onRetry={retry} />
-      {phase === 'done' && data && <ClusterResultPanel data={data} />}
+      {phase === 'done' && data && <QualificationPanel data={data} />}
     </div>
   );
 }
@@ -40,21 +39,15 @@ describe('Agent UI Integration', () => {
     const user = userEvent.setup();
 
     // Mock successful API response
-    const mockResult: ClusterResult = {
-      meta: {
-        totalPages: 5,
-        clustersFound: 1,
+    const mockResult = {
+      pageId: 'page-1',
+      title: '뱅크샐러드',
+      source: { from: 'toggle', rawLength: 42 },
+      summary: {
+        bullets: ['조건1', '조건2'],
+        model: 'gemini-2.0-flash-exp',
+        tokenLimit: 120,
       },
-      clusters: [
-        {
-          name: '테스트 클러스터',
-          keywords: ['키워드1', '키워드2'],
-          pageRefs: [{ pageId: 'page1', title: '테스트 페이지' }],
-        },
-      ],
-      topKeywords: [
-        { keyword: '키워드1', count: 3 },
-      ],
     };
 
     fetchMock.mockResolvedValueOnce({
@@ -77,7 +70,7 @@ describe('Agent UI Integration', () => {
     // Verify API was called
     await waitFor(() => {
       expect(fetchMock).toHaveBeenCalledWith(
-        '/api/agent/keywords',
+        '/api/agent/project',
         expect.objectContaining({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -91,13 +84,8 @@ describe('Agent UI Integration', () => {
       expect(screen.getByText('완료')).toBeInTheDocument();
     });
 
-    expect(screen.getByText('분석된 페이지:')).toBeInTheDocument();
-    expect(screen.getByText('5개')).toBeInTheDocument();
-    expect(screen.getByText('클러스터 수:')).toBeInTheDocument();
-    expect(screen.getByText('1개')).toBeInTheDocument();
-    expect(screen.getByText('테스트 클러스터')).toBeInTheDocument();
-    // 키워드1 appears in both cluster keywords and topKeywords
-    expect(screen.getAllByText('키워드1').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('뱅크샐러드')).toBeInTheDocument();
+    expect(screen.getByText('조건1')).toBeInTheDocument();
   });
 
   it('should handle error and retry flow', async () => {
@@ -128,19 +116,11 @@ describe('Agent UI Integration', () => {
     expect(retryButton).toBeInTheDocument();
 
     // Mock successful response for retry
-    const mockResult: ClusterResult = {
-      meta: {
-        totalPages: 1,
-        clustersFound: 1,
-      },
-      clusters: [
-        {
-          name: '재시도 클러스터',
-          keywords: ['재시도'],
-          pageRefs: [{ pageId: 'retry1', title: '재시도 페이지' }],
-        },
-      ],
-      topKeywords: [{ keyword: '재시도', count: 1 }],
+    const mockResult = {
+      pageId: 'page-1',
+      title: '재시도',
+      source: { from: 'page' },
+      summary: { bullets: ['재시도'], model: 'gemini-2.0-flash-exp', tokenLimit: 120 },
     };
 
     fetchMock.mockResolvedValueOnce({
@@ -154,7 +134,7 @@ describe('Agent UI Integration', () => {
     // Verify retry uses the same query (마지막 queryText 유지)
     await waitFor(() => {
       expect(fetchMock).toHaveBeenLastCalledWith(
-        '/api/agent/keywords',
+        '/api/agent/project',
         expect.objectContaining({
           method: 'POST',
           body: JSON.stringify({ queryText: '실패 테스트' }),
@@ -165,7 +145,7 @@ describe('Agent UI Integration', () => {
     // Verify success after retry
     await waitFor(() => {
       expect(screen.getByText('완료')).toBeInTheDocument();
-      expect(screen.getByText('재시도 클러스터')).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: '재시도' })).toBeInTheDocument();
     });
   });
 
@@ -190,16 +170,17 @@ describe('Agent UI Integration', () => {
 
     // Verify loading state
     await waitFor(() => {
-      expect(screen.getByText('Notion에서 완료 페이지 조회 중...')).toBeInTheDocument();
+      expect(screen.getByText('Project DB 조회 중...')).toBeInTheDocument();
     });
 
     // Resolve the promise
     resolvePromise!({
       ok: true,
       json: async () => ({
-        meta: { totalPages: 1, clustersFound: 0 },
-        clusters: [],
-        topKeywords: [],
+        pageId: 'page-1',
+        title: '테스트',
+        source: { from: 'page' },
+        summary: { bullets: ['a'], model: 'gemini-2.0-flash-exp', tokenLimit: 120 },
       }),
     });
 

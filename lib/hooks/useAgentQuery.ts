@@ -1,11 +1,11 @@
 import { useState, useRef } from 'react';
-import { ClusterResultSchema, type ClusterResult } from '@/lib/agent/schema';
+import { ProjectSummarySchema, type ProjectSummary } from '@/lib/agent/schema';
 
 export type Phase = 'idle' | 'fetch' | 'normalize' | 'cluster' | 'done' | 'error';
 
 export interface UseAgentQueryReturn {
   phase: Phase;
-  data: ClusterResult | null;
+  data: ProjectSummary | null;
   error: string | null;
   executeQuery: (text: string) => Promise<void>;
   retry: () => Promise<void>;
@@ -13,7 +13,7 @@ export interface UseAgentQueryReturn {
 
 export function useAgentQuery(): UseAgentQueryReturn {
   const [phase, setPhase] = useState<Phase>('idle');
-  const [data, setData] = useState<ClusterResult | null>(null);
+  const [data, setData] = useState<ProjectSummary | null>(null);
   const [error, setError] = useState<string | null>(null);
   const lastQueryText = useRef<string>('');
 
@@ -23,7 +23,7 @@ export function useAgentQuery(): UseAgentQueryReturn {
     setError(null);
 
     try {
-      const response = await fetch('/api/agent/keywords', {
+      const response = await fetch('/api/agent/project', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ queryText: text }),
@@ -39,7 +39,7 @@ export function useAgentQuery(): UseAgentQueryReturn {
       const rawResult = await response.json();
 
       // Validate response with zod schema
-      const parseResult = ClusterResultSchema.safeParse(rawResult);
+      const parseResult = ProjectSummarySchema.safeParse(rawResult);
       if (!parseResult.success) {
         throw new Error(`Invalid API response: ${parseResult.error.message}`);
       }

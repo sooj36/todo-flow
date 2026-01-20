@@ -447,3 +447,166 @@
 - [x] 테스트: `NotionCalendar.test.tsx`에 클릭 시 `onDateChange` 호출 검증 추가
 - [] 통합 테스트: `app/__tests__/page.integration.test.tsx`에서 달력 클릭 시 `FlowBoard` 데이터가 바뀌는 시나리오 추가
 - [x] 커밋: feat: implement calendar day click to sync date
+
+## Phase 13 Tasks (AI Agent MVP: Keyword Clustering)
+- 목표: 검색창 입력 → Notion "키워드 추출 완료" 페이지 수집 → LLM 클러스터링 결과 UI 렌더링
+- 원칙: LLM은 Notion 직접 탐색 금지, 구조화 JSON + zod 검증, 진행 단계 표시 필수
+- TDD: 각 단계 test 작성 → 구현 → 통과 → 커밋 순서 엄수
+
+### 13.1 UI Entry Point (검색창 + 결과 패널)
+
+#### 13.1.1 SearchBar 컴포넌트 (기본 레이아웃)
+- 파일: `components/agent/SearchBar.tsx`
+- [x] Test: SearchBar 렌더링, placeholder 표시 확인
+- [x] Impl: input + Enter 핸들러 추가, onSearch prop 전달
+- [x] Test: Enter 입력 시 onSearch 콜백 호출 확인
+- [x] 커밋: `feat(agent): add SearchBar component`
+
+#### 13.1.2 상태 관리 (useAgentQuery 훅)
+- 파일: `lib/hooks/useAgentQuery.ts`
+- queryText 전달 방식: 사용자 입력 → `{ queryText }` body로 POST → API에서 Notion 필터(title/keywords 부분 일치)에 전달
+- 반환값: `{ phase, data, error, executeQuery: (text: string) => Promise<void>, retry: () => Promise<void> }`
+- retry 동작: 내부에 마지막 queryText를 useRef로 보관, retry 호출 시 저장된 값 재사용
+- retry 예외 처리: lastQueryText가 비어있으면 no-op (early return), console.warn으로 "재시도할 검색어가 없습니다" 경고
+- [x] Test: 초기 상태 phase="idle", executeQuery 호출 시 phase="fetch"로 변경
+- [x] Impl: useState로 phase, data, error 관리 + useRef로 lastQueryText 보관
+- [x] Impl: executeQuery 내부에서 lastQueryText.current 업데이트 + phase 단계별 업데이트 (fetch → normalize → cluster → done)
+- [x] Impl: retry 함수는 lastQueryText.current 체크 후, 비어있으면 early return + console.warn
+- [x] Impl: POST /api/agent/keywords 호출, body: `{ queryText }`
+- [x] Test: 성공 시 phase="done" + 데이터 저장, 실패 시 phase="error"
+- [x] Test: retry 호출 시 마지막 queryText로 executeQuery 재실행 확인
+- [x] Test: lastQueryText 없을 때 retry 호출 → no-op 확인
+- [x] 커밋: `feat(agent): add useAgentQuery hook with phase tracking and retry`
+
+#### 13.1.3 진행 단계 표시 (ProgressIndicator)
+- 파일: `components/agent/ProgressIndicator.tsx`
+- 상태값 타입: `phase: "idle" | "fetch" | "normalize" | "cluster" | "done" | "error"`
+- Error UX 기준: phase="error" 시 에러 메시지 표시 + "다시 시도" 버튼 포함, onRetry prop 전달
+- 메시지 관리: 컴포넌트 상단에 `PHASE_MESSAGES` 상수 객체로 정의 (예: `{ fetch: "Notion에서...", normalize: "키워드 정규화 중..." }`)
+- [x] Test: phase="fetch"일 때 "Notion에서 완료 페이지 조회 중..." 렌더링
+- [x] Impl: phase prop 받아서 PHASE_MESSAGES[phase]로 메시지 표시
+- [x] Impl: 컴포넌트 상단에 PHASE_MESSAGES 상수 정의
+- [x] Test: phase="normalize" → "키워드 정규화 중...", phase="cluster" → "클러스터링 중..." 렌더링 확인
+- [x] Test: phase="error" → 에러 메시지 + "다시 시도" 버튼 렌더링, 버튼 클릭 시 onRetry 호출 확인
+- [x] Test: phase="done" 상태 메시지 렌더링 확인
+- [x] 커밋: `feat(agent): add ProgressIndicator with phase-based messaging and retry`
+
+#### 13.1.4 결과 패널 (ClusterResultPanel)
+- 파일: `components/agent/ClusterResultPanel.tsx`
+- [x] Test: 결과 데이터(meta, clusters, topKeywords) 렌더링
+- [x] Impl: 접기/펼치기 토글 상태 관리
+- [x] Test: 클러스터 접기/펼치기 인터랙션 확인
+- [x] 커밋: `feat(agent): add ClusterResultPanel with collapsible clusters`
+
+#### 13.1.5 통합 (app/page.tsx)
+- 파일: `app/page.tsx`
+- onRetry 연결 흐름: useAgentQuery의 retry → ProgressIndicator의 onRetry prop으로 직접 전달 (retry는 마지막 queryText 자동 재사용)
+- [x] Impl: SearchBar, ProgressIndicator, ClusterResultPanel 배치
+- [x] Impl: useAgentQuery에서 { phase, data, error, executeQuery, retry } 받아서 각 컴포넌트에 전달
+- [x] Impl: SearchBar에 onSearch={executeQuery}, ProgressIndicator에 onRetry={retry} 전달
+- [x] Test: 검색 → 로딩 → 결과 표시 플로우 통합 테스트
+- [x] Test: 에러 발생 → "다시 시도" 클릭 → retry 재호출 확인 (마지막 queryText 유지)
+- [x] 커밋: `feat(agent): integrate agent UI into main page`
+
+### 13.2 Notion Retrieval (키워드 추출 완료 필터)
+
+#### 13.2.1 Notion Query 함수
+- 파일: `lib/notion/keywords.ts`
+- queryText 필터 규칙: 대소문자 무시(case-insensitive), 공백 trim 후 부분 일치(contains), title OR keywords 속성 검색
+- limit: 20 제한 근거: Gemini Free Tier TPM 한도(32k) + 페이지당 평균 150 tokens 가정 = 안전 마진 확보 + 3~5초 응답 시간 목표
+- [x] Test: getCompletedKeywordPages 호출 시 필터 조건 확인
+- [x] Impl: Notion API query, 필터: `키워드 추출 == true`
+- [x] Impl: 정렬: 최근 업데이트 순, limit: 20
+- [x] Impl: queryText 필터 적용 (trim, toLowerCase, contains 검색)
+- [x] Test: queryText 있을 때 title/keywords 대소문자 무시 부분 일치 확인
+- [x] 커밋: `feat(notion): add getCompletedKeywordPages query`
+
+#### 13.2.2 데이터 정규화
+- 파일: `lib/notion/keywords.ts` (함수 내부)
+- [x] Test: 응답 데이터를 { pageId, title, keywords[] } 형태로 변환
+- [x] Impl: trim, 중복 제거, 빈 값 제거 로직 추가
+- [x] Test: keywords 배열 정제 결과 확인
+- [x] 커밋: `feat(notion): normalize keyword page data` (13.2.1과 함께 완료)
+
+#### 13.2.3 에러 처리 (Failure Modes)
+- 파일: `lib/notion/keywords.ts`
+- [x] Test: 완료 페이지 0개 → 특정 에러 메시지 throw
+- [x] Impl: 키워드 속성 없음 → 가이드 메시지 throw
+- [x] Test: Cold start 시나리오 → "최소 3~5개 키워드 입력 필요" 안내
+- [x] 커밋: `feat(notion): add failure handling for empty results`
+
+### 13.3 LLM Orchestration (Gemini + 구조화 출력)
+
+#### 13.3.1 API 라우트 (기본 구조)
+- 파일: `app/api/agent/keywords/route.ts`
+- [x] Test: POST 요청 시 queryText 파싱 확인
+- [x] Impl: export async function POST(req: Request)
+- [x] Impl: 입력: { queryText?: string }, 기본값 빈 문자열
+- [x] 커밋: `feat(api): add POST /api/agent/keywords route`
+
+#### 13.3.2 Gemini 클러스터링 함수
+- 파일: `lib/agent/clustering.ts`
+- [x] Test: 페이지 배열 입력 → 클러스터 JSON 출력 확인
+- [x] Impl: Gemini API 호출, 프롬프트: 동의어 통일 + 5~8개 클러스터
+- [x] Impl: 구조화 출력 설정 (JSON mode)
+- [x] Test: 응답이 고정 스키마 형태인지 확인
+- [x] 커밋: `feat(agent): add Gemini clustering function`
+
+#### 13.3.3 스키마 검증 (zod)
+- 파일: `lib/agent/schema.ts`
+- [x] Test: zod 스키마로 클러스터 응답 파싱 성공/실패 케이스
+- [x] Impl: ClusterResultSchema 정의 (meta, clusters, topKeywords)
+- [x] Impl: 파싱 실패 시 ZodError throw
+- [x] 커밋: `feat(agent): add zod schema for cluster result`
+
+#### 13.3.4 Fallback 처리
+- 파일: `app/api/agent/keywords/route.ts`
+- [x] Test: Gemini 실패 시 1회 재시도 확인
+- [x] Impl: try-catch로 재시도 로직 추가
+- [x] Test: 2회 실패 시 topKeywords만 반환 (빈도 집계)
+- [x] Impl: 빈도 집계 fallback 함수 추가
+- [x] 커밋: `feat(api): add fallback for LLM failure`
+
+#### 13.3.5 성능/비용 메모
+- 파일: `docs/plan_b.md` (추가 섹션)
+- [x] 문서: 20페이지 기준 2k~4k tokens, 3~5초 목표 명시
+- [x] 문서: Gemini Free Tier 한도 (RPM/TPM) 기록
+- [x] 커밋: `docs: add performance and cost notes for agent`
+
+### 13.4 UX & Evidence
+
+#### 13.4.1 pageRefs 포함
+- 파일: `lib/agent/clustering.ts` (프롬프트 수정)
+- [x] Test: 각 클러스터에 pageRefs 최소 1개 포함 확인
+- [x] Impl: 프롬프트에 "각 클러스터마다 pageId 포함" 명시
+- [x] 커밋: `feat(agent): include pageRefs in cluster output`
+
+#### 13.4.2 근거 표시 UI
+- 파일: `components/agent/ClusterResultPanel.tsx`
+- [x] Test: pageRefs 렌더링 시 페이지 타이틀 표시
+- [x] Impl: 각 클러스터 내 pageRefs 리스트 렌더링
+- [x] 커밋: `feat(agent): display pageRefs as evidence`
+
+### 13.5 Verification & Integration
+
+#### 13.5.1 Manual Testing
+- [x] Manual: 검색 입력 → 로딩 → 결과 렌더링 E2E 확인
+- [x] Manual: 완료 페이지 0개 시나리오 → 안내 메시지 표시 확인
+- [x] Manual: 키워드 없음 시나리오 → 가이드 문구 표시 확인
+
+#### 13.5.2 Unit Tests
+- [x] Test: Notion query 필터 조건 (lib/notion/keywords.test.ts)
+- [x] Test: zod 스키마 검증 실패 → fallback (lib/agent/schema.test.ts)
+- [x] Test: 빈도 집계 fallback 동작 (lib/agent/clustering.test.ts)
+
+#### 13.5.3 Integration Tests
+- Mock 전략: vi.stubGlobal('fetch') 사용, POST /api/agent/keywords 응답 mock
+- [x] Test: UI 통합 (검색 → 로딩 → 결과) (app/__tests__/agent.test.tsx)
+  - fetch mock으로 성공/실패 시나리오 응답 설정
+  - userEvent로 검색창 입력 → Enter → phase 변화 → 결과 렌더링 확인
+- [x] Test: API 라우트 E2E (app/api/agent/keywords/route.test.ts)
+  - Notion/Gemini 호출은 vi.spyOn으로 mock, 실제 라우트 핸들러 호출
+
+#### 13.5.4 Final Commit
+- [x] 커밋: `feat: complete AI agent keyword clustering MVP (Phase 13)`
+- [x] PR: Phase 13 완료, 체크리스트 링크
