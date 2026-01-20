@@ -354,3 +354,4 @@
 ## Phase 14.7 캘린더 진행률 연동 – 2026-01-20
 - components/calendar/CalendarFlowPercent.integration.test.tsx: 3/3 테스트 통과 ✅ – 2026-01-20
 - components/flow/__tests__/FlowBoard.flow-step-toggle.test.tsx: 7/7 테스트 통과 ✅ – 2026-01-20
+- 업데이트: 캘린더 퍼센트 계산을 인스턴스 상태가 아닌 플로우 스텝 체크 단위로 전환, 다른 날짜 진행률에 영향 없도록 데이별 override 사용 – 2026-01-20
