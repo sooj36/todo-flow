@@ -99,6 +99,7 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({
     () => applyInstanceStatusOverrides(instances, instanceStatusOverrides),
     [instances, instanceStatusOverrides]
   );
+  const dayProgressRef = useRef<Record<string, { completed: number; total: number }>>({});
 
   const templateProgressMap = useMemo(() => {
     return templates.reduce<Record<string, { done: number; total: number }>>(
@@ -120,9 +121,9 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({
     if (!onDayStepProgressChange) return;
     const aggregated = effectiveInstances.reduce(
       (acc, instance) => {
-        const progress = templateProgressMap[instance.templateId];
-        acc.completed += progress?.done ?? 0;
-        acc.total += progress?.total ?? 0;
+        const progress = calculateTemplateProgress(instance.template, stepOverrides);
+        acc.completed += progress.done;
+        acc.total += progress.total;
         return acc;
       },
       { completed: 0, total: 0 }
@@ -132,7 +133,7 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({
       dayProgressRef.current[dateString] = aggregated;
       onDayStepProgressChange(dateString, aggregated);
     }
-  }, [templateProgressMap, onDayStepProgressChange, effectiveInstances, dateString]);
+  }, [onDayStepProgressChange, effectiveInstances, dateString, stepOverrides]);
 
   const handleFlowStepToggleWithStatus = useCallback(
     async (stepId: string, nextDone: boolean, previousDone: boolean) => {
@@ -174,9 +175,13 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({
         onTemplateProgressChange(nextProgress);
 
         if (onDayStepProgressChange) {
-          const aggregated = relatedInstances.reduce(
+          const aggregated = effectiveInstances.reduce(
             (acc, instance) => {
-              const progress = nextProgress[instance.templateId];
+              const tplProgress = calculateTemplateProgress(instance.template, {
+                ...stepOverrides,
+                [stepId]: nextDone,
+              });
+              const progress = nextProgress[instance.templateId] || tplProgress;
               acc.completed += progress?.done ?? 0;
               acc.total += progress?.total ?? 0;
               return acc;
@@ -218,7 +223,6 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const dayProgressRef = useRef<Record<string, { completed: number; total: number }>>({});
 
   // Update nodes when data changes, preserving user-dragged positions
   React.useEffect(() => {
