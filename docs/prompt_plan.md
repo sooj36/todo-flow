@@ -98,3 +98,9 @@
   - b) lib/schema/templates.test.ts (42개): 반복 옵션 파싱/직렬화/검증(요일/limit) 테스트 포함
   - c) components/calendar/CreateTaskDialog.test.tsx (17개): 다이얼로그 렌더/밸리데이션/제출/중복 제출 차단 테스트 포함
   - d) components/calendar/CreateTaskIntegration.test.tsx (9개) + components/flow/FlowBoardRefetch.test.tsx (9개): 성공 후 캘린더+FlowBoard refetch 통합 테스트 (버튼 재활성 시점 포함)
+
+### 14.6 캘린더 인스턴스 날짜 정규화
+- [x] Notion Date start 값(ISO/UTC)을 캘린더 키(YYYY-MM-DD)로 정규화해 인스턴스 누락 방지 (notionDateToLocal 사용)
+- [x] lib/notion/parsers.ts: extractDate/nullable가 ISO 문자열을 YYYY-MM-DD로 변환
+- [x] lib/notion/parsers.test.ts: ISO 입력 정규화 테스트 추가, 통과
+- [x] 테스트: pnpm test lib/notion/parsers.test.ts

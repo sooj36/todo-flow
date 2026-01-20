@@ -1,6 +1,8 @@
 // lib/notion/parsers.ts
 // Common Notion property parsing utilities
 
+import { notionDateToLocal } from '@/lib/utils/dateTransform';
+
 /**
  * Extract plain text from Title property
  */
@@ -161,7 +163,7 @@ export function extractDate(property: unknown, defaultValue = ''): string {
         'start' in property.date &&
         typeof property.date.start === 'string'
     ) {
-        return property.date.start;
+        return notionDateToLocal(property.date.start) || defaultValue;
     }
     return defaultValue;
 }
@@ -181,7 +183,7 @@ export function extractDateNullable(property: unknown): string | null {
         'start' in property.date &&
         typeof property.date.start === 'string'
     ) {
-        return property.date.start;
+        return notionDateToLocal(property.date.start);
     }
     return null;
 }

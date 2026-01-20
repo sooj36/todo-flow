@@ -95,6 +95,11 @@
 - pnpm lint: 통과
 - pnpm test:run: 202개 테스트 통과
 
+### Phase 14.6: 캘린더 인스턴스 날짜 정규화 (2026-01-18)
+- lib/notion/parsers.ts: extractDate/Nullable가 Notion ISO 날짜(start)를 YYYY-MM-DD로 정규화(notionDateToLocal)해 캘린더 키와 일치시킴 → 일정 미표시 방지
+- lib/notion/parsers.test.ts: ISO 입력 정규화 테스트 추가 및 통과
+- 테스트: pnpm test lib/notion/parsers.test.ts (pass)
+
 ## Phase 13 작업 기록 (AI Agent MVP: Keyword Clustering)
 
 ### Phase 13.2.1-13.2.2: Notion Query 함수 및 데이터 정규화 (2026-01-13)

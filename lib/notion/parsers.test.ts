@@ -182,6 +182,14 @@ describe('Notion Property Parsers', () => {
             expect(extractDate(property)).toBe('2026-01-09');
         });
 
+        it('should normalize ISO date string to YYYY-MM-DD', () => {
+            const property = {
+                type: 'date',
+                date: { start: '2026-01-09T00:00:00.000Z' },
+            };
+            expect(extractDate(property)).toBe('2026-01-09');
+        });
+
         it('should return default value for invalid property', () => {
             expect(extractDate(null)).toBe('');
             expect(extractDate({}, '2026-01-01')).toBe('2026-01-01');
@@ -194,6 +202,14 @@ describe('Notion Property Parsers', () => {
             const property = {
                 type: 'date',
                 date: { start: '2026-12-31' },
+            };
+            expect(extractDateNullable(property)).toBe('2026-12-31');
+        });
+
+        it('should normalize ISO date string to YYYY-MM-DD', () => {
+            const property = {
+                type: 'date',
+                date: { start: '2026-12-31T00:00:00.000Z' },
             };
             expect(extractDateNullable(property)).toBe('2026-12-31');
         });
