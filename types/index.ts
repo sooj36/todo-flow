@@ -87,9 +87,9 @@ export type TaskStatus = 'todo' | 'doing' | 'done';
 // ============================================
 export interface CalendarDayData {
   date: string;                    // YYYY-MM-DD
-  totalTasks: number;
-  completedTasks: number;
-  tasks: TaskInstance[];
+  totalTasks: number;              // interpreted as total steps for the day
+  completedTasks: number;          // interpreted as completed steps for the day
+  tasks: TaskInstance[];           // raw instances for the day
 }
 
 export interface CalendarMonth {

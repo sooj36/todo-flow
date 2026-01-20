@@ -141,6 +141,8 @@ const buildFixtures = () => {
 const CalendarFlowHarness = () => {
   const [selectedDate, setSelectedDate] = useState(new Date(2026, 0, 10));
   const [overrides, setOverrides] = useState<Record<string, TaskStatus>>({});
+  const [templateProgress, setTemplateProgress] = useState<Record<string, { done: number; total: number }>>({});
+  const [dayStepProgressOverrides, setDayStepProgressOverrides] = useState<Record<string, { completed: number; total: number }>>({});
 
   const handleInstanceStatusChange = (updates: Array<{ instanceId: string; status: TaskStatus }>) => {
     setOverrides((prev) => {
@@ -158,11 +160,17 @@ const CalendarFlowHarness = () => {
         selectedDate={selectedDate}
         onDateChange={setSelectedDate}
         instanceStatusOverrides={overrides}
+        templateProgress={templateProgress}
+        dayStepProgressOverrides={dayStepProgressOverrides}
       />
       <FlowBoard
         selectedDate={selectedDate}
         instanceStatusOverrides={overrides}
         onInstanceStatusChange={handleInstanceStatusChange}
+        onTemplateProgressChange={setTemplateProgress}
+        onDayStepProgressChange={(date, progress) =>
+          setDayStepProgressOverrides((prev) => ({ ...prev, [date]: progress }))
+        }
       />
     </>
   );
@@ -186,14 +194,14 @@ describe("Calendar + FlowBoard percent sync", () => {
     render(<CalendarFlowHarness />);
 
     const day10 = screen.getByTestId("calendar-day-10");
-    expect(within(day10).getByText("0/5 tasks")).toBeInTheDocument();
+    expect(within(day10).getByText("0/5 steps")).toBeInTheDocument();
     expect(within(day10).getByText("0%")).toBeInTheDocument();
 
     fireEvent.click(screen.getByLabelText("T1 Step 완료"));
 
     await waitFor(() => {
       const updated = screen.getByTestId("calendar-day-10");
-      expect(within(updated).getByText("1/5 tasks")).toBeInTheDocument();
+      expect(within(updated).getByText("1/5 steps")).toBeInTheDocument();
       expect(within(updated).getByText("20%")).toBeInTheDocument();
     });
 
@@ -201,7 +209,7 @@ describe("Calendar + FlowBoard percent sync", () => {
 
     await waitFor(() => {
       const updated = screen.getByTestId("calendar-day-10");
-      expect(within(updated).getByText("2/5 tasks")).toBeInTheDocument();
+      expect(within(updated).getByText("2/5 steps")).toBeInTheDocument();
       expect(within(updated).getByText("40%")).toBeInTheDocument();
     });
   });
@@ -218,7 +226,7 @@ describe("Calendar + FlowBoard percent sync", () => {
 
     await waitFor(() => {
       const day10 = screen.getByTestId("calendar-day-10");
-      expect(within(day10).getByText("0/5 tasks")).toBeInTheDocument();
+      expect(within(day10).getByText("0/5 steps")).toBeInTheDocument();
       expect(within(day10).getByText("0%")).toBeInTheDocument();
     });
   });
@@ -227,19 +235,19 @@ describe("Calendar + FlowBoard percent sync", () => {
     render(<CalendarFlowHarness />);
 
     const otherDay = screen.getByTestId("calendar-day-11");
-    expect(within(otherDay).getByText("0/1 tasks")).toBeInTheDocument();
+    expect(within(otherDay).getByText("0/1 steps")).toBeInTheDocument();
     expect(within(otherDay).getByText("0%")).toBeInTheDocument();
 
     fireEvent.click(screen.getByLabelText("T1 Step 완료"));
 
     await waitFor(() => {
       const day10 = screen.getByTestId("calendar-day-10");
-      expect(within(day10).getByText("1/5 tasks")).toBeInTheDocument();
+      expect(within(day10).getByText("1/5 steps")).toBeInTheDocument();
       expect(within(day10).getByText("20%")).toBeInTheDocument();
     });
 
     const otherDayAfter = screen.getByTestId("calendar-day-11");
-    expect(within(otherDayAfter).getByText("0/1 tasks")).toBeInTheDocument();
+    expect(within(otherDayAfter).getByText("0/1 steps")).toBeInTheDocument();
     expect(within(otherDayAfter).getByText("0%")).toBeInTheDocument();
   });
 });

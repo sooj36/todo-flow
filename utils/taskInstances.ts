@@ -1,4 +1,5 @@
 import { TaskInstance, TaskStatus } from "@/types";
+import { calculateTemplateProgress } from "./flowNodes";
 
 export function applyInstanceStatusOverrides(
   instances: TaskInstance[],
@@ -16,4 +17,22 @@ export function applyInstanceStatusOverrides(
       status: overrideStatus,
     };
   });
+}
+
+export function aggregateDayStepProgress(
+  instances: TaskInstance[],
+  templateProgress: Record<string, { done: number; total: number }>
+): { completed: number; total: number } {
+  return instances.reduce(
+    (acc, instance) => {
+      const progress =
+        templateProgress[instance.templateId] ||
+        calculateTemplateProgress(instance.template, {});
+
+      acc.completed += progress.done;
+      acc.total += progress.total;
+      return acc;
+    },
+    { completed: 0, total: 0 }
+  );
 }

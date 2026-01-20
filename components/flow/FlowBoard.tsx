@@ -34,6 +34,8 @@ interface FlowBoardProps {
   refreshTrigger?: number;
   instanceStatusOverrides?: Record<string, TaskStatus>;
   onInstanceStatusChange?: (updates: Array<{ instanceId: string; status: TaskStatus }>) => void;
+  onTemplateProgressChange?: (progress: Record<string, { done: number; total: number }>) => void;
+  onDayStepProgressChange?: (date: string, progress: { completed: number; total: number }) => void;
 }
 
 export const FlowBoard: React.FC<FlowBoardProps> = ({
@@ -41,6 +43,8 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({
   refreshTrigger,
   instanceStatusOverrides,
   onInstanceStatusChange,
+  onTemplateProgressChange,
+  onDayStepProgressChange,
 }) => {
   // Helper function to format Date to YYYY-MM-DD
   const formatDateString = (date: Date): string => {
@@ -96,6 +100,40 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({
     [instances, instanceStatusOverrides]
   );
 
+  const templateProgressMap = useMemo(() => {
+    return templates.reduce<Record<string, { done: number; total: number }>>(
+      (acc, template) => {
+        acc[template.id] = calculateTemplateProgress(template, stepOverrides);
+        return acc;
+      },
+      {}
+    );
+  }, [templates, stepOverrides]);
+
+  useEffect(() => {
+    if (onTemplateProgressChange) {
+      onTemplateProgressChange(templateProgressMap);
+    }
+  }, [templateProgressMap, onTemplateProgressChange]);
+
+  useEffect(() => {
+    if (!onDayStepProgressChange) return;
+    const aggregated = effectiveInstances.reduce(
+      (acc, instance) => {
+        const progress = templateProgressMap[instance.templateId];
+        acc.completed += progress?.done ?? 0;
+        acc.total += progress?.total ?? 0;
+        return acc;
+      },
+      { completed: 0, total: 0 }
+    );
+    const prev = dayProgressRef.current[dateString];
+    if (!prev || prev.completed !== aggregated.completed || prev.total !== aggregated.total) {
+      dayProgressRef.current[dateString] = aggregated;
+      onDayStepProgressChange(dateString, aggregated);
+    }
+  }, [templateProgressMap, onDayStepProgressChange, effectiveInstances, dateString]);
+
   const handleFlowStepToggleWithStatus = useCallback(
     async (stepId: string, nextDone: boolean, previousDone: boolean) => {
       const success = await handleToggleFlowStep(stepId, nextDone, previousDone);
@@ -124,6 +162,31 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({
 
       if (relatedInstances.length === 0) return;
 
+      if (onTemplateProgressChange) {
+        const nextOverrides = { ...stepOverrides, [stepId]: nextDone };
+        const nextProgress = templates.reduce<Record<string, { done: number; total: number }>>(
+          (acc, tpl) => {
+            acc[tpl.id] = calculateTemplateProgress(tpl, nextOverrides);
+            return acc;
+          },
+          {}
+        );
+        onTemplateProgressChange(nextProgress);
+
+        if (onDayStepProgressChange) {
+          const aggregated = relatedInstances.reduce(
+            (acc, instance) => {
+              const progress = nextProgress[instance.templateId];
+              acc.completed += progress?.done ?? 0;
+              acc.total += progress?.total ?? 0;
+              return acc;
+            },
+            { completed: 0, total: 0 }
+          );
+          onDayStepProgressChange(dateString, aggregated);
+        }
+      }
+
       onInstanceStatusChange(
         relatedInstances.map((instance) => ({
           instanceId: instance.id,
@@ -131,7 +194,7 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({
         }))
       );
     },
-    [handleToggleFlowStep, templates, onInstanceStatusChange, stepOverrides, effectiveInstances]
+    [handleToggleFlowStep, templates, onInstanceStatusChange, stepOverrides, effectiveInstances, onTemplateProgressChange, onDayStepProgressChange, dateString]
   );
 
   // Create nodes and edges for React Flow
@@ -155,6 +218,7 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const dayProgressRef = useRef<Record<string, { completed: number; total: number }>>({});
 
   // Update nodes when data changes, preserving user-dragged positions
   React.useEffect(() => {

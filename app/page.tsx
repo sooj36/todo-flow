@@ -18,6 +18,8 @@ export default function Home() {
   const [selectedDate, setSelectedDate] = useState(new Date()); // Shared date state
   const [flowBoardRefreshTrigger, setFlowBoardRefreshTrigger] = useState(0);
   const [instanceStatusOverrides, setInstanceStatusOverrides] = useState<Record<string, TaskStatus>>({});
+  const [templateProgress, setTemplateProgress] = useState<Record<string, { done: number; total: number }>>({});
+  const [dayStepProgressOverrides, setDayStepProgressOverrides] = useState<Record<string, { completed: number; total: number }>>({});
   const mainRef = useRef<HTMLElement>(null);
 
   // Agent query state
@@ -71,6 +73,23 @@ export default function Home() {
     []
   );
 
+  const handleTemplateProgressChange = useCallback(
+    (progress: Record<string, { done: number; total: number }>) => {
+      setTemplateProgress(progress);
+    },
+    []
+  );
+
+  const handleDayStepProgressChange = useCallback(
+    (date: string, progress: { completed: number; total: number }) => {
+      setDayStepProgressOverrides((prev) => ({
+        ...prev,
+        [date]: progress,
+      }));
+    },
+    []
+  );
+
   return (
     <div className="flex h-screen w-full bg-[#f4f5f7] overflow-hidden selection:bg-blue-100">
       <Sidebar
@@ -91,6 +110,8 @@ export default function Home() {
             onDateChange={setSelectedDate}
             onTaskCreated={() => setFlowBoardRefreshTrigger(prev => prev + 1)}
             instanceStatusOverrides={instanceStatusOverrides}
+            templateProgress={templateProgress}
+            dayStepProgressOverrides={dayStepProgressOverrides}
           />
         </div>
 
@@ -112,6 +133,8 @@ export default function Home() {
               refreshTrigger={flowBoardRefreshTrigger}
               instanceStatusOverrides={instanceStatusOverrides}
               onInstanceStatusChange={handleInstanceStatusChange}
+              onTemplateProgressChange={handleTemplateProgressChange}
+              onDayStepProgressChange={handleDayStepProgressChange}
             />
           </div>
         </div>

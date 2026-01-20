@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useMemo, useState, useCallback, useEffect, useRef } from "react";
+import React, { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { ChevronLeft, ChevronRight, Plus, MoreHorizontal, Link2, Loader2, AlertCircle, RefreshCw } from "lucide-react";
 import { useTaskInstances } from "@/hooks/useTaskInstances";
 import { useCreateTask } from "@/hooks/useCreateTask";
 import { CalendarDayData, TaskStatus } from "@/types";
 import { CreateTaskDialog } from "./CreateTaskDialog";
-import { applyInstanceStatusOverrides } from "@/utils/taskInstances";
+import { applyInstanceStatusOverrides, aggregateDayStepProgress } from "@/utils/taskInstances";
 
 const days1To15 = Array.from({ length: 15 }, (_, i) => i + 1);
 const days16To31 = Array.from({ length: 16 }, (_, i) => i + 16);
@@ -16,6 +16,8 @@ interface NotionCalendarProps {
   onDateChange: (date: Date) => void;
   onTaskCreated?: () => void;
   instanceStatusOverrides?: Record<string, TaskStatus>;
+  templateProgress?: Record<string, { done: number; total: number }>;
+  dayStepProgressOverrides?: Record<string, { completed: number; total: number }>;
 }
 
 export const NotionCalendar: React.FC<NotionCalendarProps> = ({
@@ -23,6 +25,8 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
   onDateChange,
   onTaskCreated,
   instanceStatusOverrides,
+  templateProgress = {},
+  dayStepProgressOverrides = {},
 }) => {
   const now = new Date(); // Actual current date for "today" highlighting
 
@@ -125,25 +129,25 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
     [instances, instanceStatusOverrides]
   );
 
-  const calendarData = useMemo(() => {
-    const year = selectedDate.getFullYear();
-    const month = selectedDate.getMonth();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const dataMap = new Map<string, CalendarDayData>();
+  const year = selectedDate.getFullYear();
+  const month = selectedDate.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const calendarData = new Map<string, CalendarDayData>();
 
-    for (let day = 1; day <= daysInMonth; day++) {
-      const date = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-      const dayInstances = effectiveInstances.filter(inst => inst.date === date);
-      dataMap.set(date, {
-        date,
-        totalTasks: dayInstances.length,
-        completedTasks: dayInstances.filter(inst => inst.status === 'done').length,
-        tasks: dayInstances,
-      });
-    }
-
-    return dataMap;
-  }, [effectiveInstances, selectedDate]); // Changed: now -> selectedDate
+  for (let day = 1; day <= daysInMonth; day++) {
+    const date = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const dayInstances = effectiveInstances.filter(inst => inst.date === date);
+    const overrideProgress = dayStepProgressOverrides[date];
+    const stepTotals = overrideProgress
+      ? overrideProgress
+      : aggregateDayStepProgress(dayInstances, {});
+    calendarData.set(date, {
+      date,
+      totalTasks: stepTotals.total,
+      completedTasks: stepTotals.completed,
+      tasks: dayInstances,
+    });
+  }
 
   const isConnected = !loading && !error;
 
@@ -401,7 +405,7 @@ const CalendarDay: React.FC<CalendarDayProps> = ({ day, data, loading, isToday, 
       {data && data.totalTasks > 0 && (
         <div className="space-y-2">
           <div className="flex items-center justify-between text-[10px] text-[#37352f]/60">
-            <span>{data.completedTasks}/{data.totalTasks} tasks</span>
+            <span>{data.completedTasks}/{data.totalTasks} steps</span>
             <span>{Math.round(completionRate * 100)}%</span>
           </div>
           <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
