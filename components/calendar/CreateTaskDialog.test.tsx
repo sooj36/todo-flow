@@ -196,11 +196,8 @@ describe("CreateTaskDialog", () => {
       await user.type(nameInputs[0], "Test Task");
 
       // Enable repeat
-      const toggleButtons = screen.getAllByRole("button");
-      const toggle = toggleButtons.find(btn =>
-        btn.classList.contains("bg-gray-300") || btn.classList.contains("bg-blue-500")
-      );
-      if (toggle) await user.click(toggle);
+      const toggle = screen.getByLabelText("반복 설정 토글");
+      await user.click(toggle);
 
       // Select custom frequency
       await waitFor(() => {
@@ -224,11 +221,8 @@ describe("CreateTaskDialog", () => {
       await user.type(nameInputs[0], "Test Task");
 
       // Enable repeat
-      const toggleButtons = screen.getAllByRole("button");
-      const toggle = toggleButtons.find(btn =>
-        btn.classList.contains("bg-gray-300") || btn.classList.contains("bg-blue-500")
-      );
-      if (toggle) await user.click(toggle);
+      const toggle = screen.getByLabelText("반복 설정 토글");
+      await user.click(toggle);
 
       // Select custom frequency
       await waitFor(() => {
@@ -258,11 +252,8 @@ describe("CreateTaskDialog", () => {
       await user.type(nameInputs[0], "Test Task");
 
       // Enable repeat
-      const toggleButtons = screen.getAllByRole("button");
-      const toggle = toggleButtons.find(btn =>
-        btn.classList.contains("bg-gray-300") || btn.classList.contains("bg-blue-500")
-      );
-      if (toggle) await user.click(toggle);
+      const toggle = screen.getByLabelText("반복 설정 토글");
+      await user.click(toggle);
 
       // Enter valid repeatLimit
       await waitFor(() => {

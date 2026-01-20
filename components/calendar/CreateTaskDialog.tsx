@@ -385,6 +385,7 @@ export const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
               type="button"
               onClick={() => setIsRepeating(!isRepeating)}
               disabled={isSubmitting}
+              aria-label="반복 설정 토글"
               className={`relative w-10 h-6 rounded-full transition-colors ${
                 isRepeating ? "bg-blue-500" : "bg-gray-300"
               } disabled:opacity-50`}
