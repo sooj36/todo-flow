@@ -85,8 +85,12 @@
   - 렌더링, 폼 검증, 제출 방지, 부분 실패 메시지, 다이얼로그 인터랙션 테스트
 
 ### 14.4 데이터 반영/동기화
-- [ ] Frontend: 제출 시 Notion 생성 → 성공하면 캘린더(`useTaskInstances` all) + FlowBoard(`useTaskInstances(date)` + `useTaskTemplates`) refetch를 모두 호출(steps 응답 미포함이므로 refetch 강제). 클릭한 날짜를 payload에 포함, 중복 제출 방지 플래그/로딩 상태 관리, refetch 중 상태 표시와 실패 메시지/재시도 제공.
-- [ ] FlowBoard 동기화: 단일 경로 확정 → steps는 응답에 포함하지 않고 `useTaskTemplates` refetch로 반영, 보상 실패 시에도 상태 일관성 유지.
+- [x] Frontend: 제출 시 Notion 생성 → 성공하면 캘린더(`useTaskInstances` all) + FlowBoard(`useTaskInstances(date)` + `useTaskTemplates`) refetch를 모두 호출(steps 응답 미포함이므로 refetch 강제). 클릭한 날짜를 payload에 포함, 중복 제출 방지 플래그/로딩 상태 관리, refetch 중 상태 표시와 실패 메시지/재시도 제공.
+  - NotionCalendar: onTaskCreated 콜백으로 부모에게 생성 완료 알림
+  - page.tsx: flowBoardRefreshTrigger 상태로 FlowBoard refetch 조율
+  - FlowBoard: refreshTrigger prop으로 부모 트리거 시 templates+instances refetch
+- [x] FlowBoard 동기화: 단일 경로 확정 → steps는 응답에 포함하지 않고 `useTaskTemplates` refetch로 반영, 보상 실패 시에도 상태 일관성 유지.
+  - useFlowSync 훅에서 refetch 로직 관리, 보상 실패와 무관하게 refetch 수행
 
 ### 14.5 테스트
 - [ ] 테스트: a) API 라우트 유닛(기본값 적용, 생성 순서, 중간 실패 보상/cleanupIds 포함), b) 반복 옵션 파싱/직렬화/검증(요일/limit), c) 다이얼로그 렌더/밸리데이션/제출/중복 제출 차단, d) 성공 후 캘린더+FlowBoard refetch 두 곳 모두 호출되는 통합 테스트(버튼 재활성 시점 포함).
