@@ -202,7 +202,7 @@ describe('projects Notion helpers', () => {
     const result = await getProjectPageContent(page);
 
     expect(mockList).toHaveBeenCalledTimes(4);
-    expect(result.text).toBe('line1 line2');
+    expect(result.text).toBe('line1\nline2');
     expect(result.rawLength).toBe('line1\nline2'.length);
     // ensure pagination cursors were used
     expect(mockList).toHaveBeenNthCalledWith(
@@ -244,7 +244,7 @@ describe('projects Notion helpers', () => {
     const result = await getProjectPageContent(page);
 
     expect(result.source).toBe('page');
-    expect(result.text).toBe('첫 문장 두 번째 문장');
+    expect(result.text).toBe('첫 문장\n두 번째 문장');
     expect(mockList).toHaveBeenCalledTimes(1);
   });
 

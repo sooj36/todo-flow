@@ -166,6 +166,7 @@ function collectPlainText(blocks: any[]): string[] {
       const text = payload.rich_text.map((r: any) => r.plain_text || '').join('').trim();
       if (text) {
         lines.push(text);
+        lines.push('');
       }
     }
   }
