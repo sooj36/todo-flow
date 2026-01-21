@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { queryProjectPages, getProjectPageContent } from './projects';
+import { getProjectPages, getProjectPageContent } from './projects';
 import * as notionClient from './client';
 
 describe('projects Notion helpers', () => {
@@ -32,7 +32,7 @@ describe('projects Notion helpers', () => {
 
     vi.spyOn(notionClient, 'getNotionClient').mockReturnValue(mockClient);
 
-    const result = await queryProjectPages('  뱅크샐러드 ');
+    const result = await getProjectPages('  뱅크샐러드 ');
 
     expect(mockQuery).toHaveBeenCalledWith({
       database_id: process.env.NOTION_PROJECT_DB_ID,
@@ -64,7 +64,7 @@ describe('projects Notion helpers', () => {
 
     vi.spyOn(notionClient, 'getNotionClient').mockReturnValue(mockClient);
 
-    await expect(queryProjectPages('test')).rejects.toThrow('NOTION_PROJECT_DB_ID environment variable is not set');
+    await expect(getProjectPages('test')).rejects.toThrow('NOTION_PROJECT_DB_ID environment variable is not set');
 
     process.env.NOTION_PROJECT_DB_ID = original;
   });
@@ -202,7 +202,7 @@ describe('projects Notion helpers', () => {
     const result = await getProjectPageContent(page);
 
     expect(mockList).toHaveBeenCalledTimes(4);
-    expect(result.text).toBe('line1\nline2');
+    expect(result.text).toBe('line1 line2');
     expect(result.rawLength).toBe('line1\nline2'.length);
     // ensure pagination cursors were used
     expect(mockList).toHaveBeenNthCalledWith(
@@ -213,5 +213,60 @@ describe('projects Notion helpers', () => {
       4,
       expect.objectContaining({ block_id: 'toggle-1', start_cursor: 'child-next' })
     );
+  });
+
+  it('falls back to page text when 공고 토글이 없고 trims/merges paragraphs', async () => {
+    const mockList = vi
+      .fn()
+      // Root blocks only (no toggle)
+      .mockResolvedValueOnce({
+        results: [
+          {
+            type: 'paragraph',
+            paragraph: { rich_text: [{ plain_text: '첫 문장' }] },
+          },
+          {
+            type: 'paragraph',
+            paragraph: { rich_text: [{ plain_text: '두 번째 문장' }] },
+          },
+        ],
+        has_more: false,
+      });
+
+    const mockClient = {
+      blocks: { children: { list: mockList } },
+    } as unknown as ReturnType<typeof notionClient.getNotionClient>;
+
+    vi.spyOn(notionClient, 'getNotionClient').mockReturnValue(mockClient);
+
+    const page = { pageId: 'page-4', title: '테스트', summary: '' };
+
+    const result = await getProjectPageContent(page);
+
+    expect(result.source).toBe('page');
+    expect(result.text).toBe('첫 문장 두 번째 문장');
+    expect(mockList).toHaveBeenCalledTimes(1);
+  });
+
+  it('throws when no 공고 텍스트 or 요약 is available', async () => {
+    const mockList = vi.fn().mockResolvedValue({
+      results: [
+        {
+          type: 'paragraph',
+          paragraph: { rich_text: [] },
+        },
+      ],
+      has_more: false,
+    });
+
+    const mockClient = {
+      blocks: { children: { list: mockList } },
+    } as unknown as ReturnType<typeof notionClient.getNotionClient>;
+
+    vi.spyOn(notionClient, 'getNotionClient').mockReturnValue(mockClient);
+
+    const page = { pageId: 'page-5', title: '테스트', summary: '' };
+
+    await expect(getProjectPageContent(page)).rejects.toThrow('공고 내용이 비어있습니다');
   });
 });

@@ -7,3 +7,4 @@ export * from './templates';
 export * from './flowSteps';
 export * from './instances';
 export * from './create-task-with-template';
+export * from './projects';

@@ -30,6 +30,10 @@
 - 규칙 정의: "충돌"과 "미완료" 기준 문서화
 - 실행 로그 구조: 단계별 결과/에러 기록 방식 결정
 - 안전장치: 드라이런/되돌리기/재시도 정책
+- 검색/대화 맥락 유지 설계(미구현, 후속 작업용):
+  - 짧은 맥락: 검색 API에 `history` 배열 필드 추가(최근 질의/응답 전달), 클라이언트 상태/세션 저장 위치 결정
+  - 긴 맥락: 대화 요약본(`updatedSummary`)을 함께 보내는 옵션 검토(LLM 호출 or 서버 생성), 개인정보 보존/만료 정책 정의
+  - 실패 대비: history 전달 실패 시 기본 검색만 수행하는 fallback 흐름 명시
 
 ## Verification Loop
 - After task: "Keep CI green" – run tests, commit. (TDD: 테스트 작성 → 실행 → 통과 확인 후에만 commit.)
@@ -126,12 +130,12 @@
 ## phase 15 
 
 ### phase 15.1 검색창 DB (KEYWORD DB -> PROJECT DB) 구현
-- [ ] Notion Project DB 조회 함수 추가: `getProjectPages(queryText)` → 제목 contains 필터(한글 포함), page_size 20, 상태/레벨 필터 없음(default 전체). 실패 시 “프로젝트 DB에 일치하는 페이지가 없습니다” 반환.
-- [ ] 검색 엔트리 흐름 교체: `/api/agent/keywords` → `/api/agent/project` (신규)로 연결, env는 `NOTION_PROJECT_DB_ID` 사용. queryText 미입력 시 400.
-- [ ] 페이지 본문 최소 추출: 찾은 첫 페이지의 블록 children 중 토글 “공고” 우선 → plain text만 모으고 link/pdf 등 비텍스트는 건너뛰기. 토글 없으면 heading/paragraph 전체를 3~4k chars로 컷.
-- [ ] 토큰 절약 전처리: 연속 paragraph 병합, trim/중복 문장 제거, 빈 라인 제거. 캐시: 동일 pageId 재조회 시 블록 재호출 없이 메모리/kv 반환.
-- [ ] 에러/빈 데이터 UX: 공고 토글 없거나 텍스트 0자면 “공고 내용이 비어있습니다” 메시지로 안내, 재시도/다른 페이지 검색 유도.
-- [ ] 테스트: a) query payload에 contains 필터 포함, b) 공고 토글 선택/없을 때 fallback, c) 빈 결과 에러 메시지, d) 캐시 사용 시 블록 호출 1회만 되는지.
+- [x] Notion Project DB 조회 함수 추가: `getProjectPages(queryText)` → 제목 contains 필터(한글 포함), page_size 20, 상태/레벨 필터 없음(default 전체). 실패 시 “프로젝트 DB에 일치하는 페이지가 없습니다” 반환.
+- [x] 검색 엔트리 흐름 교체: `/api/agent/keywords` → `/api/agent/project` (신규)로 연결, env는 `NOTION_PROJECT_DB_ID` 사용. queryText 미입력 시 400.
+- [x] 페이지 본문 최소 추출: 찾은 첫 페이지의 블록 children 중 토글 “공고” 우선 → plain text만 모으고 link/pdf 등 비텍스트는 건너뛰기. 토글 없으면 heading/paragraph 전체를 3~4k chars로 컷.
+- [x] 토큰 절약 전처리: 연속 paragraph 병합, trim/중복 문장 제거, 빈 라인 제거. 캐시: 동일 pageId 재조회 시 블록 재호출 없이 메모리/kv 반환.
+- [x] 에러/빈 데이터 UX: 공고 토글 없거나 텍스트 0자면 “공고 내용이 비어있습니다” 메시지로 안내, 재시도/다른 페이지 검색 유도.
+- [x] 테스트: a) query payload에 contains 필터 포함, b) 공고 토글 선택/없을 때 fallback, c) 빈 결과 에러 메시지, d) 캐시 사용 시 블록 호출 1회만 되는지.
 
 ### phase 15.2 지원자격 요약/응답
 - [ ] 요약 프롬프트 확정: “입력은 plain text. 지원자격/요구사항만 5 bullets, 한국어, 120 tokens 이내, 불필요한 서론 금지.”로 고정.

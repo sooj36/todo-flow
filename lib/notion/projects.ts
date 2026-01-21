@@ -25,7 +25,7 @@ const MAX_CHARS = 4000;
 /**
  * Query Project DB pages by title (contains match, trimmed).
  */
-export async function queryProjectPages(queryText: string): Promise<ProjectPage[]> {
+export async function getProjectPages(queryText: string): Promise<ProjectPage[]> {
   const notion = getNotionClient();
   const dbId = process.env.NOTION_PROJECT_DB_ID;
 
@@ -71,6 +71,9 @@ export async function queryProjectPages(queryText: string): Promise<ProjectPage[
     };
   });
 }
+
+// Backward compatibility alias.
+export const queryProjectPages = getProjectPages;
 
 /**
  * Get cached/plaintext content for a project page.
@@ -174,19 +177,10 @@ function collectPlainText(blocks: any[]): string[] {
  * Deduplicate/trim lines and cut to max length.
  */
 function compressText(lines: string[]): string {
-  const seen = new Set<string>();
-  const deduped: string[] = [];
+  const normalized = normalizeLines(lines);
+  if (normalized.length === 0) return '';
 
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (!trimmed || seen.has(trimmed)) continue;
-    seen.add(trimmed);
-    deduped.push(trimmed);
-  }
-
-  if (deduped.length === 0) return '';
-
-  const joined = deduped.join('\n');
+  const joined = normalized.join('\n').trim();
   if (joined.length <= MAX_CHARS) return joined;
   return joined.slice(0, MAX_CHARS);
 }
@@ -197,6 +191,48 @@ function compressText(lines: string[]): string {
 function computeRawLength(lines: string[]): number {
   if (lines.length === 0) return 0;
   return lines.map((line) => line.trim()).filter(Boolean).join('\n').length;
+}
+
+/**
+ * Merge consecutive paragraphs, trim, dedupe, and drop empty lines.
+ */
+function normalizeLines(lines: string[]): string[] {
+  const merged: string[] = [];
+  let buffer: string[] = [];
+  const seenRaw = new Set<string>();
+
+  const flush = () => {
+    if (buffer.length === 0) return;
+    const text = buffer.join(' ').trim();
+    if (text) {
+      merged.push(text);
+    }
+    buffer = [];
+  };
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      flush();
+      continue;
+    }
+    if (seenRaw.has(trimmed)) {
+      continue;
+    }
+    seenRaw.add(trimmed);
+    buffer.push(trimmed);
+  }
+  flush();
+
+  const seen = new Set<string>();
+  const deduped: string[] = [];
+  for (const line of merged) {
+    if (seen.has(line)) continue;
+    seen.add(line);
+    deduped.push(line);
+  }
+
+  return deduped;
 }
 
 /**

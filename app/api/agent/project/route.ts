@@ -1,6 +1,6 @@
 // app/api/agent/project/route.ts
 import { NextResponse } from 'next/server';
-import { queryProjectPages, getProjectPageContent } from '@/lib/notion/projects';
+import { getProjectPages, getProjectPageContent } from '@/lib/notion/projects';
 import { summarizeQualifications } from '@/lib/agent/project-summary';
 import { ConfigError } from '@/lib/agent/errors';
 
@@ -22,7 +22,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'queryText is required' }, { status: 400 });
     }
 
-    const pages = await queryProjectPages(queryText);
+    const pages = await getProjectPages(queryText);
     const target = pages[0];
 
     const content = await getProjectPageContent(target);

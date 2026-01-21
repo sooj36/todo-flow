@@ -14,7 +14,7 @@ describe('POST /api/agent/project', () => {
   });
 
   it('returns summarized bullets for the first matched project page', async () => {
-    vi.spyOn(projects, 'queryProjectPages').mockResolvedValue([
+    vi.spyOn(projects, 'getProjectPages').mockResolvedValue([
       { pageId: 'page-1', title: '뱅크샐러드', summary: '' },
     ]);
 
@@ -45,7 +45,7 @@ describe('POST /api/agent/project', () => {
     const data = await response.json();
 
     expect(response.status).toBe(200);
-    expect(projects.queryProjectPages).toHaveBeenCalledWith('뱅크샐러드 지원자격');
+    expect(projects.getProjectPages).toHaveBeenCalledWith('뱅크샐러드 지원자격');
     expect(projects.getProjectPageContent).toHaveBeenCalledWith({
       pageId: 'page-1',
       title: '뱅크샐러드',
@@ -75,7 +75,7 @@ describe('POST /api/agent/project', () => {
   });
 
   it('exposes safe error message when no page matches', async () => {
-    vi.spyOn(projects, 'queryProjectPages').mockRejectedValue(
+    vi.spyOn(projects, 'getProjectPages').mockRejectedValue(
       new Error('프로젝트 DB에 일치하는 페이지가 없습니다')
     );
 
@@ -93,7 +93,7 @@ describe('POST /api/agent/project', () => {
   });
 
   it('fails fast on ConfigError from Gemini', async () => {
-    vi.spyOn(projects, 'queryProjectPages').mockResolvedValue([
+    vi.spyOn(projects, 'getProjectPages').mockResolvedValue([
       { pageId: 'page-1', title: '테스트', summary: '' },
     ]);
     vi.spyOn(projects, 'getProjectPageContent').mockResolvedValue({
