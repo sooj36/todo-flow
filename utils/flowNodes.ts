@@ -55,7 +55,9 @@ export function createFlowNodes({
     {
       id: "daily-start",
       type: "customNode",
-      position: savedPositions["daily-start"] || { x: 50, y: 100 },
+      position: { x: 50, y: 100 },
+      draggable: false,
+      selectable: false,
       data: {
         title: "Daily Start",
         icon: icons.trigger,

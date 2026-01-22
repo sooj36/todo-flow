@@ -162,7 +162,7 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
             🗓️ {monthLabel}
           </h1>
           <p className="text-sm text-secondary mt-1 calendar-subtext">
-            인생은 기세다.
+            .......
           </p>
         </div>
         <div className="calendar-toolbar flex flex-wrap items-center justify-end gap-4 min-w-0">

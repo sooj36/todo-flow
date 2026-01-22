@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import {
   Zap,
   Cpu,
   Briefcase,
   Database,
+  Loader2,
 } from "lucide-react";
 import ReactFlow, {
   Controls,
@@ -57,6 +58,8 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({
   const dateString = formatDateString(selectedDate);
   const { instances, loading: instancesLoading, error: instancesError, refetch: refetchInstances } = useTaskInstances(dateString);
   const { templates, loading: templatesLoading, error: templatesError, refetch: refetchTemplates } = useTaskTemplates();
+  const prevDateRef = useRef(dateString);
+  const isDateChanging = prevDateRef.current !== dateString;
 
   const {
     isSyncing,
@@ -91,7 +94,12 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({
     }
   }, [refreshTrigger, refetchTemplates, refetchInstances]);
 
+  useEffect(() => {
+    prevDateRef.current = dateString;
+  }, [dateString]);
+
   const loading = instancesLoading || templatesLoading;
+  const showLoadingOverlay = isDateChanging || instancesLoading;
   const error = instancesError || templatesError;
   const isConnected = !loading && !error;
 
@@ -99,6 +107,8 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({
     () => applyInstanceStatusOverrides(instances, instanceStatusOverrides),
     [instances, instanceStatusOverrides]
   );
+  const displayInstances = isDateChanging ? [] : effectiveInstances;
+  const displayTemplates = isDateChanging ? [] : templates;
   const dayProgressRef = useRef<Record<string, { completed: number; total: number }>>({});
 
   const templateProgressMap = useMemo(() => {
@@ -119,7 +129,7 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({
 
   useEffect(() => {
     if (!onDayStepProgressChange) return;
-    const aggregated = effectiveInstances.reduce(
+    const aggregated = displayInstances.reduce(
       (acc, instance) => {
         const progress = calculateTemplateProgress(instance.template, stepOverrides);
         acc.completed += progress.done;
@@ -133,7 +143,7 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({
       dayProgressRef.current[dateString] = aggregated;
       onDayStepProgressChange(dateString, aggregated);
     }
-  }, [onDayStepProgressChange, effectiveInstances, dateString, stepOverrides]);
+  }, [onDayStepProgressChange, displayInstances, dateString, stepOverrides]);
 
   const handleFlowStepToggleWithStatus = useCallback(
     async (stepId: string, nextDone: boolean, previousDone: boolean) => {
@@ -207,8 +217,8 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({
     return createFlowNodes({
       loading,
       error,
-      instances: effectiveInstances,
-      templates,
+      instances: displayInstances,
+      templates: displayTemplates,
       stepOverrides,
       stepUpdating,
       isConnected,
@@ -219,18 +229,26 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({
         notionDb: <Briefcase className="text-blue-500" size={16} />,
       },
     });
-  }, [loading, error, effectiveInstances, templates, stepOverrides, stepUpdating, isConnected, handleFlowStepToggleWithStatus]);
+  }, [loading, error, displayInstances, displayTemplates, stepOverrides, stepUpdating, isConnected, handleFlowStepToggleWithStatus]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
   // Update nodes when data changes, preserving user-dragged positions
-  React.useEffect(() => {
+  useLayoutEffect(() => {
+    if (isDateChanging) {
+      setNodes(initialNodes);
+      setEdges(initialEdges);
+      return;
+    }
     setNodes((currentNodes) => {
       const nodeMap = new Map(currentNodes.map(n => [n.id, n]));
 
       return initialNodes.map(newNode => {
         const existingNode = nodeMap.get(newNode.id);
+        if (newNode.id === "daily-start") {
+          return newNode;
+        }
         // Keep existing position if node already exists (user may have dragged it)
         if (existingNode) {
           return {
@@ -242,17 +260,21 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({
       });
     });
     setEdges(initialEdges);
-  }, [initialNodes, initialEdges, setNodes, setEdges]);
+  }, [initialNodes, initialEdges, setNodes, setEdges, isDateChanging]);
 
   // Save node positions to localStorage when they change
   const handleNodesChange = useCallback((changes: any) => {
-    onNodesChange(changes);
+    const filteredChanges = changes.filter(
+      (c: any) => !(c.type === "position" && c.id === "daily-start")
+    );
+    onNodesChange(filteredChanges);
 
     // Extract position changes and save to localStorage
-    const positionChanges = changes.filter((c: any) => c.type === 'position' && c.dragging === false);
+    const positionChanges = filteredChanges.filter((c: any) => c.type === 'position' && c.dragging === false);
     if (positionChanges.length > 0) {
       setNodes((nds) => {
         const positions = nds.reduce((acc, node) => {
+          if (node.id === "daily-start") return acc;
           acc[node.id] = node.position;
           return acc;
         }, {} as Record<string, { x: number; y: number }>);
@@ -285,8 +307,8 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({
       {/* Dot background */}
       <div className="flex-1 relative bg-[#E6E2AC]/30">
         <ReactFlow
-          nodes={nodes}
-          edges={edges}
+          nodes={isDateChanging ? [] : nodes}
+          edges={isDateChanging ? [] : edges}
           onNodesChange={handleNodesChange}
           onEdgesChange={onEdgesChange}
           nodeTypes={nodeTypes}
@@ -311,6 +333,14 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({
             }}
           />
         </ReactFlow>
+        {showLoadingOverlay && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/70 backdrop-blur-sm">
+            <div className="flex items-center gap-2 text-xs font-semibold text-secondary">
+              <Loader2 size={16} className="animate-spin text-[#6c5ce7]" />
+              Loading...
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Flow footer status (Database ID / auto-save) */}
