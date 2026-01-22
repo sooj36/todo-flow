@@ -63,6 +63,8 @@ export function createFlowNodes({
         type: "Trigger",
       },
     },
+    // AI agent node is hidden; keep Daily Start as the connector source.
+    /*
     {
       id: "ai-reporter",
       type: "customNode",
@@ -74,17 +76,10 @@ export function createFlowNodes({
         type: "AI Agent",
       },
     },
+    */
   ];
 
-  const edges: Edge[] = [
-    {
-      id: "e-start-reporter",
-      source: "daily-start",
-      target: "ai-reporter",
-      type: "smoothstep",
-      animated: false,
-    },
-  ];
+  const edges: Edge[] = [];
 
   // Add Notion DB nodes dynamically
   if (!loading && !error && instances.length > 0 && templates.length > 0) {
@@ -133,8 +128,8 @@ export function createFlowNodes({
       });
 
       edges.push({
-        id: `e-reporter-${nodeId}`,
-        source: "ai-reporter",
+        id: `e-start-${nodeId}`,
+        source: "daily-start",
         target: nodeId,
         type: "smoothstep",
         animated: false,
