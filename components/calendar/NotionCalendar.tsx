@@ -162,7 +162,7 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
             🗓️ {monthLabel}
           </h1>
           <p className="text-sm text-secondary mt-1 calendar-subtext">
-            수진 캘린더
+            인생은 기세다.
           </p>
         </div>
         <div className="calendar-toolbar flex flex-wrap items-center justify-end gap-4 min-w-0">
@@ -187,7 +187,7 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
           {error && (
             <div className="flex items-center gap-2 text-sm font-semibold text-red-500 bg-[#ffecec] px-3 py-2 rounded-full shadow-sm flex-shrink-0">
               <AlertCircle size={16} />
-              <span>Connection error — Check .env.local</span>
+              <span>Connection error — 노션 연결 확인</span>
             </div>
           )}
           {!loading && !error && (

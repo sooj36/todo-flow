@@ -97,7 +97,7 @@ export default function Home() {
         <div className="absolute right-0 bottom-0 h-72 w-72 rounded-full bg-[#c7f0ff] blur-3xl opacity-50" />
       </div>
 
-      <div className="relative flex h-screen w-full max-w-[1600px] mx-auto px-6 py-5 gap-5">
+      <div className="relative flex h-screen w-full max-w-[1800px] mx-auto px-6 py-5 gap-5">
         <Sidebar
           collapsed={isSidebarCollapsed}
           onToggle={() => setIsSidebarCollapsed((prev) => !prev)}
