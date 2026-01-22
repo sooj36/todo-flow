@@ -28,7 +28,7 @@
   --color-border-soft: var(--border-soft);
   --shadow-soft: var(--shadow-soft);
   --shadow-card: var(--shadow-card);
-  --font-sans: var(--font-inter);
+  --font-sans: var(--font-pretendard);
   --font-mono: var(--font-jetbrains-mono);
   --radius-md: 14px;
   --radius-lg: 18px;
@@ -43,7 +43,7 @@
 body {
   background-color: #4F7939;
   color: var(--foreground);
-  font-family: var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-pretendard), system-ui, sans-serif;
   min-height: 100vh;
 }
 
