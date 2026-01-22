@@ -313,6 +313,8 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({
         </ReactFlow>
       </div>
 
+      {/* Flow footer status (Database ID / auto-save) */}
+      {/*
       <div className="p-4 border-t border-[#ececeb] bg-white flex items-center justify-between z-20">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 px-3 py-1.5 bg-[#f6f4ff] text-secondary rounded-full text-[10px] font-bold shadow-sm">
@@ -329,6 +331,7 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({
           <div className="w-2 h-2 rounded-full bg-red-500 opacity-30"></div>
         </div>
       </div>
+      */}
     </div>
   );
 };
