@@ -31,10 +31,15 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
   const now = new Date(); // Actual current date for "today" highlighting
 
   const today = now.getDate();
-  const monthLabel = new Intl.DateTimeFormat("en-US", {
-    month: "long",
-    year: "numeric",
-  }).format(selectedDate); // Use selectedDate for display
+  const monthLabel = useMemo(() => {
+    const parts = new Intl.DateTimeFormat("en-US", {
+      month: "long",
+      year: "numeric",
+    }).formatToParts(selectedDate);
+    const year = parts.find((part) => part.type === "year")?.value ?? "";
+    const month = parts.find((part) => part.type === "month")?.value ?? "";
+    return `${year} ${month}`.trim();
+  }, [selectedDate]); // Use selectedDate for display
 
   const { instances, loading, error, refetch } = useTaskInstances();
   const { createTask } = useCreateTask();
@@ -355,19 +360,19 @@ const CalendarDay: React.FC<CalendarDayProps> = ({ day, data, loading, isToday, 
     : 0;
 
   const bgColor = completionRate >= 0.8
-    ? "bg-[#e7f8f1] border-[#b6efd6]"
+    ? "bg-[#e9f7ef] border-[#bfead2]"
     : completionRate >= 0.5
-      ? "bg-[#fff6e9] border-[#ffdfb9]"
+      ? "bg-[#fff2df] border-[#ffd4a3]"
       : completionRate > 0
-        ? "bg-[#f0edff] border-[#dcd6ff]"
+        ? "bg-[#fff8dc] border-[#f3e3a1]"
         : "bg-white/80";
 
   // Priority: isSelected > isToday
   const borderClass = isSelected
-    ? "border-2 border-[#6c5ce7] shadow-[0_12px_30px_rgba(108,92,231,0.15)]"  // Selected: prominent
+    ? "border-2 border-[#c7c7c7] shadow-[0_12px_30px_rgba(55,53,47,0.12)]"  // Selected: neutral
     : (isToday ? "border-2 border-[#0d8f5b]" : "border border-[#e6e2f3]");  // Today: subtle
 
-  const selectedBg = isSelected ? "bg-[#ede9ff]" : bgColor;
+  const selectedBg = isSelected ? "bg-white" : bgColor;
 
   if (loading) {
     return (
@@ -391,7 +396,7 @@ const CalendarDay: React.FC<CalendarDayProps> = ({ day, data, loading, isToday, 
     >
       {/* Today dot: only show if today but NOT selected */}
       {isToday && !isSelected && (
-        <div className="absolute top-1 right-1 w-2 h-2 bg-[#0d8f5b] rounded-full" />
+        <div className="absolute top-2 right-2 w-2 h-2 bg-[#0d8f5b] rounded-full" />
       )}
       <div className="flex items-center justify-between mb-2">
         <span className="text-xs font-bold text-secondary/70">{day}</span>
@@ -416,10 +421,10 @@ const CalendarDay: React.FC<CalendarDayProps> = ({ day, data, loading, isToday, 
           <div className="w-full h-1.5 bg-[#e6e2f3] rounded-full overflow-hidden">
             <div
               className={`h-full transition-all ${completionRate >= 0.8
-                ? "bg-gradient-to-r from-[#0d8f5b] to-[#1dd187]"
+                ? "bg-gradient-to-r from-[#159a67] to-[#2ed08a]"
                 : completionRate >= 0.5
-                  ? "bg-gradient-to-r from-[#f8c266] to-[#ff9e2c]"
-                  : "bg-gradient-to-r from-[#6c5ce7] to-[#9aa8ff]"
+                  ? "bg-gradient-to-r from-[#f6b85c] to-[#ff9c2a]"
+                  : "bg-gradient-to-r from-[#f4d27a] to-[#f0b64b]"
                 }`}
               style={{ width: `${completionRate * 100}%` }}
             ></div>

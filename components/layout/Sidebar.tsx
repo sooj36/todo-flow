@@ -29,15 +29,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
     >
       <div className="relative p-4">
         <div className={`flex items-center ${collapsed ? "justify-center" : "gap-3"}`}>
-          {/*
-          <div className="w-10 h-10 bg-gradient-to-br from-[#6c5ce7] to-[#9aa8ff] rounded-xl flex items-center justify-center text-white font-black shadow-lg">
-            F
-          </div>
-          */}
+          <img
+            src="/images/concert.png"
+            alt="Workspace"
+            className="w-8 h-8 rounded-full object-cover shadow-sm"
+          />
           {!collapsed && (
-            <span className="font-bold text-lg text-primary tracking-tight">
-              Flow Planner
-            </span>
+            <div className="flex flex-col overflow-hidden">
+              <span className="text-sm font-semibold text-primary truncate">
+                Soo&apos;s Workspace
+              </span>
+              <span className="text-[10px] text-secondary/70 font-medium">
+                Synced with Notion
+              </span>
+            </div>
           )}
         </div>
         <button
@@ -67,25 +72,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <NavItem icon={<Workflow size={16} />} label="Integrations" collapsed={collapsed} />
       </nav>
 
-      <div className="p-4 border-t border-[#e6e2f3]">
-        <div
-          className={`flex items-center ${collapsed ? "justify-center" : "gap-3"} px-3 py-2 hover:bg-[#f0edff] rounded-xl cursor-pointer transition-all`}
-        >
-          <div className="w-8 h-8 bg-gradient-to-tr from-[#6c5ce7] to-[#88ddff] rounded-full flex items-center justify-center text-[10px] text-white font-bold shadow-sm">
-            JD
-          </div>
-          {!collapsed && (
-            <div className="flex flex-col overflow-hidden">
-              <span className="text-sm font-semibold text-primary truncate">
-                Soo&apos;s Workspace
-              </span>
-              <span className="text-[10px] text-secondary/70 font-medium">
-                Synced with Notion
-              </span>
-            </div>
-          )}
-        </div>
-      </div>
+      <div className="p-4 border-t border-[#e6e2f3]"></div>
     </aside>
   );
 };
