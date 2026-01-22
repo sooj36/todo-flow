@@ -7,8 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest",
-    "test:run": "vitest run"
+    "test": "NODE_OPTIONS=--max-old-space-size=8192 vitest",
+    "test:run": "vitest run",
+    "test:focus": "node scripts/vitest-focus.mjs"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

@@ -2,7 +2,7 @@
 
 ## Instructions for AI
 - Read @spec.md, @PRD.md first.
-- Execute tasks sequentially. After each, verify with tests (pnpm lint, pnpm test).
+- Execute tasks sequentially. After each, verify with tests (pnpm lint, pnpm test:focus -- <related test files>).
 - If unclear, ask questions in [ ] format.
 - Mark done with [x], update this file.
 - TDD: Write test → implement → pass. Phase 8 리팩토링에서는 테스트 삭제 금지 (임시 테스트는 별도 파일로 격리 후 유지).
@@ -37,7 +37,7 @@
 
 ## Verification Loop
 - After task: "Keep CI green" – run tests, commit. (TDD: 테스트 작성 → 실행 → 통과 확인 후에만 commit.)
-- Phase 8: 전체 테스트 대신 API 테스트만 실행 (pnpm test:run app/api/notion)
+- Phase 8: 전체 테스트 대신 API 테스트만 실행 (pnpm test:focus -- app/api/notion)
 - If error: Analyze, fix, update this file. (Codex로 commit 평가 후, 수정 사항 적용.)
 - 코드 작성 전 브랜치명을 확인해서 (feature, test, design) 구분해서 할 것  
     ex)feature/layout-resize
@@ -127,6 +127,15 @@
 
 ### 14.11 Dialog의 “반복 횟수(선택)” 필드 용도/동작을 명확히 정의·표기해야 하는 문제
 
+### 14.12 Split View/Responsive Layout Fix
+- [x] 문제: Split View로 너비가 줄어들 때 `NotionCalendar` 헤더와 우측 패널의 버튼/텍스트가 겹치거나 잘림. `flex-wrap` 부재 및 고정 픽셀/텍스트 유지로 인한 현상.
+- [x] 해결 방안:
+  - NotionCalendar Header: `flex-wrap` 적용으로 줄바꿈 허용.
+  - 반응형 숨김: 너비가 좁을 때(Container Query 또는 Media Query) "Bi-weekly..." 서브텍스트와 "Notion connected" 텍스트 숨기기(아이콘만 유지).
+  - 버튼 최적화: 툴바 영역(`Refresh`, `Today`, `Arrows`)이 좁은 폭에서도 정렬 유지되도록 `gap` 조정 및 `flex-shrink` 설정.
+  - page.tsx: Resizable 패널 최소 너비 보장 혹은 좁을 때 UI 간소화 처리. 
+
+
 ## phase 15 
 
 ### phase 15.1 검색창 DB (KEYWORD DB -> PROJECT DB) 구현
@@ -141,4 +150,34 @@
 - [ ] 요약 프롬프트 확정: “입력은 plain text. 지원자격/요구사항만 5 bullets, 한국어, 120 tokens 이내, 불필요한 서론 금지.”로 고정.
 - [ ] 파이프라인: 검색어에 “지원자격/요구/조건” 포함 시 공고 텍스트 → LLM 요약 → UI 결과 패널에 bullet 렌더. 토글 텍스트 없으면 DB `요약` 필드 사용(없으면 에러 반환).
 - [ ] UI 문구: 결과 패널 상단에 “프로젝트 DB·공고 토글 기반 요약” 메타 표시, 실패 시 명확한 원인(페이지 없음/공고 비어 있음/LLM 실패).
-- [ ] 테스트: 요약 프롬프트에 투입되는 텍스트 길이 제한 적용, 지원자격 키워드 입력 시 LLM 호출 1회, fallback(요약 필드) 시에도 bullet 출력 확인.
+
+## Phase 16: UI Visual Overhaul (Deel Style Tone & Manner)
+### 16.1 Global Theme & Design Tokens
+- [x] Analyze Design Reference: Extract colors/styles from reference image.
+  - Primary Background: Light Lavender/Purple (e.g., #F0F2F5 to #F3F1FA range) -> Clean & Airy feel.
+  - Card Style: Pure White, Rounded-2xl (large radius), Soft/Diffuse Shadows (no harsh borders).
+  - Typography: Modern Sans-serif (Inter/Pretendard), High contrast headings (Black/Dark Gray), Muted labels.
+- [x] Tailwind Config Update:
+  - Add specific colors: `bg-page`, `text-primary`, `text-secondary`, `brand-gradient` (if needed for charts).
+  - Update `borderRadius` defaults (prefer `xl`, `2xl`).
+- [x] Global Layout Polish:
+  - Apply global background color.
+  - Wrap main content in a consistent container that floats on the background (or uses the background fully).
+
+### 16.2 Modern Core Components Polish
+- [x] Card/Container Unification:
+  - Refactor major sections (Dashboards, Metrics, Lists) to use a unified `Card` style.
+  - Ensure generous padding (p-6+) to match the "Airy" tone.
+- [x] Header & Navigation:
+  - Minimized visual weight (transparent or blend-in background).
+  - Navigation items as "Pills" or clean icon+text.
+  - Remove heavy dividers/borders.
+- [x] Controls (Buttons/Inputs):
+  - Primary Buttons: Rounded capsules (full rounded) or soft rounded-xl.
+  - Inputs: Light gray background or soft border, large touch targets.
+
+### 16.3 Visual Consistency & Verify
+- [x] Chart/Graph Aesthetics (if present): Use smooth curves, soft gradients (blue/teal/purple) instead of flat solid blocks.
+- [x] Tone & Manner Review: Compare against reference image.
+  - Check for "Cleanliness", "Softness", "Readability".
+- [x] Tests: Verify no layout shifts or broken responsiveness with new spacing.

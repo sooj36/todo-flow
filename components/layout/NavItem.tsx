@@ -14,13 +14,13 @@ export const NavItem: React.FC<NavItemProps> = ({
   collapsed = false,
 }) => (
   <button
-    className={`w-full flex items-center ${collapsed ? "justify-center" : "gap-2.5"} px-3 py-2 text-sm rounded-lg transition-all font-medium ${
+    className={`w-full flex items-center ${collapsed ? "justify-center" : "gap-2.5"} px-3 py-2.5 text-sm rounded-full transition-all font-medium ${
       active
-        ? "bg-[#efefed] text-[#37352f]"
-        : "text-[#37352f]/60 hover:bg-[#efefed]/50 hover:text-[#37352f]"
+        ? "bg-[#f0edff] text-primary shadow-[0_10px_30px_rgba(108,92,231,0.15)]"
+        : "text-secondary hover:bg-[#f6f4ff] hover:text-primary"
     }`}
   >
-    <span className={active ? "text-black" : "text-[#37352f]/40"}>
+    <span className={active ? "text-[#6c5ce7]" : "text-secondary/60"}>
       {icon}
     </span>
     {!collapsed && label}

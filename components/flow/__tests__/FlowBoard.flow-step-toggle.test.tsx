@@ -102,7 +102,7 @@ describe('FlowBoard - Flow Step Refactoring', () => {
 
         // Verify core UI is rendered
         expect(screen.getByText('Daily Automation Flow')).toBeInTheDocument();
-        expect(screen.getAllByText('notion connect success').length).toBeGreaterThan(0);
+        expect(screen.getAllByText('Notion connected').length).toBeGreaterThan(0);
     });
 
     it('should verify FlowStep.done type safety', () => {

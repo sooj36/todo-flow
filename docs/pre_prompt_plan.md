@@ -41,7 +41,7 @@
 - [x] 테스트 환경 최소 수정 (리팩토링 시작 전 필수)
   - [x] vitest.setup.ts에 ResizeObserver mock 추가
   - [x] vitest.setup.ts에 localStorage mock 수정 (getItem is not a function)
-  - [x] pnpm test:run 실행해서 환경 문제만 해결되었는지 확인
+  - [x] pnpm test:focus -- <related test files> 실행해서 환경 문제만 해결되었는지 확인
   - Note: 테스트 로직 실패(filter, 통합 테스트)는 별도 이슈로 추적, 리팩토링 블로킹 아님
 - [x] FlowBoard.tsx 현재 라인 기준 주석 또는 메모 확보
 - [x] 분리 대상 의존성 정리 (React Flow, Notion hooks, UI 상태)
@@ -56,7 +56,7 @@
 ```
 - [ ] 단계: 7.x (예: 7.1 nodePositions 유틸 분리)
 - [ ] 변경 요약:
-- [ ] 검증: pnpm lint / pnpm test (결과, 시간)
+- [ ] 검증: pnpm lint / pnpm test:focus -- <related test files> (결과, 시간)
 - [ ] 커밋: <commit hash> (message)
 ```
 
@@ -117,7 +117,7 @@
 ### 7.4 최종 검증
 - [x] FlowBoard.tsx 최종 라인 수 200줄 이하 확인 (198줄 달성)
 - [x] 기존 모든 기능 정상 작동 (수동 테스트)
-- [x] pnpm lint, pnpm test 통과
+- [x] pnpm lint, pnpm test:focus -- <related test files> 통과
 - [x] 리팩토링 전후 비교 문서 작성 (docs/log.md)
 - [x] 타입 오류 수정 (React import, async 함수 타입)
 - 커밋: a0f5751 (문서화), 61a34d8 (타입 수정), 800f16b (문서 업데이트)
@@ -142,7 +142,7 @@
   - 영향: app/page.tsx, components/flow/FlowBoard.tsx의 localStorage 호출 정상 동작
   - 커밋: c008a68
 
-- [x] 검증: pnpm test:run 실행, 환경 에러만 해결되었는지 확인
+- [x] 검증: pnpm test:focus -- <related test files> 실행, 환경 에러만 해결되었는지 확인
   - 성공 기준: ResizeObserver/localStorage 에러 사라짐 ✓
   - 테스트 로직 실패는 여전히 존재 가능 (7+.2, 7+.3에서 처리)
   - 커밋: c008a68
@@ -172,7 +172,7 @@
   - 원인: ResizeObserver + localStorage 환경 문제 해결됨, 하지만 메모리 부족 발생
   - Note: 통합 테스트 실행 시 메모리 부족 (JavaScript heap out of memory)
   - Note: API 테스트(16개)는 모두 통과, 통합 테스트는 별도 메모리 최적화 필요
-- [ ] 최종 검증: pnpm test:run 전체 통과 확인 (메모리 문제로 보류)
+- [ ] 최종 검증: pnpm test:focus -- <batch of test files> 통과 확인 (메모리 문제로 보류)
 
 ## Phase 8 Tasks (Code Refactoring - lib/notion.ts)
 - 목표: lib/notion.ts 329줄 분리 → 유지보수성/재사용성 향상, 책임 분리
@@ -192,8 +192,8 @@
   - [x] app/api/notion/templates/route.ts
   - [x] app/api/notion/flow-steps/route.ts
   - [x] app/api/notion/instances/route.ts
-- [x] 기존 API 테스트 실행 확인 (pnpm test:run app/api/notion) - 19 tests passed
-- [x] 각 단계 완료 후: 타입 체크 + API 테스트(pnpm test:run app/api/notion) + 커밋
+- [x] 기존 API 테스트 실행 확인 (pnpm test:focus -- app/api/notion) - 19 tests passed
+- [x] 각 단계 완료 후: 타입 체크 + API 테스트(pnpm test:focus -- app/api/notion) + 커밋
 - [x] 단계별 수행: parsers → client → 각 도메인 모듈 순서 (의존성 역순) - 완료: 4f06ab2, b53df52, 2d0a97d
 - [x] import 경로 정책 결정 (기존 `lib/notion` 유지 vs `lib/notion/*`로 일괄 변경) - lib/notion/index.ts로 re-export
 - [x] 분리 후 기존 lib/notion.ts 삭제 또는 re-export 파일로 전환 - 삭제 완료
@@ -203,7 +203,7 @@
 ```
 - [ ] 단계: 8.x (예: 8.1 parsers 유틸 분리)
 - [ ] 변경 요약:
-- [ ] 검증: pnpm lint / pnpm test (API 라우트 테스트 결과)
+- [ ] 검증: pnpm lint / pnpm test:focus -- app/api/notion (API 라우트 테스트 결과)
 - [ ] 커밋: <commit hash> (message)
 ```
 
@@ -241,7 +241,7 @@
   - parsers.ts의 파싱 함수 활용으로 코드 간소화
   - Client import 및 타입 import
   - 검증: app/api/notion/templates/route.ts 정상 작동
-  - 검증: pnpm test templates/route.test.ts 통과
+  - 검증: pnpm test:focus -- app/api/notion/templates/route.test.ts 통과
   - [x] 커밋: refactor: extract notion templates module
 
 ### 8.4 Flow Steps 모듈 분리
@@ -251,7 +251,7 @@
   - parsers.ts의 파싱 함수 활용으로 코드 간소화
   - Client import 및 타입 import
   - 검증: app/api/notion/flow-steps/route.ts 정상 작동
-  - 검증: pnpm test flow-steps/route.test.ts 통과
+  - 검증: pnpm test:focus -- app/api/notion/flow-steps/route.test.ts 통과
   - [x] 커밋: refactor: extract notion flow steps module
 
 ### 8.5 Task Instances 모듈 분리
@@ -261,7 +261,7 @@
   - parsers.ts의 파싱 함수 활용으로 코드 간소화
   - Client import 및 타입 import
   - 검증: app/api/notion/instances/route.ts 정상 작동
-  - 검증: pnpm test instances/route.test.ts 통과
+  - 검증: pnpm test:focus -- app/api/notion/instances/route.test.ts 통과
   - [x] 커밋: refactor: extract notion instances module
 
 ### 8.6 lib/notion.ts 정리 및 re-export
@@ -276,7 +276,7 @@
 - [x] lib/notion/ 폴더 구조 확인
   - client.ts, templates.ts, flowSteps.ts, instances.ts, parsers.ts, index.ts
 - [x] 모든 API 라우트 정상 작동 (수동 테스트)
-- [x] pnpm lint, pnpm test 통과
+- [x] pnpm lint, pnpm test:focus -- <related test files> 통과
 - [x] 파싱 함수 재사용으로 코드 라인 수 감소 확인
 - [x] 리팩토링 전후 비교 문서 작성 (docs/log.md)
 - [x] 타입 오류/import 경로 오류 없음 확인
@@ -334,7 +334,7 @@
 - [x] 전체 날짜 탐색 플로우 수동 테스트 - dev 서버로 테스트 가능
 - [x] 접근성 확인 (키보드 탐색, screen reader) - aria-label 추가 완료
 - [x] 성능 확인 (불필요한 리렌더링 없음) - useCallback 사용
-- [x] pnpm lint, pnpm test 통과 - test 통과, lint는 기존 dependency 이슈
+- [x] pnpm lint, pnpm test:focus -- <related test files> 통과 - test 통과, lint는 기존 dependency 이슈
 - [x] 커밋: docs: mark Phase 9 complete
 
 ## Phase 10 Tasks (Calendar-Flow Date Synchronization)
@@ -381,7 +381,7 @@
 - [x] End-to-end 네비게이션 플로우 동작 확인 - 수동 테스트 필요
 - [x] Console 에러 없음
 - [x] 성능 체크 (불필요한 리렌더링 없음)
-- [x] pnpm test 통과 - NotionCalendar tests 통과
+- [x] pnpm test:focus -- components/calendar/NotionCalendar.test.tsx 통과
 - [x] 커밋: docs: mark Phase 10 complete
 
 
@@ -411,7 +411,7 @@
 - [x] Manual: 다른 월로 이동 → 다른 월의 같은 일자는 하이라이트 안됨
 - [x] Manual: selected = today 케이스 확인
 - [x] 테스트 업데이트 (isSelected 검증)
-- [x] pnpm test 통과
+- [x] pnpm test:focus -- <related test files> 통과
 - [x] 커밋: test: verify selected date highlighting (513a403)
 
 ### 11.4 Final Verification

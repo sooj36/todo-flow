@@ -153,16 +153,19 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
 
   return (
     <div className="flex flex-col h-full">
-      <div className="px-8 py-6 flex items-center justify-between">
+      <div
+        data-testid="calendar-header"
+        className="calendar-header px-6 py-5 flex flex-wrap items-center justify-between gap-4"
+      >
         <div>
-          <h1 className="text-3xl font-bold text-[#37352f] flex items-center gap-3">
-            📅 {monthLabel}
+          <h1 className="text-3xl font-semibold text-primary flex items-center gap-3">
+            🗓️ {monthLabel}
           </h1>
-          <p className="text-sm text-[#37352f]/60 mt-1">
-            Split View: Life in Two Acts
+          <p className="text-sm text-secondary mt-1 calendar-subtext">
+            수진 캘린더
           </p>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="calendar-toolbar flex flex-wrap items-center justify-end gap-4 min-w-0">
           {/* Aria-live region for screen readers */}
           <div
             role="status"
@@ -176,13 +179,13 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
           </div>
 
           {loading && (
-            <div className="flex items-center gap-2 text-sm font-medium text-[#37352f]/60">
-              <Loader2 size={16} className="animate-spin" />
+            <div className="flex items-center gap-2 text-sm font-medium text-secondary flex-shrink-0">
+              <Loader2 size={16} className="animate-spin text-[#6c5ce7]" />
               Loading...
             </div>
           )}
           {error && (
-            <div className="flex items-center gap-2 text-sm font-medium text-red-500">
+            <div className="flex items-center gap-2 text-sm font-semibold text-red-500 bg-[#ffecec] px-3 py-2 rounded-full shadow-sm flex-shrink-0">
               <AlertCircle size={16} />
               <span>Connection error — Check .env.local</span>
             </div>
@@ -190,23 +193,25 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
           {!loading && !error && (
             <div
               className={`flex items-center gap-2 text-xs font-semibold tracking-wide ${isConnected
-                ? "rounded-full bg-green-100 px-3 py-1 text-green-700"
-                : "text-[#37352f]/60"
-                }`}
+                ? "rounded-full bg-[#e7f8f1] px-3 py-1.5 text-[#0d8f5b] shadow-sm"
+                : "text-secondary"
+                } flex-shrink-0`}
             >
               <Link2 size={16} />
-              {isConnected ? "notion connect success" : "Notion not connected"}
+              <span className="calendar-connection-text">
+                {isConnected ? "Notion connected" : "Notion not connected"}
+              </span>
             </div>
           )}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={handleSync}
               disabled={!isConnected || isSyncing}
-              className={`p-2 border border-[#ececeb] rounded-md transition-all ${syncSuccess
-                ? "bg-green-100 text-green-600"
+              className={`p-2.5 border border-[#e6e2f3] rounded-full transition-all ${syncSuccess
+                ? "bg-[#e7f8f1] text-[#0d8f5b]"
                 : syncError
-                  ? "bg-red-100 text-red-600"
-                  : "bg-white text-[#37352f]/60 hover:text-[#37352f]"
+                  ? "bg-[#ffecec] text-red-600"
+                  : "bg-white/80 text-secondary hover:text-primary shadow-sm"
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
               aria-label={syncError && syncErrorMessage ? `Sync failed: ${syncErrorMessage}` : "Sync with Notion"}
             >
@@ -218,17 +223,17 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
               </span>
             )}
           </div>
-          <div className="flex items-center bg-[#efefed] rounded-md p-1">
+          <div className="flex items-center bg-[#f6f4ff] border border-[#e6e2f3] rounded-full p-1 shadow-sm">
             <button
               onClick={handlePreviousDay}
-              className="p-1 hover:bg-white hover:shadow-sm rounded transition-all"
+              className="p-1.5 hover:bg-white hover:shadow-sm rounded-full transition-all"
               aria-label="Previous day"
             >
               <ChevronLeft size={16} />
             </button>
             <button
               onClick={handleToday}
-              className="px-3 text-xs font-bold uppercase tracking-tight hover:bg-white rounded transition-all"
+              className="px-4 text-xs font-bold uppercase tracking-tight hover:bg-white rounded-full transition-all text-primary"
               aria-label="Go to today"
             >
               {selectedDate.toDateString() === now.toDateString()
@@ -237,7 +242,7 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
             </button>
             <button
               onClick={handleNextDay}
-              className="p-1 hover:bg-white hover:shadow-sm rounded transition-all"
+              className="p-1.5 hover:bg-white hover:shadow-sm rounded-full transition-all"
               aria-label="Next day"
             >
               <ChevronRight size={16} />
@@ -246,13 +251,13 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto custom-scrollbar px-8 pb-10 space-y-8">
+      <div className="flex-1 overflow-y-auto custom-scrollbar px-6 pb-8 space-y-8">
         <section>
-          <div className="flex items-center justify-between mb-4 border-b border-[#ececeb] pb-2">
-            <h2 className="text-sm font-bold uppercase tracking-widest text-[#37352f]/40">
+          <div className="flex items-center justify-between mb-4 border-b border-[#e6e2f3] pb-2">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.25em] text-secondary/60">
               Phase 01: 01 — 15
             </h2>
-            <button className="text-[#37352f]/40 hover:text-[#37352f] transition-colors">
+            <button className="text-secondary/60 hover:text-primary transition-colors">
               <MoreHorizontal size={18} />
             </button>
           </div>
@@ -282,15 +287,15 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
         </section>
 
         <div className="flex items-center justify-center">
-          <div className="h-1 w-full rounded-full bg-red-500/80"></div>
+          <div className="h-1 w-full rounded-full bg-gradient-to-r from-[#dcd6ff] via-[#c7f0ff] to-[#dcd6ff] shadow-inner"></div>
         </div>
 
         <section>
-          <div className="flex items-center justify-between mb-4 border-b border-[#ececeb] pb-2">
-            <h2 className="text-sm font-bold uppercase tracking-widest text-[#37352f]/40">
+          <div className="flex items-center justify-between mb-4 border-b border-[#e6e2f3] pb-2">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.25em] text-secondary/60">
               Phase 02: 16 — 31
             </h2>
-            <button className="text-[#37352f]/40 hover:text-[#37352f] transition-colors">
+            <button className="text-secondary/60 hover:text-primary transition-colors">
               <MoreHorizontal size={18} />
             </button>
           </div>
@@ -350,30 +355,30 @@ const CalendarDay: React.FC<CalendarDayProps> = ({ day, data, loading, isToday, 
     : 0;
 
   const bgColor = completionRate >= 0.8
-    ? "bg-green-50 border-green-200"
+    ? "bg-[#e7f8f1] border-[#b6efd6]"
     : completionRate >= 0.5
-      ? "bg-yellow-50 border-yellow-200"
+      ? "bg-[#fff6e9] border-[#ffdfb9]"
       : completionRate > 0
-        ? "bg-blue-50 border-blue-200"
-        : "bg-[#fbfbfa]";
+        ? "bg-[#f0edff] border-[#dcd6ff]"
+        : "bg-white/80";
 
   // Priority: isSelected > isToday
   const borderClass = isSelected
-    ? "border-2 border-black"  // Selected: prominent
-    : (isToday ? "border-2 border-green-500" : "border border-[#ececeb]");  // Today: subtle
+    ? "border-2 border-[#6c5ce7] shadow-[0_12px_30px_rgba(108,92,231,0.15)]"  // Selected: prominent
+    : (isToday ? "border-2 border-[#0d8f5b]" : "border border-[#e6e2f3]");  // Today: subtle
 
-  const selectedBg = isSelected ? "bg-blue-50" : bgColor;
+  const selectedBg = isSelected ? "bg-[#ede9ff]" : bgColor;
 
   if (loading) {
     return (
       <div
         data-testid={`calendar-day-${day}`}
-        className={`group min-h-[100px] rounded-lg p-2 bg-[#fbfbfa] animate-pulse ${borderClass}`}
+        className={`group min-h-[100px] rounded-2xl p-3 bg-white/70 animate-pulse ${borderClass}`}
       >
         <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-bold text-[#37352f]/40">{day}</span>
+          <span className="text-xs font-bold text-secondary/70">{day}</span>
         </div>
-        <div className="h-2 bg-gray-200 rounded w-full"></div>
+        <div className="h-2 bg-[#e6e2f3] rounded w-full"></div>
       </div>
     );
   }
@@ -382,39 +387,39 @@ const CalendarDay: React.FC<CalendarDayProps> = ({ day, data, loading, isToday, 
     <div
       data-testid={`calendar-day-${day}`}
       onClick={() => onClick?.(day)}
-      className={`group relative min-h-[100px] rounded-lg p-2 transition-all hover:shadow-md cursor-pointer ${selectedBg} ${borderClass} hover:bg-white`}
+      className={`group relative min-h-[100px] rounded-2xl p-3 transition-all hover:shadow-lg cursor-pointer ${selectedBg} ${borderClass} hover:bg-white`}
     >
       {/* Today dot: only show if today but NOT selected */}
       {isToday && !isSelected && (
-        <div className="absolute top-1 right-1 w-2 h-2 bg-green-500 rounded-full" />
+        <div className="absolute top-1 right-1 w-2 h-2 bg-[#0d8f5b] rounded-full" />
       )}
       <div className="flex items-center justify-between mb-2">
-        <span className="text-xs font-bold text-[#37352f]/40">{day}</span>
+        <span className="text-xs font-bold text-secondary/70">{day}</span>
         <button
           onClick={(e) => {
             e.stopPropagation();
             onAddClick?.(day);
           }}
-          className="opacity-0 group-hover:opacity-100 p-0.5 hover:bg-[#efefed] rounded transition-all"
+          className="opacity-0 group-hover:opacity-100 p-1 hover:bg-white rounded-full transition-all shadow-sm"
           aria-label={`Add task for day ${day}`}
         >
-          <Plus size={14} className="text-[#37352f]/40" />
+          <Plus size={14} className="text-secondary/60" />
         </button>
       </div>
 
       {data && data.totalTasks > 0 && (
         <div className="space-y-2">
-          <div className="flex items-center justify-between text-[10px] text-[#37352f]/60">
+          <div className="flex items-center justify-between text-[10px] text-secondary">
             <span>{data.completedTasks}/{data.totalTasks} steps</span>
             <span>{Math.round(completionRate * 100)}%</span>
           </div>
-          <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+          <div className="w-full h-1.5 bg-[#e6e2f3] rounded-full overflow-hidden">
             <div
               className={`h-full transition-all ${completionRate >= 0.8
-                ? "bg-green-500"
+                ? "bg-gradient-to-r from-[#0d8f5b] to-[#1dd187]"
                 : completionRate >= 0.5
-                  ? "bg-yellow-500"
-                  : "bg-blue-500"
+                  ? "bg-gradient-to-r from-[#f8c266] to-[#ff9e2c]"
+                  : "bg-gradient-to-r from-[#6c5ce7] to-[#9aa8ff]"
                 }`}
               style={{ width: `${completionRate * 100}%` }}
             ></div>

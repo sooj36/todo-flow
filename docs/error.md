@@ -11,8 +11,8 @@ FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaS
 ```
 
 **발생 조건**:
-- `pnpm test:run` 전체 테스트 실행 시
-- 개별 테스트 파일/폴더 실행 시에는 발생하지 않음
+- `pnpm test:focus -- <files>`로 많은 테스트를 한 번에 지정해 실행할 때
+- 개별 테스트 파일/폴더 단위 실행 시에는 발생하지 않음 (`pnpm test:focus -- <files>`)
 
 **원인 분석**:
 1. **jsdom + forks 조합**: 21개 테스트 파일 × jsdom 환경 = 메모리 누적
@@ -60,7 +60,7 @@ test: {
 
 #### Option C: Node.js 메모리 한도 증가 (임시방편)
 ```bash
-NODE_OPTIONS="--max-old-space-size=8192" pnpm test:run
+NODE_OPTIONS="--max-old-space-size=8192" pnpm test:focus -- <files>
 ```
 
 #### Option D: threads 모드 사용 (오버헤드 완화, 힙 공유 아님)
@@ -79,5 +79,5 @@ test: {
 **권장**: Option B (maxForks: 2) - 적절한 병렬성 유지하면서 메모리 제한
 
 **참고**:
-- 개별 폴더 테스트는 정상: `pnpm test:run lib/agent/`
+- 개별 폴더 테스트는 정상: `pnpm test:focus -- lib/agent/`
 - 전체 테스트는 로직 통과하더라도 워커가 OOM으로 종료될 수 있음

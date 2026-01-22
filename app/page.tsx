@@ -91,75 +91,83 @@ export default function Home() {
   );
 
   return (
-    <div className="flex h-screen w-full bg-[#f4f5f7] overflow-hidden selection:bg-blue-100">
-      <Sidebar
-        collapsed={isSidebarCollapsed}
-        onToggle={() => setIsSidebarCollapsed((prev) => !prev)}
-      />
+    <div className="relative min-h-screen w-full overflow-hidden text-primary selection:bg-[#d6d1ff]">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -left-10 top-10 h-64 w-64 rounded-full bg-[#dcd6ff] blur-3xl opacity-60" />
+        <div className="absolute right-0 bottom-0 h-72 w-72 rounded-full bg-[#c7f0ff] blur-3xl opacity-50" />
+      </div>
 
-      <main
-        ref={mainRef}
-        className={`relative flex-1 flex overflow-hidden ${isDragging ? "select-none" : ""}`}
-      >
-        <div
-          className="h-full border-r border-[#ececeb] flex flex-col bg-white z-10 shadow-[4px_0_24px_rgba(0,0,0,0.02)] min-w-0 flex-none"
-          style={{ width: `${splitRatio * 100}%` }}
+      <div className="relative flex h-screen w-full max-w-[1600px] mx-auto px-6 py-5 gap-5">
+        <Sidebar
+          collapsed={isSidebarCollapsed}
+          onToggle={() => setIsSidebarCollapsed((prev) => !prev)}
+        />
+
+        <main
+          ref={mainRef}
+          className={`relative flex-1 flex overflow-hidden rounded-[30px] border border-[#e6e2f3] bg-white/70 backdrop-blur shadow-[var(--shadow-soft)] ${isDragging ? "select-none" : ""}`}
         >
-          <NotionCalendar
-            selectedDate={selectedDate}
-            onDateChange={setSelectedDate}
-            onTaskCreated={() => setFlowBoardRefreshTrigger(prev => prev + 1)}
-            instanceStatusOverrides={instanceStatusOverrides}
-            templateProgress={templateProgress}
-            dayStepProgressOverrides={dayStepProgressOverrides}
-          />
-        </div>
-
-        <div
-          className="h-full flex flex-col bg-[#f9fafb] min-w-0 flex-none overflow-hidden"
-          style={{ width: `${(1 - splitRatio) * 100}%` }}
-        >
-          {/* Agent Section */}
-          <div className="flex-shrink-0 bg-white border-b border-[#ececeb] p-4 space-y-4">
-            <SearchBar onSearch={executeQuery} />
-            <ProgressIndicator phase={phase} error={error ?? undefined} onRetry={retry} />
-            {phase === "done" && data && <QualificationPanel data={data} />}
-          </div>
-
-          {/* FlowBoard Section */}
-          <div className="flex-1 overflow-auto">
-            <FlowBoard
+          <div
+            data-testid="calendar-panel"
+            className="h-full border-r border-[#e6e2f3] flex flex-col bg-white/90 backdrop-blur-sm z-10 shadow-[var(--shadow-card)]/70 min-w-[320px] flex-none px-5"
+            style={{ width: `${splitRatio * 100}%` }}
+          >
+            <NotionCalendar
               selectedDate={selectedDate}
-              refreshTrigger={flowBoardRefreshTrigger}
+              onDateChange={setSelectedDate}
+              onTaskCreated={() => setFlowBoardRefreshTrigger((prev) => prev + 1)}
               instanceStatusOverrides={instanceStatusOverrides}
-              onInstanceStatusChange={handleInstanceStatusChange}
-              onTemplateProgressChange={handleTemplateProgressChange}
-              onDayStepProgressChange={handleDayStepProgressChange}
+              templateProgress={templateProgress}
+              dayStepProgressOverrides={dayStepProgressOverrides}
             />
           </div>
-        </div>
 
-        <div
-          role="separator"
-          aria-orientation="vertical"
-          aria-valuemin={30}
-          aria-valuemax={70}
-          aria-valuenow={Math.round(splitRatio * 100)}
-          title="Drag to resize"
-          onPointerDown={() => setIsDragging(true)}
-          className={`absolute top-0 bottom-0 w-3 cursor-col-resize z-20 group ${isDragging ? "cursor-col-resize" : ""
-            }`}
-          style={{ left: `calc(${splitRatio * 100}% - 6px)` }}
-        >
-          <div className="h-full w-px bg-[#ececeb] mx-auto transition-colors group-hover:bg-[#cfd2d7] group-hover:w-0.5" />
-          <div className="absolute inset-y-0 left-1/2 w-2 -translate-x-1/2 rounded-full bg-[#cfd2d7]/0 group-hover:bg-[#cfd2d7]/30 transition-colors" />
-        </div>
-      </main>
+          <div
+            data-testid="flow-panel"
+            className="h-full flex flex-col bg-[#f8f6ff] min-w-[320px] flex-none overflow-hidden"
+            style={{ width: `${(1 - splitRatio) * 100}%` }}
+          >
+            {/* Agent Section */}
+            <div className="flex-shrink-0 bg-white/80 backdrop-blur p-5 space-y-4 border-b border-transparent shadow-[var(--shadow-card)]">
+              <SearchBar onSearch={executeQuery} />
+              <ProgressIndicator phase={phase} error={error ?? undefined} onRetry={retry} />
+              {phase === "done" && data && <QualificationPanel data={data} />}
+            </div>
 
-      <div className="fixed bottom-6 right-6 flex flex-col gap-3 z-50">
-        <button className="w-12 h-12 bg-white border border-[#ececeb] text-[#37352f] rounded-full flex items-center justify-center shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-95 group">
-          <Bell size={20} className="group-hover:rotate-12 transition-transform" />
-        </button>
+            {/* FlowBoard Section */}
+            <div className="flex-1 overflow-auto">
+              <FlowBoard
+                selectedDate={selectedDate}
+                refreshTrigger={flowBoardRefreshTrigger}
+                instanceStatusOverrides={instanceStatusOverrides}
+                onInstanceStatusChange={handleInstanceStatusChange}
+                onTemplateProgressChange={handleTemplateProgressChange}
+                onDayStepProgressChange={handleDayStepProgressChange}
+              />
+            </div>
+          </div>
+
+          <div
+            role="separator"
+            aria-orientation="vertical"
+            aria-valuemin={30}
+            aria-valuemax={70}
+            aria-valuenow={Math.round(splitRatio * 100)}
+            title="Drag to resize"
+            onPointerDown={() => setIsDragging(true)}
+            className={`absolute top-4 bottom-4 w-4 cursor-col-resize z-20 group ${isDragging ? "cursor-col-resize" : ""}`}
+            style={{ left: `calc(${splitRatio * 100}% - 6px)` }}
+          >
+            <div className="h-full w-px bg-[#d7d2ef] mx-auto transition-all group-hover:bg-[#b7addf] group-hover:w-0.5" />
+            <div className="absolute inset-y-0 left-1/2 w-3 -translate-x-1/2 rounded-full bg-[#b7addf]/0 group-hover:bg-[#b7addf]/30 transition-colors" />
+          </div>
+
+          <div className="fixed bottom-6 right-6 flex flex-col gap-3 z-50">
+            <button className="w-12 h-12 bg-white/90 border border-[#dcd6ff] text-primary rounded-full flex items-center justify-center shadow-[var(--shadow-card)] hover:shadow-[0_15px_35px_rgba(108,92,231,0.35)] hover:-translate-y-1 transition-all active:scale-95 group">
+              <Bell size={20} className="group-hover:rotate-12 transition-transform text-[#6c5ce7]" />
+            </button>
+          </div>
+        </main>
       </div>
     </div>
   );

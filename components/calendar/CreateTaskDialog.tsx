@@ -100,6 +100,7 @@ export const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
   } | null>(null);
 
   const firstInputRef = useRef<HTMLInputElement>(null);
+  const focusTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Reset form when dialog opens
   useEffect(() => {
@@ -124,9 +125,24 @@ export const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
   // Focus first input when dialog opens
   useEffect(() => {
     if (isOpen && firstInputRef.current) {
-      setTimeout(() => firstInputRef.current?.focus(), 100);
+      if (focusTimeoutRef.current) {
+        clearTimeout(focusTimeoutRef.current);
+      }
+      focusTimeoutRef.current = setTimeout(() => {
+        if (!document.activeElement || document.activeElement === document.body) {
+          firstInputRef.current?.focus();
+        }
+      }, 100);
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    return () => {
+      if (focusTimeoutRef.current) {
+        clearTimeout(focusTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Escape key handler
   useEffect(() => {

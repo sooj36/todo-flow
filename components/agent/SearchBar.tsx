@@ -21,7 +21,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
   return (
     <div className="relative w-full max-w-2xl">
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6c5ce7]" />
         <input
           type="text"
           value={query}
@@ -29,7 +29,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
           onKeyDown={handleKeyDown}
           placeholder="검색어를 입력하세요"
           aria-label="키워드 검색"
-          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full pl-12 pr-4 py-3.5 rounded-full border border-[#e6e2f3] bg-white/80 shadow-[0_12px_35px_rgba(20,17,36,0.06)] focus:outline-none focus:ring-2 focus:ring-[#cfd6ff] focus:border-transparent text-primary placeholder:text-secondary"
         />
       </div>
     </div>

@@ -44,13 +44,26 @@ describe("NotionCalendar", () => {
 
     const headers = screen.queryAllByText(new RegExp(monthLabel));
     expect(headers.length).toBeGreaterThan(0);
-    expect(screen.getByText("notion connect success")).toBeInTheDocument();
+    expect(screen.getByText("Notion connected")).toBeInTheDocument();
     expect(screen.getByText("Phase 01: 01 — 15")).toBeInTheDocument();
     expect(screen.getByText("Phase 02: 16 — 31")).toBeInTheDocument();
     expect(screen.getByText("1")).toBeInTheDocument();
     expect(screen.getByText("31")).toBeInTheDocument();
-    // Today highlight should always be visible for day 15
-    expect(screen.getByTestId(`calendar-day-${todayDate}`)).toHaveClass("border-black");
+    // Selected day (today) should have selected styling
+    expect(screen.getByTestId(`calendar-day-${todayDate}`)).toHaveClass("border-[#6c5ce7]");
+  });
+
+  it("marks header elements for compact layout handling", () => {
+    render(<NotionCalendar {...defaultProps} />);
+
+    const header = screen.getByTestId("calendar-header");
+    expect(header).toHaveClass("flex-wrap");
+
+    const subtext = screen.getByText("Bi-weekly cadence with synced Notion tasks");
+    expect(subtext).toHaveClass("calendar-subtext");
+
+    const connection = screen.getByText("Notion connected");
+    expect(connection).toHaveClass("calendar-connection-text");
   });
 
   it("calls onDateChange when previous day arrow is clicked", () => {
@@ -119,15 +132,15 @@ describe("NotionCalendar", () => {
 
     // Day 8 (Selected) should have bold border
     expect(day8).toHaveClass("border-2");
-    expect(day8).toHaveClass("border-black");
-    expect(day8).toHaveClass("bg-blue-50");
+    expect(day8).toHaveClass("border-[#6c5ce7]");
+    expect(day8).toHaveClass("bg-[#ede9ff]");
 
     // Day 15 (Today) should have subtle green border and a green dot
     expect(day15).toHaveClass("border-2");
-    expect(day15).toHaveClass("border-green-500");
+    expect(day15).toHaveClass("border-[#0d8f5b]");
 
     // Check for the green dot indicator inside day 15
-    const dot = day15.querySelector(".bg-green-500.rounded-full");
+    const dot = day15.querySelector('[class*="bg-[#0d8f5b]"]');
     expect(dot).toBeInTheDocument();
   });
 

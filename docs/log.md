@@ -2,6 +2,31 @@
 
 ## Phase 14 작업 기록 (Calendar + Button → Create Template/Steps/Instance)
 
+### Phase 14.12: Split View/Responsive Layout Fix (2026-01-21)
+- NotionCalendar 헤더에 flex-wrap + container query 적용, 좁은 폭에서 서브텍스트/연결 텍스트 숨김 처리
+- 툴바 영역 간격 축소 및 flex-shrink 조정으로 버튼 겹침 완화
+- page.tsx: 좌/우 패널 최소 너비 설정으로 분할 시 지나친 압축 방지
+- 테스트: NotionCalendar.test.tsx (8개) 통과, pnpm lint 통과
+- 테스트: pnpm test:focus -- components/calendar/CreateTaskDialog.test.tsx 실패 (waitFor 타임아웃 및 vitest worker 종료)
+
+### Phase 14.12 후속: CreateTaskDialog 안정화 + Split Panel 테스트 (2026-01-21)
+- CreateTaskDialog: 첫 입력 자동 포커스가 다른 입력 포커스를 훔치지 않도록 타이머 정리/조건부 포커스 적용
+- page.tsx: split panel data-testid 추가
+- app/__tests__/page.split.test.tsx: split panel min-width 테스트 추가
+- scripts/vitest-focus.mjs + package.json: 선택 실행이 실제로 동작하도록 test:focus 스크립트 추가
+- vitest.config.ts: OOM 방지를 위해 maxWorkers=1, fileParallelism=false, pool=forks 설정
+- 테스트: pnpm lint 통과
+- 테스트: pnpm test:focus -- <multiple files> 실패 (vitest OOM: Worker exited unexpectedly)
+- 테스트: NODE_OPTIONS=--max-old-space-size=4096 pnpm test:focus -- <multiple files> 실패 (OOM)
+- 테스트: pnpm test:focus -- <multiple files> -- --no-threads 실패 (OOM)
+- 테스트: pnpm test:focus -- components/calendar/NotionCalendar.test.tsx components/calendar/CreateTaskDialog.test.tsx app/__tests__/page.split.test.tsx 실패 (OOM, 전체 테스트가 실행됨)
+- 테스트: pnpm test:focus -- components/calendar/NotionCalendar.test.tsx 통과
+- 테스트: pnpm test:focus -- components/calendar/NotionCalendar.test.tsx components/calendar/CreateTaskDialog.test.tsx app/__tests__/page.split.test.tsx 통과
+- 테스트: pnpm test:focus -- <multiple files> 실패 (ERR_WORKER_OUT_OF_MEMORY, threads pool)
+- 테스트: pnpm test:focus -- <multiple files> 실패 (OOM, forks pool)
+- package.json: test 스크립트에 NODE_OPTIONS=--max-old-space-size=8192 추가
+- 테스트: pnpm test:focus -- <multiple files> 실패 (OOM, max-old-space-size=8192)
+
 ### Phase 14.2: API 설계/구현 (2026-01-18)
 
 #### API Endpoint: `POST /api/notion/create-task`
@@ -93,12 +118,12 @@
 - lib/schema/templates.test.ts: 42개 테스트 통과
 - lib/utils/dateTransform.test.ts: 25개 테스트 통과
 - pnpm lint: 통과
-- pnpm test:run: 202개 테스트 통과
+- pnpm test:focus -- <all test files>: 202개 테스트 통과
 
 ### Phase 14.6: 캘린더 인스턴스 날짜 정규화 (2026-01-18)
 - lib/notion/parsers.ts: extractDate/Nullable가 Notion ISO 날짜(start)를 YYYY-MM-DD로 정규화(notionDateToLocal)해 캘린더 키와 일치시킴 → 일정 미표시 방지
 - lib/notion/parsers.test.ts: ISO 입력 정규화 테스트 추가 및 통과
-- 테스트: pnpm test lib/notion/parsers.test.ts (pass)
+- 테스트: pnpm test:focus -- lib/notion/parsers.test.ts (pass)
 
 ## Phase 13 작업 기록 (AI Agent MVP: Keyword Clustering)
 

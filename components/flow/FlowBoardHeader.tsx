@@ -30,37 +30,38 @@ export const FlowBoardHeader: React.FC<FlowBoardHeaderProps> = ({
   handleSync,
 }) => {
   return (
-    <div className="p-4 flex items-center justify-between bg-white/80 backdrop-blur-sm border-b border-[#ececeb] z-20">
+    <div className="p-5 flex items-center justify-between bg-transparent border-b border-[#e6e2f3] z-20">
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 bg-orange-100 text-orange-600 rounded flex items-center justify-center">
-          <Zap size={18} fill="currentColor" />
+        <div className="w-10 h-10 bg-gradient-to-br from-[#ffb347] to-[#ff867a] text-white rounded-2xl flex items-center justify-center shadow-md">
+          <Zap size={18} fill="currentColor" className="drop-shadow-sm" />
         </div>
         <div>
-          <h2 className="text-sm font-bold text-[#37352f]">
+          <h2 className="text-base font-semibold text-primary">
             Daily Automation Flow
           </h2>
           <div className="flex items-center gap-2">
             {loading && (
-              <span className="flex items-center gap-1 text-[10px] text-gray-400 font-bold uppercase tracking-wider">
-                <Loader2 size={12} className="animate-spin" />
+              <span className="flex items-center gap-1 text-[11px] text-secondary font-semibold tracking-wide">
+                <Loader2 size={14} className="animate-spin" />
                 Loading...
               </span>
             )}
             {error && (
-              <span className="flex items-center gap-1 text-[10px] text-red-500 font-bold uppercase tracking-wider">
-                <AlertCircle size={12} />
+              <span className="flex items-center gap-1 text-[11px] text-red-500 font-semibold tracking-wide">
+                <AlertCircle size={14} />
                 Connection error
               </span>
             )}
             {!loading && !error && (
               <span
-                className={`flex items-center gap-1 text-[10px] font-bold tracking-wide ${isConnected
-                  ? "rounded-full bg-green-100 px-2 py-0.5 text-green-700"
-                  : "text-gray-400"
-                  }`}
+                className={`flex items-center gap-1 text-[11px] font-semibold tracking-wide ${
+                  isConnected
+                    ? "rounded-full bg-[#e7f8f1] px-2.5 py-1 text-[#0d8f5b] shadow-sm"
+                    : "text-secondary"
+                }`}
               >
-                <span className={`w-1.5 h-1.5 ${isConnected ? 'bg-green-500' : 'bg-gray-300'} rounded-full`}></span>
-                {isConnected ? 'notion connect success' : 'Notion not connected'}
+                <span className={`w-1.5 h-1.5 ${isConnected ? 'bg-[#10b981]' : 'bg-gray-300'} rounded-full`}></span>
+                {isConnected ? 'Notion connected' : 'Notion not connected'}
               </span>
             )}
           </div>
@@ -84,11 +85,11 @@ export const FlowBoardHeader: React.FC<FlowBoardHeaderProps> = ({
           <button
             onClick={handleSync}
             disabled={!isConnected || isSyncing}
-            className={`p-2 border border-[#ececeb] rounded-md transition-all ${syncSuccess
-              ? "bg-green-100 text-green-600"
+            className={`p-2.5 border border-[#e6e2f3] rounded-full transition-all ${syncSuccess
+              ? "bg-[#e7f8f1] text-[#0d8f5b]"
               : syncError
-                ? "bg-red-100 text-red-600"
-                : "bg-white text-[#37352f]/60 hover:text-[#37352f]"
+                ? "bg-[#ffecec] text-red-600"
+                : "bg-white/80 text-secondary hover:text-primary shadow-sm"
               } disabled:opacity-50 disabled:cursor-not-allowed`}
             aria-label={syncError && syncErrorMessage ? `Sync failed: ${syncErrorMessage}` : "Sync with Notion"}
           >
@@ -100,7 +101,7 @@ export const FlowBoardHeader: React.FC<FlowBoardHeaderProps> = ({
             </span>
           )}
         </div>
-        <button className="p-2 bg-white border border-[#ececeb] rounded-md text-[#37352f]/60 hover:text-[#37352f] transition-all">
+        <button className="p-2.5 bg-white/80 border border-[#e6e2f3] rounded-full text-secondary hover:text-primary transition-all shadow-sm">
           <Plus size={16} />
         </button>
       </div>

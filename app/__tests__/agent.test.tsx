@@ -170,7 +170,7 @@ describe('Agent UI Integration', () => {
 
     // Verify loading state
     await waitFor(() => {
-      expect(screen.getByText('Project DB 조회 중...')).toBeInTheDocument();
+      expect(screen.getByText('Notion에서 완료 페이지 조회 중...')).toBeInTheDocument();
     });
 
     // Resolve the promise

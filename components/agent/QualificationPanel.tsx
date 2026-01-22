@@ -14,24 +14,24 @@ export const QualificationPanel: React.FC<QualificationPanelProps> = ({ data }) 
         : "요약 필드 기반 요약";
 
   return (
-    <div className="flex flex-col gap-4 p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
-      <div className="text-sm text-gray-500">
+    <div className="flex flex-col gap-4 p-6 bg-white/90 border border-[#e6e2f3] rounded-2xl shadow-[var(--shadow-card)]">
+      <div className="text-sm text-secondary">
         프로젝트 DB · {sourceLabel}
       </div>
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900">{data.title}</h3>
-        <span className="text-xs text-gray-500">
+        <h3 className="text-lg font-semibold text-primary">{data.title}</h3>
+        <span className="text-xs text-secondary">
           {data.summary.model} · {data.summary.tokenLimit} tokens 이내
         </span>
       </div>
-      <ul className="list-disc pl-5 space-y-2 text-gray-800">
+      <ul className="list-disc pl-5 space-y-2 text-primary/90">
         {data.summary.bullets.map((bullet, idx) => (
           <li key={idx} className="leading-6">
             {bullet}
           </li>
         ))}
       </ul>
-      <div className="text-xs text-gray-500">
+      <div className="text-xs text-secondary">
         원문 길이: {data.source.rawLength ?? "알 수 없음"} chars
       </div>
     </div>

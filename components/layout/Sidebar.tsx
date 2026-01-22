@@ -23,17 +23,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   return (
     <aside
-      className={`bg-[#fbfbfa] border-r border-[#ececeb] flex flex-col shrink-0 z-30 transition-[width] duration-200 ${
-        collapsed ? "w-16" : "w-64"
+      className={`bg-white/80 backdrop-blur flex flex-col shrink-0 z-30 transition-[width] duration-200 border border-[#e6e2f3] shadow-[var(--shadow-card)] rounded-[24px] ${
+        collapsed ? "w-[72px]" : "w-64"
       }`}
     >
       <div className="relative p-4">
         <div className={`flex items-center ${collapsed ? "justify-center" : "gap-3"}`}>
-          <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center text-white font-bold shadow-lg">
-            B
+          <div className="w-10 h-10 bg-gradient-to-br from-[#6c5ce7] to-[#9aa8ff] rounded-xl flex items-center justify-center text-white font-black shadow-lg">
+            F
           </div>
           {!collapsed && (
-            <span className="font-bold text-[#37352f] tracking-tight">
+            <span className="font-bold text-lg text-primary tracking-tight">
               Flow Planner
             </span>
           )}
@@ -42,7 +42,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           type="button"
           onClick={onToggle}
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          className={`absolute top-4 ${collapsed ? "right-2" : "right-4"} p-1 rounded-md text-[#37352f]/50 hover:text-[#37352f] hover:bg-[#efefed] transition-all`}
+          className={`absolute top-4 ${collapsed ? "right-2" : "right-4"} p-1.5 rounded-full text-secondary/60 hover:text-primary hover:bg-[#f0edff] transition-all`}
         >
           {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
         </button>
@@ -54,7 +54,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {!collapsed && (
           <div className="pt-6 pb-2 px-3">
-            <span className="text-[10px] font-bold text-[#37352f]/30 uppercase tracking-[0.2em]">
+            <span className="text-[10px] font-bold text-secondary/50 uppercase tracking-[0.28em]">
               Dashboard
             </span>
           </div>
@@ -65,19 +65,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <NavItem icon={<Workflow size={16} />} label="Integrations" collapsed={collapsed} />
       </nav>
 
-      <div className="p-4 border-t border-[#ececeb]">
+      <div className="p-4 border-t border-[#e6e2f3]">
         <div
-          className={`flex items-center ${collapsed ? "justify-center" : "gap-3"} px-3 py-2 hover:bg-[#efefed] rounded-lg cursor-pointer transition-all`}
+          className={`flex items-center ${collapsed ? "justify-center" : "gap-3"} px-3 py-2 hover:bg-[#f0edff] rounded-xl cursor-pointer transition-all`}
         >
-          <div className="w-6 h-6 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-[10px] text-white font-bold shadow-sm">
+          <div className="w-8 h-8 bg-gradient-to-tr from-[#6c5ce7] to-[#88ddff] rounded-full flex items-center justify-center text-[10px] text-white font-bold shadow-sm">
             JD
           </div>
           {!collapsed && (
             <div className="flex flex-col overflow-hidden">
-              <span className="text-xs font-semibold text-[#37352f] truncate">
+              <span className="text-sm font-semibold text-primary truncate">
                 Soo&apos;s Workspace
               </span>
-              <span className="text-[9px] text-[#37352f]/50 font-medium">
+              <span className="text-[10px] text-secondary/70 font-medium">
                 Synced with Notion
               </span>
             </div>

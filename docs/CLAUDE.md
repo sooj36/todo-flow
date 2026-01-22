@@ -18,8 +18,7 @@ pnpm install          # 의존성 설치
 pnpm dev              # 개발 서버 (기본 localhost:3000)
 pnpm build            # 프로덕션 빌드
 pnpm lint             # ESLint 실행
-pnpm test             # Vitest (watch)
-pnpm test:run         # Vitest (run)
+pnpm test:focus -- <files>  # 지정한 테스트 파일만 실행 (OOM 회피)
 ```
 
 ## Tech Stack
@@ -64,4 +63,3 @@ components/
 - [ ] 캘린더 이벤트 렌더링
 - [ ] FlowBoard 데이터 바인딩
 - [ ] E2E 테스트 추가 및 유지
-

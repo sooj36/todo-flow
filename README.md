@@ -1,51 +1,20 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Notion Environment Setup (Personal Mode)
-
-Create a `.env.local` file in the project root:
-
-```bash
-NOTION_API_KEY=secret_xxx
-NOTION_TEMPLATE_DB_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-NOTION_STEP_DB_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-NOTION_INSTANCE_DB_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-```
-
-- Keep these values server-only; do not commit `.env.local`.
-- The UI assumes Notion is connected when the API calls succeed.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 # todo-flow
+
+반복 Task를 시각화하고, 전체 캘린더 한눈에 보는 Flow Planner.
+
+## 스펙 요약
+- 비전/기능: 반복 Task 시각화, Notion API 연동 예정. Phase 1은 UI/빈 상태, Phase 2는 Notion 연결/클라이언트 구성, Phase 3는 데이터 바인딩 및 E2E.
+- 아키텍처: Next.js App Router, TypeScript strict. 데이터 흐름은 `useTaskTemplates` -> `useTaskInstances` 훅.
+- UI/UX: 캘린더는 월을 1-15, 16-말일로 분할해 채움도 하이라이트. FlowBoard는 Phase 2에서 드래그 앤 드롭 지원. 연동 전엔 빈 상태 표시.
+- 제약: `any` 금지, Tailwind만 사용. MVP는 cron/멀티유저 제외.
+- 참고: `docs/PRD.md`, `docs/DATA_MODEL.md`, `docs/COMPONENTS.md`.
+
+## 문서 맵
+- `docs/PRD.md` 제품 요구사항
+- `docs/spec.md` 상세 스펙
+- `docs/COMPONENTS.md` 컴포넌트 목록
+- `docs/prompt_plan.md` 프롬프트 계획
+- `docs/pre_prompt_plan.md` 사전 프롬프트 계획
+- `docs/log.md` 작업 로그
+- `docs/CLAUDE.md` Claude 노트
+

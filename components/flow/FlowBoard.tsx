@@ -294,7 +294,7 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({
           maxZoom={1.5}
           defaultViewport={{ x: 0, y: 0, zoom: 1 }}
         >
-          <Background variant={BackgroundVariant.Dots} gap={16} size={1} color="#e5e7eb" />
+          <Background variant={BackgroundVariant.Dots} gap={16} size={1} color="#e6e2f3" />
           <Controls showInteractive={false} />
           <MiniMap
             nodeColor={(node) => {
@@ -306,7 +306,7 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({
             maskColor="rgba(0, 0, 0, 0.05)"
             style={{
               backgroundColor: "white",
-              border: "1px solid #ececeb",
+              border: "1px solid #e6e2f3",
             }}
           />
         </ReactFlow>
@@ -314,11 +314,11 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({
 
       <div className="p-4 border-t border-[#ececeb] bg-white flex items-center justify-between z-20">
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 px-2 py-1 bg-gray-100 text-gray-500 rounded text-[10px] font-bold">
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-[#f6f4ff] text-secondary rounded-full text-[10px] font-bold shadow-sm">
             <Database size={12} />
             DATABASE ID: —
           </div>
-          <div className="text-[11px] text-gray-400">
+          <div className="text-[11px] text-secondary">
             Auto-save disabled until connected
           </div>
         </div>
