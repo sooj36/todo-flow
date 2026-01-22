@@ -328,6 +328,7 @@ describe('CreateTaskTemplateSchema', () => {
     if (result.success) {
       expect(result.data.icon).toBe(DEFAULT_ICON);
       expect(result.data.color).toBe(DEFAULT_COLOR);
+      expect(result.data.mood).toBe('🙂');
       expect(result.data.isRepeating).toBe(false);
       expect(result.data.steps).toEqual([]);
     }

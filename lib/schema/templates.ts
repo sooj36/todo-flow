@@ -141,6 +141,14 @@ export const DEFAULT_ICON = '📋';
 export const DEFAULT_COLOR: TaskColor = 'gray';
 
 // ============================================
+// Mood (Daily)
+// ============================================
+export const MOOD_EMOJIS = ['😁', '😉', '🙂', '🫥', '🫨'] as const;
+export const MoodEmojiSchema = z.enum(MOOD_EMOJIS);
+export type MoodEmoji = z.infer<typeof MoodEmojiSchema>;
+export const DEFAULT_MOOD: MoodEmoji = '😁';
+
+// ============================================
 // Frequency & Repeat Options
 // ============================================
 export const FREQUENCIES = ['daily', 'weekly', 'custom'] as const;
@@ -251,6 +259,9 @@ export const CreateTaskTemplateSchema = z.object({
   icon: IconSchema.default(DEFAULT_ICON),
 
   color: TaskColorSchema.default(DEFAULT_COLOR),
+
+  // Daily mood (stored on instance)
+  mood: MoodEmojiSchema.default(DEFAULT_MOOD),
 
   isRepeating: z.boolean().default(false),
 

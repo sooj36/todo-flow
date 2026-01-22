@@ -12,9 +12,12 @@ export {
   WEEKDAYS_EN,
   DEFAULT_ICON,
   DEFAULT_COLOR,
+  MOOD_EMOJIS,
+  DEFAULT_MOOD,
   // Schemas
   TaskColorSchema,
   IconSchema,
+  MoodEmojiSchema,
   FrequencySchema,
   WeekdaySchema,
   WeekdayEnSchema,
@@ -30,6 +33,7 @@ export {
   assignStepOrders,
   // Types (from Zod inference)
   type TaskColor,
+  type MoodEmoji,
   type Frequency,
   type Weekday,
   type WeekdayEn,
@@ -73,6 +77,7 @@ export interface TaskInstance {
   templateId: string;
   template: TaskTemplate;
   date: string;                    // YYYY-MM-DD
+  mood?: MoodEmoji;
   status: TaskStatus;
   currentStepId: string | null;
   completedStepIds: string[];
@@ -90,6 +95,7 @@ export interface CalendarDayData {
   totalTasks: number;              // interpreted as total steps for the day
   completedTasks: number;          // interpreted as completed steps for the day
   tasks: TaskInstance[];           // raw instances for the day
+  mood?: MoodEmoji;
 }
 
 export interface CalendarMonth {

@@ -110,6 +110,7 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
     setIsCreateDialogOpen(true);
   }, [selectedDate]);
 
+
   const handleCloseCreateDialog = useCallback(() => {
     setIsCreateDialogOpen(false);
   }, []);
@@ -142,6 +143,9 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
   for (let day = 1; day <= daysInMonth; day++) {
     const date = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     const dayInstances = effectiveInstances.filter(inst => inst.date === date);
+    const moodInstance = dayInstances
+      .filter((inst) => inst.mood)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0];
     const overrideProgress = dayStepProgressOverrides[date];
     const stepTotals = overrideProgress
       ? overrideProgress
@@ -151,6 +155,7 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
       totalTasks: stepTotals.total,
       completedTasks: stepTotals.completed,
       tasks: dayInstances,
+      mood: moodInstance?.mood,
     });
   }
 
@@ -354,7 +359,15 @@ interface CalendarDayProps {
   onAddClick?: (day: number) => void;
 }
 
-const CalendarDay: React.FC<CalendarDayProps> = ({ day, data, loading, isToday, isSelected, onClick, onAddClick }) => {
+const CalendarDay: React.FC<CalendarDayProps> = ({
+  day,
+  data,
+  loading,
+  isToday,
+  isSelected,
+  onClick,
+  onAddClick,
+}) => {
   const completionRate = data && data.totalTasks > 0
     ? data.completedTasks / data.totalTasks
     : 0;
@@ -399,7 +412,14 @@ const CalendarDay: React.FC<CalendarDayProps> = ({ day, data, loading, isToday, 
         <div className="absolute top-2 right-2 w-2 h-2 bg-[#0d8f5b] rounded-full" />
       )}
       <div className="flex items-center justify-between mb-2">
-        <span className="text-xs font-bold text-secondary/70">{day}</span>
+        <div className="flex items-center gap-1">
+          <span className="text-xs font-bold text-secondary/70">{day}</span>
+          {data?.mood && (
+            <span className="text-xs" aria-label={`Mood ${data.mood}`}>
+              {data.mood}
+            </span>
+          )}
+        </div>
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -431,6 +451,7 @@ const CalendarDay: React.FC<CalendarDayProps> = ({ day, data, loading, isToday, 
           </div>
         </div>
       )}
+
     </div>
   );
 };

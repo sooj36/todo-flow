@@ -2,7 +2,7 @@
 // Task Instances domain logic
 
 import { Client } from '@notionhq/client';
-import type { TaskInstance, TaskTemplate, TaskStatus } from '@/types';
+import type { TaskInstance, TaskTemplate, TaskStatus, MoodEmoji } from '@/types';
 import {
     extractRelation,
     extractDate,
@@ -11,6 +11,7 @@ import {
     extractRelationMulti,
     extractDateNullable,
 } from './parsers';
+import { MOOD_EMOJIS } from '@/lib/schema/templates';
 
 /**
  * Get task instances from Notion, optionally filtered by date
@@ -48,11 +49,17 @@ export async function getTaskInstances(
         // Created time
         const createdAt = 'created_time' in page ? page.created_time : new Date().toISOString();
 
+        const moodValue = extractSelect<string>(properties['Mood'], '');
+        const mood = MOOD_EMOJIS.includes(moodValue as MoodEmoji)
+            ? (moodValue as MoodEmoji)
+            : undefined;
+
         instances.push({
             id: page.id,
             templateId: extractRelation(properties['Template'], ''),
             template: {} as TaskTemplate, // Will be populated separately
             date: extractDate(properties['Date'], ''),
+            mood,
             status: extractSelect<TaskStatus>(properties['Status'], 'todo'),
             currentStepId: extractRelationNullable(properties['Current Step']),
             completedStepIds: extractRelationMulti(properties['Completed Steps']),
@@ -78,7 +85,8 @@ export async function createTaskInstance(
     databaseId: string,
     templateId: string,
     templateName: string,
-    date: string
+    date: string,
+    mood?: MoodEmoji
 ): Promise<TaskInstance> {
     const response = await client.pages.create({
         parent: { database_id: databaseId },
@@ -105,6 +113,7 @@ export async function createTaskInstance(
                     name: 'todo',
                 },
             },
+            ...(mood ? { Mood: { select: { name: mood } } } : {}),
         },
     });
 
@@ -113,6 +122,7 @@ export async function createTaskInstance(
         templateId,
         template: {} as TaskTemplate,
         date,
+        mood,
         status: 'todo',
         currentStepId: null,
         completedStepIds: [],

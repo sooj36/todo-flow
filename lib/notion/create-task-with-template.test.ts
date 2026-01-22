@@ -34,6 +34,7 @@ describe('createTaskWithTemplate', () => {
       const input: CreateTaskTemplateInput = {
         name: 'Morning Routine',
         instanceDate: '2026-01-18',
+        mood: '🙂',
         icon: '📋',
         color: 'gray',
         isRepeating: false,
@@ -64,6 +65,7 @@ describe('createTaskWithTemplate', () => {
       const input: CreateTaskTemplateInput = {
         name: 'Morning Routine',
         instanceDate: '2026-01-18',
+        mood: '🙂',
         steps: [
           { name: 'Wake up' },
           { name: 'Exercise' },
@@ -89,6 +91,7 @@ describe('createTaskWithTemplate', () => {
       const input: CreateTaskTemplateInput = {
         name: 'Test Task',
         instanceDate: '2026-01-18',
+        mood: '🙂',
       };
 
       await createTaskWithTemplate(mockClient, mockDbIds, input);
@@ -120,6 +123,7 @@ describe('createTaskWithTemplate', () => {
       const input: CreateTaskTemplateInput = {
         name: 'Test Task',
         instanceDate: '2026-01-18',
+        mood: '🙂',
         steps: [{ name: 'First' }, { name: 'Second' }],
       };
 
@@ -155,6 +159,7 @@ describe('createTaskWithTemplate', () => {
       const input: CreateTaskTemplateInput = {
         name: 'Test Task',
         instanceDate: '2026-01-18',
+        mood: '🙂',
       };
 
       await createTaskWithTemplate(mockClient, mockDbIds, input);
@@ -179,6 +184,7 @@ describe('createTaskWithTemplate', () => {
       const input: CreateTaskTemplateInput = {
         name: 'Test Task',
         instanceDate: '2026-01-18',
+        mood: '🙂',
       };
 
       await createTaskWithTemplate(mockClient, mockDbIds, input);
@@ -202,6 +208,7 @@ describe('createTaskWithTemplate', () => {
       const input: CreateTaskTemplateInput = {
         name: 'Weekly Workout',
         instanceDate: '2026-01-18',
+        mood: '🙂',
         isRepeating: true,
         repeatOptions: {
           frequency: 'custom',
@@ -241,6 +248,7 @@ describe('createTaskWithTemplate', () => {
       const input: CreateTaskTemplateInput = {
         name: 'Daily Task',
         instanceDate: '2026-01-18',
+        mood: '🙂',
         isRepeating: true,
         repeatOptions: {
           frequency: 'daily',
@@ -270,6 +278,7 @@ describe('createTaskWithTemplate', () => {
       const input: CreateTaskTemplateInput = {
         name: 'Test Task',
         instanceDate: '2026-01-18',
+        mood: '🙂',
         steps: [{ name: 'Step 1' }],
       };
 
@@ -297,6 +306,7 @@ describe('createTaskWithTemplate', () => {
       const input: CreateTaskTemplateInput = {
         name: 'Test Task',
         instanceDate: '2026-01-18',
+        mood: '🙂',
         steps: [{ name: 'Step 1' }, { name: 'Step 2' }],
       };
 
@@ -322,6 +332,7 @@ describe('createTaskWithTemplate', () => {
       const input: CreateTaskTemplateInput = {
         name: 'Test Task',
         instanceDate: '2026-01-18',
+        mood: '🙂',
         steps: [{ name: 'Step 1' }, { name: 'Step 2' }],
       };
 
@@ -342,6 +353,7 @@ describe('createTaskWithTemplate', () => {
       const input: CreateTaskTemplateInput = {
         name: 'Test Task',
         instanceDate: '2026-01-18',
+        mood: '🙂',
         steps: [{ name: 'Step 1' }],
       };
 
@@ -358,6 +370,7 @@ describe('createTaskWithTemplate', () => {
       const input: CreateTaskTemplateInput = {
         name: 'Test Task',
         instanceDate: '2026-01-18',
+        mood: '🙂',
       };
 
       await expect(createTaskWithTemplate(mockClient, mockDbIds, input)).rejects.toMatchObject({

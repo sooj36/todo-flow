@@ -189,7 +189,8 @@ async function createInstance(
   databaseId: string,
   templateId: string,
   templateName: string,
-  date: string
+  date: string,
+  mood: CreateTaskTemplateInput['mood']
 ): Promise<PageCreationResult> {
   // Convert local date to UTC 00:00 for Notion storage
   const utcDate = localDateToUTC(date);
@@ -208,6 +209,9 @@ async function createInstance(
       },
       Status: {
         select: { name: 'todo' },
+      },
+      Mood: {
+        select: { name: mood },
       },
     },
   });
@@ -279,7 +283,8 @@ export async function createTaskWithTemplate(
         dbIds.instanceDbId,
         createdIds.templateId,
         input.name,
-        input.instanceDate
+        input.instanceDate,
+        input.mood
       );
       createdIds.instanceId = instanceResult.id;
     } catch (instanceError) {

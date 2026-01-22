@@ -8,8 +8,11 @@ import {
   WEEKDAYS,
   DEFAULT_ICON,
   DEFAULT_COLOR,
+  MOOD_EMOJIS,
+  DEFAULT_MOOD,
   CreateTaskTemplateSchema,
   type TaskColor,
+  type MoodEmoji,
   type Frequency,
   type Weekday,
   type FlowStepInput,
@@ -19,6 +22,10 @@ import { formatLocalDate } from "@/lib/utils/dateTransform";
 
 // Popular icons for quick selection
 const POPULAR_ICONS = ['📋', '✅', '📝', '🎯', '💡', '🔥', '⭐', '📚', '💪', '🏃', '🧘', '🍎'];
+const MOOD_SCALE = MOOD_EMOJIS.map((emoji, index) => ({
+  emoji,
+  score: 5 - index,
+}));
 
 interface CreateTaskDialogProps {
   isOpen: boolean;
@@ -32,6 +39,7 @@ export interface CreateTaskFormData {
   name: string;
   icon: string;
   color: TaskColor;
+  mood: MoodEmoji;
   isRepeating: boolean;
   repeatOptions?: RepeatOptions;
   steps: FlowStepInput[];
@@ -81,6 +89,7 @@ export const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
   const [name, setName] = useState("");
   const [icon, setIcon] = useState(DEFAULT_ICON);
   const [color, setColor] = useState<TaskColor>(DEFAULT_COLOR);
+  const [mood, setMood] = useState<MoodEmoji>(DEFAULT_MOOD);
   const [isRepeating, setIsRepeating] = useState(false);
   const [frequency, setFrequency] = useState<Frequency>("daily");
   const [weekdays, setWeekdays] = useState<Weekday[]>([]);
@@ -108,6 +117,7 @@ export const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
       setName("");
       setIcon(DEFAULT_ICON);
       setColor(DEFAULT_COLOR);
+      setMood(DEFAULT_MOOD);
       setIsRepeating(false);
       setFrequency("daily");
       setWeekdays([]);
@@ -161,6 +171,7 @@ export const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
       name: name.trim(),
       icon,
       color,
+      mood,
       isRepeating,
       steps,
       instanceDate: formatLocalDate(selectedDate),
@@ -177,7 +188,7 @@ export const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
     }
 
     return data;
-  }, [name, icon, color, isRepeating, frequency, weekdays, repeatEnd, repeatLimit, steps, selectedDate]);
+  }, [name, icon, color, mood, isRepeating, frequency, weekdays, repeatEnd, repeatLimit, steps, selectedDate]);
 
   // Validation errors
   const errors = useMemo(() => {
@@ -288,6 +299,15 @@ export const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
     setSubmitError(null);
   };
 
+  const handleMoodDoubleClick = (selectedMood: MoodEmoji) => {
+    if (isSubmitting) return;
+    setMood(selectedMood);
+    setName((prev) => (prev.trim() ? prev : "Mood"));
+    setTimeout(() => {
+      handleSubmit();
+    }, 0);
+  };
+
   if (!isOpen) return null;
 
   const dateLabel = selectedDate.toLocaleDateString("ko-KR", {
@@ -320,6 +340,30 @@ export const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
 
         {/* Form */}
         <div className="space-y-5 px-5 py-5">
+          {/* Mood */}
+          <div>
+            <label className="text-xs font-semibold text-[#37352f]">기분</label>
+            <div className="mt-2 flex gap-1">
+              {MOOD_SCALE.map(({ emoji, score }) => (
+                <button
+                  key={emoji}
+                  type="button"
+                  onClick={() => setMood(emoji)}
+                  onDoubleClick={() => handleMoodDoubleClick(emoji)}
+                  disabled={isSubmitting}
+                  aria-label={`Mood ${score}`}
+                  className={`w-10 h-10 rounded-md transition-all flex flex-col items-center justify-center ${
+                    mood === emoji
+                      ? "bg-[#f0f0f0] ring-1 ring-[#5f5b55]"
+                      : "bg-[#fbfbfa] hover:bg-[#efefed]"
+                  } disabled:opacity-50`}
+                >
+                  <span className="text-lg">{emoji}</span>
+                  <span className="text-[9px] text-[#37352f]/60">{score}</span>
+                </button>
+              ))}
+            </div>
+          </div>
           {/* Template Name */}
           <div>
             <label htmlFor="task-name" className="text-xs font-semibold text-[#37352f]">

@@ -7,6 +7,7 @@ import {
   getTaskTemplates,
   getFlowSteps,
 } from '@/lib/notion';
+import { MOOD_EMOJIS } from '@/lib/schema/templates';
 
 export async function GET(request: NextRequest) {
   try {
@@ -104,11 +105,18 @@ export async function POST(request: NextRequest) {
     const notionClient = createNotionClient(apiKey);
 
     const body = await request.json();
-    const { templateId, date } = body;
+    const { templateId, date, mood } = body;
 
     if (!templateId || !date) {
       return NextResponse.json(
         { error: 'Missing required parameters: templateId, date' },
+        { status: 400 }
+      );
+    }
+
+    if (mood && !MOOD_EMOJIS.includes(mood)) {
+      return NextResponse.json(
+        { error: 'Invalid mood value' },
         { status: 400 }
       );
     }
@@ -130,7 +138,8 @@ export async function POST(request: NextRequest) {
       instanceDbId,
       templateId,
       template.name,
-      date
+      date,
+      mood
     );
 
     return NextResponse.json({ instance }, { status: 201 });
