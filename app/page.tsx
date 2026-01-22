@@ -12,7 +12,7 @@ import { useAgentQuery } from "@/lib/hooks/useAgentQuery";
 import { TaskStatus } from "@/types";
 
 export default function Home() {
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
   const [splitRatio, setSplitRatio] = useState(0.5);
   const [isDragging, setIsDragging] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date()); // Shared date state
@@ -129,7 +129,7 @@ export default function Home() {
           >
             {/* Agent Section */}
             <div className="flex-shrink-0 bg-white/80 backdrop-blur p-5 space-y-4 border-b border-transparent shadow-[var(--shadow-card)]">
-              <SearchBar onSearch={executeQuery} />
+            <SearchBar onSearch={executeQuery} />
               <ProgressIndicator phase={phase} error={error ?? undefined} onRetry={retry} />
               {phase === "done" && data && <QualificationPanel data={data} />}
             </div>
@@ -162,11 +162,13 @@ export default function Home() {
             <div className="absolute inset-y-0 left-1/2 w-3 -translate-x-1/2 rounded-full bg-[#b7addf]/0 group-hover:bg-[#b7addf]/30 transition-colors" />
           </div>
 
+          {/*
           <div className="fixed bottom-6 right-6 flex flex-col gap-3 z-50">
             <button className="w-12 h-12 bg-white/90 border border-[#dcd6ff] text-primary rounded-full flex items-center justify-center shadow-[var(--shadow-card)] hover:shadow-[0_15px_35px_rgba(108,92,231,0.35)] hover:-translate-y-1 transition-all active:scale-95 group">
               <Bell size={20} className="group-hover:rotate-12 transition-transform text-[#6c5ce7]" />
             </button>
           </div>
+          */}
         </main>
       </div>
     </div>

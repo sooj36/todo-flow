@@ -282,7 +282,8 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({
         handleSync={handleSync}
       />
 
-      <div className="flex-1 relative">
+      {/* Dot background */}
+      <div className="flex-1 relative bg-[#E6E2AC]/30">
         <ReactFlow
           nodes={nodes}
           edges={edges}

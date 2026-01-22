@@ -29,9 +29,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
     >
       <div className="relative p-4">
         <div className={`flex items-center ${collapsed ? "justify-center" : "gap-3"}`}>
+          {/*
           <div className="w-10 h-10 bg-gradient-to-br from-[#6c5ce7] to-[#9aa8ff] rounded-xl flex items-center justify-center text-white font-black shadow-lg">
             F
           </div>
+          */}
           {!collapsed && (
             <span className="font-bold text-lg text-primary tracking-tight">
               Flow Planner
