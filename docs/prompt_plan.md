@@ -135,6 +135,15 @@
   - 버튼 최적화: 툴바 영역(`Refresh`, `Today`, `Arrows`)이 좁은 폭에서도 정렬 유지되도록 `gap` 조정 및 `flex-shrink` 설정.
   - page.tsx: Resizable 패널 최소 너비 보장 혹은 좁을 때 UI 간소화 처리. 
 
+### 14.13 캘린더-플로우 연동 회귀 (tasks 누락 + 퍼센트 비지속)
+- [x] 재현/범위: 캘린더 일별칸에 task가 안 보이고, flow-step 퍼센트가 새로고침 후 초기화되는지 확인. 영향 날짜/DB 기록 정리.
+- [x] 기준 정의: 퍼센트 계산 기준을 명확히 정리(FlowStep.done vs TaskInstance.completedStepIds/status).
+- [x] 스키마/필드 확인: Notion DB 필드명 매핑(Template/Parent Template/Date/done) 누락·변경 여부 확인.
+- [x] 데이터 파이프라인 점검: instances API가 template + flowSteps를 반환하는지, 캘린더가 이를 사용해 집계하는지 확인(steps 비어있지 않게).
+- [x] 오버라이드 리셋 분리: 새로고침 시 초기화가 서버 미반영인지, 클라이언트 오버라이드 리셋인지 분리 점검.
+- [x] step 지속성: PATCH가 Notion에 반영되고, 재조회 시 done 값이 캘린더 집계에 반영되는지 확인.
+- [x] 수정 + 테스트: day cell task 렌더링 + 퍼센트 유지되도록 데이터 흐름 수정. 관련 통합 테스트 보강(예: `components/calendar/CalendarFlowPercent.integration.test.tsx`).
+- [x] 로그: 테스트 결과를 docs/log.md에 기록.
 
 ## phase 15 
 

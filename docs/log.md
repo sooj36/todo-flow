@@ -2,6 +2,15 @@
 
 ## Phase 14 작업 기록 (Calendar + Button → Create Template/Steps/Instance)
 
+### Phase 14.13: 캘린더-플로우 연동 회귀 수정 (2026-01-22)
+- 원인 분석: `GET /api/notion/instances` API가 반환하는 `TaskInstance` 객체에 중첩된 `template.flowSteps` 데이터가 누락되어, 클라이언트에서 진행률 계산(total steps) 불가 및 태스크 정보 불완전 렌더링 문제 발생.
+- 수정 사항: `app/api/notion/instances/route.ts`의 GET 핸들러 로직 변경.
+  - `getTaskInstances`, `getTaskTemplates`, `getFlowSteps`를 `Promise.all`로 병렬 호출.
+  - 모든 `flowSteps`를 가져온 후 부모 템플릿 ID(`parentTemplateId`)를 기준으로 그룹화.
+  - 각 `TaskTemplate` 객체에 해당 `flowSteps` 배열을 채워서 `TaskInstance`에 주입.
+- 환경 변수 이름 일치: `NOTION_FLOW_STEP_DB_ID` (코드) -> `NOTION_STEP_DB_ID` (.env.local)로 수정.
+- 테스트: pnpm test:run -- components/calendar/CalendarFlowPercent.integration.test.tsx (3/3) 통과. 데이터 파이프라인 수정으로 퍼센트 연동 기능 정상 동작 확인.
+
 ### Phase 14.12: Split View/Responsive Layout Fix (2026-01-21)
 - NotionCalendar 헤더에 flex-wrap + container query 적용, 좁은 폭에서 서브텍스트/연결 텍스트 숨김 처리
 - 툴바 영역 간격 축소 및 flex-shrink 조정으로 버튼 겹침 완화
