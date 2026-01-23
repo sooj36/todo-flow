@@ -1,5 +1,5 @@
 // hooks/useTaskInstances.ts
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { TaskInstance } from '@/types';
 
 interface UseTaskInstancesReturn {
@@ -13,6 +13,7 @@ export const useTaskInstances = (date?: string): UseTaskInstancesReturn => {
   const [instances, setInstances] = useState<TaskInstance[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const prevDateRef = useRef<string | undefined>(date);
 
   const fetchInstances = async (): Promise<{ success: boolean; error?: string }> => {
     try {
@@ -41,6 +42,10 @@ export const useTaskInstances = (date?: string): UseTaskInstancesReturn => {
   };
 
   useEffect(() => {
+    if (date !== prevDateRef.current) {
+      setInstances([]);
+      prevDateRef.current = date;
+    }
     fetchInstances();
   }, [date]);
 
