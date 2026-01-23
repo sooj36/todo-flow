@@ -155,38 +155,103 @@
 - [x] 에러/빈 데이터 UX: 공고 토글 없거나 텍스트 0자면 “공고 내용이 비어있습니다” 메시지로 안내, 재시도/다른 페이지 검색 유도.
 - [x] 테스트: a) query payload에 contains 필터 포함, b) 공고 토글 선택/없을 때 fallback, c) 빈 결과 에러 메시지, d) 캐시 사용 시 블록 호출 1회만 되는지.
 
-### phase 15.2 지원자격 요약/응답
-- [ ] 요약 프롬프트 확정: “입력은 plain text. 지원자격/요구사항만 5 bullets, 한국어, 120 tokens 이내, 불필요한 서론 금지.”로 고정.
-- [ ] 파이프라인: 검색어에 “지원자격/요구/조건” 포함 시 공고 텍스트 → LLM 요약 → UI 결과 패널에 bullet 렌더. 토글 텍스트 없으면 DB `요약` 필드 사용(없으면 에러 반환).
-- [ ] UI 문구: 결과 패널 상단에 “프로젝트 DB·공고 토글 기반 요약” 메타 표시, 실패 시 명확한 원인(페이지 없음/공고 비어 있음/LLM 실패).
 
-## Phase 16: UI Visual Overhaul (Deel Style Tone & Manner)
-### 16.1 Global Theme & Design Tokens
-- [x] Analyze Design Reference: Extract colors/styles from reference image.
-  - Primary Background: Light Lavender/Purple (e.g., #F0F2F5 to #F3F1FA range) -> Clean & Airy feel.
-  - Card Style: Pure White, Rounded-2xl (large radius), Soft/Diffuse Shadows (no harsh borders).
-  - Typography: Modern Sans-serif (Inter/Pretendard), High contrast headings (Black/Dark Gray), Muted labels.
-- [x] Tailwind Config Update:
-  - Add specific colors: `bg-page`, `text-primary`, `text-secondary`, `brand-gradient` (if needed for charts).
-  - Update `borderRadius` defaults (prefer `xl`, `2xl`).
-- [x] Global Layout Polish:
-  - Apply global background color.
-  - Wrap main content in a consistent container that floats on the background (or uses the background fully).
+## Phase 16: UI 개편 (Deel 스타일 톤 앤 매너)
+### 16.1 글로벌 테마 및 디자인 토큰
+- [x] 디자인 레퍼런스 분석: 레퍼런스 이미지에서 색상 및 스타일 추출.
+  - 기본 배경색: 연한 라벤더/퍼플 (예: #F0F2F5 ~ #F3F1FA 범위) -> 깨끗하고 여유로운(Airy) 느낌.
+  - 카드 스타일: 퓨어 화이트, Rounded-2xl (큰 곡률), 부드럽고 확산된 그림자 (강한 테두리 지양).
+  - 타이포그래피: 모던 산세리프 (Inter/Pretendard), 고대비 헤딩 (Black/Dark Gray), 차분한 레이블.
+- [x] Tailwind 설정 업데이트:
+  - 특정 색상 추가: `bg-page`, `text-primary`, `text-secondary`, `brand-gradient` (차트용 필요 시).
+  - `borderRadius` 기본값 업데이트 (`xl`, `2xl` 선호).
+- [x] 글로벌 레이아웃 다듬기:
+  - 글로벌 배경색 적용.
+  - 메인 콘텐츠를 배경 위에 떠 있는 느낌의 일관된 컨테이너로 감싸기 (또는 배경 전체 활용).
 
-### 16.2 Modern Core Components Polish
-- [x] Card/Container Unification:
-  - Refactor major sections (Dashboards, Metrics, Lists) to use a unified `Card` style.
-  - Ensure generous padding (p-6+) to match the "Airy" tone.
-- [x] Header & Navigation:
-  - Minimized visual weight (transparent or blend-in background).
-  - Navigation items as "Pills" or clean icon+text.
-  - Remove heavy dividers/borders.
-- [x] Controls (Buttons/Inputs):
-  - Primary Buttons: Rounded capsules (full rounded) or soft rounded-xl.
-  - Inputs: Light gray background or soft border, large touch targets.
+### 16.2 모던 핵심 컴포넌트 고도화
+- [x] 카드/컨테이너 통일:
+  - 주요 섹션(대시보드, 지표, 리스트)을 통일된 `Card` 스타일로 리팩토링.
+  - 여유로운 패딩(p-6 이상)을 확보하여 "Airy"한 톤 유지.
+- [x] 헤더 및 내비게이션:
+  - 시각적 무게감 최소화 (투명 배경 또는 배경색과 혼합).
+  - 내비게이션 항목을 "알약(Pills)" 형태 또는 깔끔한 아이콘+텍스트로 구성.
+  - 무거운 구분선 및 테두리 제거.
+- [x] 컨트롤 (버튼/입력창):
+  - 주요 버튼: 캡슐형(Full Rounded) 또는 부드러운 rounded-xl 적용.
+  - 입력창: 연한 회색 배경 또는 부드러운 테두리, 넓은 터치 영역 확보.
 
-### 16.3 Visual Consistency & Verify
-- [x] Chart/Graph Aesthetics (if present): Use smooth curves, soft gradients (blue/teal/purple) instead of flat solid blocks.
-- [x] Tone & Manner Review: Compare against reference image.
-  - Check for "Cleanliness", "Softness", "Readability".
-- [x] Tests: Verify no layout shifts or broken responsiveness with new spacing.
+### 16.3 시각적 일관성 및 검증
+- [x] 차트/그래프 미학 (해당 시): 단색 블록 대신 매끄러운 곡선과 부드러운 그라데이션(블루/티일/퍼플) 사용.
+- [x] 톤 앤 매너 검토: 레퍼런스 이미지와 최종 결과물 비교.
+  - "깨끗함", "부드러움", "가독성" 집중 점검.
+- [x] 테스트: 새로운 간격 및 스타일 적용 시 레이아웃 틀어짐이나 반응형 결함이 없는지 확인.
+
+## Phase 17: 오늘 Task 자동 추천 (우선순위 기반, 체크리스트 + 추천 이유, 최대 3개)
+
+### 17.0 사전 확인
+- [ ] 관련 문서 확인: spec.md, PRD.md, DATA_MODEL.md, COMPONENTS.md.
+- [ ] Notion DB 필드 존재 여부 점검(Template: priority, Instance: Completed At/Status/Date).
+- [ ] priority 타입 확정(Select vs Number) 및 기존 데이터 유무 확인.
+
+### 17.1 스키마 확정 & 백필
+- [ ] 템플릿 DB에 `priority` 필드 정의/확정(Select) 및 허용값/기본값 문서화.
+  - Select 기준: High=3, Medium=2, Low=1, 기본값 Medium.
+- [ ] priority 스키마 확정 후 기존 템플릿 데이터 백필/마이그레이션 계획 수립(누락값 기본값 적용 규칙 포함).
+- [ ] types/schema 업데이트: Template 모델에 priority 타입 추가(없을 때 기본값 처리).
+- [ ] Notion 파서: template fetch 시 priority 누락/오류값 fallback 규칙 정의.
+- [ ] 완료일/반복/타임존 데이터 소스 규칙 확정(완료일 필드, 반복 기준, 기준 날짜 계산 방식).
+  - 완료일: TaskInstance.status=done인 항목 중 `Completed At` 우선, 없으면 Instance `Date`를 완료일로 간주.
+  - 마지막 완료일: 템플릿 기준 완료일 중 가장 최신 1건 사용.
+  - 미완료(완료일 없음): daysSince는 큰 값(예: 999)으로 처리해 recencyScore=3으로 고정.
+  - 반복 기준: 템플릿 반복 옵션 사용(isRepeating=false면 0). frequency=daily면 1, frequency=weekly면 기준 날짜의 요일 포함 시 1, 그 외 0.
+  - 기준 날짜/타임존: API 입력 `date`를 로컬 날짜 문자열로 취급하고, Instance `date`(YYYY-MM-DD)와 문자열 비교. (클라이언트는 항상 `date`를 전달)
+
+### 17.2 스코어링 규칙 구현
+- [ ] 스코어링 함수 정의:
+  - priorityScore: Select(High=3, Medium=2, Low=1) 또는 Number(그대로).
+  - daysSince: 기준 날짜-마지막 완료일, recencyScore = min(3, floor(daysSince / 3)).
+  - repeatScore: 일간 반복=1, 주간 반복=기준 날짜 요일 포함 시 1, 반복 없음=0.
+  - total = priorityScore * 2 + recencyScore + repeatScore.
+- [ ] 정렬 규칙: total 내림차순, 동점 시 daysSince 내림차순, 이후 title 오름차순.
+- [ ] 최대 3개 반환.
+- [ ] 추천 이유 템플릿 확정(최대 2개 조합):
+  - "우선순위가 높아요"
+  - "최근 N일 동안 수행하지 않았어요"
+  - "오늘 반복 일정에 해당돼요"
+  - 선택 규칙: 우선순위(>=3) → 미수행(daysSince>=3) → 반복(repeatScore=1) 순으로 채움.
+
+### 17.3 API 라우트/서버 로직
+- [ ] 신규 라우트: `POST /api/agent/recommendations` 추가(입력: `{ date: "YYYY-MM-DD" }`, 미입력 시 오늘).
+- [ ] Notion 데이터 수집: Template DB + 해당 날짜 Instance(완료/미완료) 조회(기준 날짜 타임존 정책 포함).
+- [ ] 추천 결과 응답 스키마 정의:
+  - `{ date, items: [{ templateId, title, priority, score, reason }] }`.
+- [ ] 에러 처리:
+  - priority 누락/파싱 실패 → "priority 값을 확인해주세요"
+  - 템플릿 없음 → "추천할 템플릿이 없습니다"
+  - Notion 실패 → "추천 중 오류가 발생했습니다"
+  - 에러 코드/타입 분리(예: INVALID_PRIORITY, EMPTY_TEMPLATES, NOTION_ERROR).
+
+### 17.4 프런트 훅/상태
+- [ ] `useAgentRecommendations` 훅: phase(idle/fetch/done/error) + retry + lastDate 유지.
+- [ ] 에러/빈 결과/로딩 UX 문구 확정.
+
+### 17.5 UI 컴포넌트
+- [ ] 체크리스트 UI: 추천 3개까지 렌더, 각 항목에 추천 이유 표시.
+- [ ] UI 구조 확정:
+  - 컴포넌트: `components/agent/RecommendationPanel.tsx`, `components/agent/RecommendationItem.tsx`.
+  - 위치: FlowBoard 상단(Agent 섹션 내부).
+  - 헤더: "오늘 추천 Task" + 새로고침 버튼.
+- [ ] UX 문구:
+  - 로딩: "추천을 계산 중이에요…"
+  - 빈 결과: "오늘 추천할 템플릿이 없어요"
+  - 에러: 기존 ProgressIndicator 에러 스타일 재사용 가능.
+
+### 17.6 테스트
+- [ ] 유닛: 스코어링 규칙(우선순위/최근일/빈도) 테스트.
+- [ ] API: 추천 결과 스키마/정렬/최대 3개 보장 테스트.
+- [ ] UI: 로딩 → 결과 → 에러/재시도 플로우 테스트.
+
+### 17.7 변경 가능 지점(구현 중 재확정)
+- [ ] 완료일 데이터 품질(Completed At 부재 시 fallback 기준).
+- [ ] 반복 규칙(템플릿 기반 vs 인스턴스 기반) 확정 여부.
