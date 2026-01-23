@@ -29,6 +29,8 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
   dayStepProgressOverrides = {},
 }) => {
   const now = new Date(); // Actual current date for "today" highlighting
+  const [showCelebration, setShowCelebration] = useState(false);
+  const lastCelebratedDateRef = useRef<string | null>(null);
 
   const today = now.getDate();
   const monthLabel = useMemo(() => {
@@ -139,6 +141,15 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
   const month = selectedDate.getMonth();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const calendarData = new Map<string, CalendarDayData>();
+  const todayKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const todayInstances = effectiveInstances.filter((inst) => inst.date === todayKey);
+  const todayOverrideProgress = dayStepProgressOverrides[todayKey];
+  const todayStepTotals = todayOverrideProgress
+    ? todayOverrideProgress
+    : aggregateDayStepProgress(todayInstances, {});
+  const todayCompletionRate = todayStepTotals.total > 0
+    ? todayStepTotals.completed / todayStepTotals.total
+    : 0;
 
   for (let day = 1; day <= daysInMonth; day++) {
     const date = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
@@ -159,10 +170,30 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
     });
   }
 
+  useEffect(() => {
+    if (todayCompletionRate === 1 && todayStepTotals.total > 0) {
+      if (lastCelebratedDateRef.current !== todayKey) {
+        setShowCelebration(true);
+        lastCelebratedDateRef.current = todayKey;
+        const timer = setTimeout(() => setShowCelebration(false), 1800);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [todayCompletionRate, todayStepTotals.total, todayKey]);
+
   const isConnected = !loading && !error;
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="relative flex flex-col h-full">
+      {showCelebration && (
+        <div className="fireworks" aria-hidden="true">
+          <span className="firework-burst" style={{ left: "12%", animationDelay: "0s" }} />
+          <span className="firework-burst" style={{ left: "32%", animationDelay: "0.1s" }} />
+          <span className="firework-burst" style={{ left: "52%", animationDelay: "0.2s" }} />
+          <span className="firework-burst" style={{ left: "72%", animationDelay: "0.05s" }} />
+          <span className="firework-burst" style={{ left: "88%", animationDelay: "0.15s" }} />
+        </div>
+      )}
       <div
         data-testid="calendar-header"
         className="calendar-header px-6 py-5 flex flex-wrap items-center justify-between gap-4"

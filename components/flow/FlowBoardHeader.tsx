@@ -30,9 +30,10 @@ export const FlowBoardHeader: React.FC<FlowBoardHeaderProps> = ({
   handleSync,
 }) => {
   return (
-    <div className="p-5 flex items-center justify-between bg-transparent border-b border-[#e6e2f3] z-20">
+    <div className="p-5 flex items-center justify-between bg-[#e8dcc8] border-b border-[#e6e2f3] z-20">
+      {/* flow 헤더 */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-gradient-to-br from-[#ffb347] to-[#ff867a] text-white rounded-2xl flex items-center justify-center shadow-md">
+        <div className="w-10 h-10 bg-gradient-to-br from-[#7bcf9a] to-[#3ba46b] text-white rounded-2xl flex items-center justify-center shadow-md">
           <Zap size={18} fill="currentColor" className="drop-shadow-sm" />
         </div>
         <div>

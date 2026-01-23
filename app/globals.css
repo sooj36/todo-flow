@@ -100,3 +100,71 @@ body {
   white-space: nowrap;
   border-width: 0;
 }
+
+.fireworks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.firework-burst {
+  position: absolute;
+  bottom: -12px;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: #f0b64b;
+  animation: firework-rise 1.6s ease-out forwards;
+}
+
+.firework-burst::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  box-shadow:
+    0 -16px 0 #f0b64b,
+    10px -10px 0 #f0b64b,
+    16px 0 0 #f0b64b,
+    10px 10px 0 #f0b64b,
+    0 16px 0 #f0b64b,
+    -10px 10px 0 #f0b64b,
+    -16px 0 0 #f0b64b,
+    -10px -10px 0 #f0b64b;
+  animation: firework-pop 1.6s ease-out forwards;
+}
+
+@keyframes firework-rise {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-220px);
+    opacity: 0;
+  }
+}
+
+@keyframes firework-pop {
+  0% {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+  55% {
+    opacity: 0;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}

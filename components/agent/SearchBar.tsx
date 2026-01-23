@@ -21,7 +21,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
   return (
     <div className="relative w-full max-w-2xl">
       <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6c5ce7]" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-black" />
         <input
           type="text"
           value={query}
