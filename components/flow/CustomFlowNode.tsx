@@ -7,6 +7,16 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { Handle, Position } from "reactflow";
+import type { TaskColor } from "@/types";
+
+const TASK_COLOR_BACKGROUNDS: Record<TaskColor, string> = {
+  blue: "#dbeafe",
+  green: "#dcfce7",
+  yellow: "#fef9c3",
+  red: "#fee2e2",
+  purple: "#f3e8ff",
+  gray: "#f3f4f6",
+};
 
 // Custom Node Data interface for React Flow
 export interface CustomNodeData {
@@ -15,6 +25,7 @@ export interface CustomNodeData {
   status: "idle" | "running" | "success" | "error";
   type: string;
   description?: string;
+  templateColor?: TaskColor;
   tasks?: Array<{
     id: string;
     name: string;
@@ -38,6 +49,7 @@ export const CustomFlowNode: React.FC<{ data: CustomNodeData }> = ({ data }) => 
     status,
     type,
     description,
+    templateColor,
     tasks,
     progress,
     isSyncable,
@@ -94,6 +106,10 @@ export const CustomFlowNode: React.FC<{ data: CustomNodeData }> = ({ data }) => 
 
   const styles = getTypeStyles(type);
 
+  const headerBackgroundColor = templateColor
+    ? TASK_COLOR_BACKGROUNDS[templateColor]
+    : undefined;
+
   return (
     <div
       className={`w-[220px] border rounded-2xl overflow-hidden backdrop-blur-sm transition-all ${styles.container}`}
@@ -112,7 +128,10 @@ export const CustomFlowNode: React.FC<{ data: CustomNodeData }> = ({ data }) => 
         style={{ background: styles.handle }}
       />
 
-      <div className="p-3 border-b border-[#e6e2f3] flex items-center justify-between bg-white/60">
+      <div
+        className="p-3 border-b border-[#e6e2f3] flex items-center justify-between bg-white/60"
+        style={headerBackgroundColor ? { backgroundColor: headerBackgroundColor } : undefined}
+      >
         <div className="flex items-center gap-2">
           <span
             className={`w-2 h-2 rounded-full ${styles.dot}`}

@@ -385,6 +385,53 @@ export const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
             )}
           </div>
 
+          {/* Flow Steps */}
+          <div>
+            <label className="text-xs font-semibold text-[#37352f]">
+              플로우 스텝 ({steps.length}/20)
+            </label>
+            <div className="mt-2 space-y-2">
+              {steps.map((step, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-2 p-2 bg-[#fbfbfa] rounded-md"
+                >
+                  <span className="text-xs text-[#37352f]/60 w-5">{index + 1}.</span>
+                  <span className="flex-1 text-sm text-[#37352f]">{step.name}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveStep(index)}
+                    disabled={isSubmitting}
+                    className="p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-all disabled:opacity-50"
+                    aria-label={`Remove step ${index + 1}`}
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              ))}
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={newStepName}
+                  onChange={(e) => setNewStepName(e.target.value)}
+                  onKeyDown={handleStepKeyDown}
+                  onBlur={() => handleBlur("steps")}
+                  placeholder="새 스텝 이름"
+                  disabled={isSubmitting || steps.length >= 20}
+                  className="flex-1 rounded-md border border-[#ececeb] px-3 py-2 text-sm text-[#37352f] placeholder:text-[#37352f]/30 focus:border-[#37352f] focus:outline-none disabled:bg-gray-50"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddStep}
+                  disabled={isSubmitting || !newStepName.trim() || steps.length >= 20}
+                  className="px-3 py-2 bg-[#efefed] text-[#37352f] rounded-md hover:bg-[#e5e5e5] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Plus size={16} />
+                </button>
+              </div>
+            </div>
+          </div>
+
           {/* Icon & Color Row */}
           <div className="flex gap-4">
             {/* Icon */}
@@ -566,53 +613,6 @@ export const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
               )}
             </div>
           )}
-
-          {/* Flow Steps */}
-          <div>
-            <label className="text-xs font-semibold text-[#37352f]">
-              플로우 스텝 ({steps.length}/20)
-            </label>
-            <div className="mt-2 space-y-2">
-              {steps.map((step, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-2 p-2 bg-[#fbfbfa] rounded-md"
-                >
-                  <span className="text-xs text-[#37352f]/60 w-5">{index + 1}.</span>
-                  <span className="flex-1 text-sm text-[#37352f]">{step.name}</span>
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveStep(index)}
-                    disabled={isSubmitting}
-                    className="p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-all disabled:opacity-50"
-                    aria-label={`Remove step ${index + 1}`}
-                  >
-                    <Trash2 size={14} />
-                  </button>
-                </div>
-              ))}
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={newStepName}
-                  onChange={(e) => setNewStepName(e.target.value)}
-                  onKeyDown={handleStepKeyDown}
-                  onBlur={() => handleBlur("steps")}
-                  placeholder="새 스텝 이름"
-                  disabled={isSubmitting || steps.length >= 20}
-                  className="flex-1 rounded-md border border-[#ececeb] px-3 py-2 text-sm text-[#37352f] placeholder:text-[#37352f]/30 focus:border-[#37352f] focus:outline-none disabled:bg-gray-50"
-                />
-                <button
-                  type="button"
-                  onClick={handleAddStep}
-                  disabled={isSubmitting || !newStepName.trim() || steps.length >= 20}
-                  className="px-3 py-2 bg-[#efefed] text-[#37352f] rounded-md hover:bg-[#e5e5e5] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <Plus size={16} />
-                </button>
-              </div>
-            </div>
-          </div>
 
           {/* Error Messages */}
           {submitError && (

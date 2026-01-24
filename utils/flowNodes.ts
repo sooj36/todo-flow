@@ -117,6 +117,7 @@ export function createFlowNodes({
           icon: icons.notionDb,
           status,
           type: "Notion DB",
+          templateColor: template.color,
           isSyncable: true,
           syncState,
           progress: {
