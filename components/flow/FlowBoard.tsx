@@ -108,7 +108,10 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({
     [instances, instanceStatusOverrides]
   );
   const displayInstances = isDateChanging ? [] : effectiveInstances;
-  const displayTemplates = isDateChanging ? [] : templates;
+  const displayTemplates = useMemo(() => {
+    if (isDateChanging) return [];
+    return templates.filter((template) => template.name.trim().toLowerCase() !== "mood");
+  }, [isDateChanging, templates]);
   const dayProgressRef = useRef<Record<string, { completed: number; total: number }>>({});
 
   const templateProgressMap = useMemo(() => {

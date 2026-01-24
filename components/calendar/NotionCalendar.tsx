@@ -170,6 +170,9 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
     });
   }
 
+  const dialogDateKey = `${createDialogDate.getFullYear()}-${String(createDialogDate.getMonth() + 1).padStart(2, '0')}-${String(createDialogDate.getDate()).padStart(2, '0')}`;
+  const selectedDayMood = calendarData.get(dialogDateKey)?.mood;
+
   useEffect(() => {
     if (todayCompletionRate === 1 && todayStepTotals.total > 0) {
       if (lastCelebratedDateRef.current !== todayKey) {
@@ -374,6 +377,7 @@ export const NotionCalendar: React.FC<NotionCalendarProps> = ({
         onClose={handleCloseCreateDialog}
         onSubmit={createTask}
         onSuccess={handleCreateSuccess}
+        existingMood={selectedDayMood}
       />
     </div>
   );

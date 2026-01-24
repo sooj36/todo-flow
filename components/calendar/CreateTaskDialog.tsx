@@ -33,6 +33,7 @@ interface CreateTaskDialogProps {
   onClose: () => void;
   onSubmit: (data: CreateTaskFormData) => Promise<CreateTaskResult>;
   onSuccess?: () => void;
+  existingMood?: MoodEmoji;
 }
 
 export interface CreateTaskFormData {
@@ -84,6 +85,7 @@ export const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
   onClose,
   onSubmit,
   onSuccess,
+  existingMood,
 }) => {
   // Form state
   const [name, setName] = useState("");
@@ -117,7 +119,7 @@ export const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
       setName("");
       setIcon(DEFAULT_ICON);
       setColor(DEFAULT_COLOR);
-      setMood(DEFAULT_MOOD);
+      setMood(existingMood ?? DEFAULT_MOOD);
       setIsRepeating(false);
       setFrequency("daily");
       setWeekdays([]);
@@ -130,7 +132,7 @@ export const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
       setSubmitError(null);
       setPartialFailure(null);
     }
-  }, [isOpen]);
+  }, [isOpen, existingMood]);
 
   // Focus first input when dialog opens
   useEffect(() => {
@@ -348,7 +350,10 @@ export const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
                 <button
                   key={emoji}
                   type="button"
-                  onClick={() => setMood(emoji)}
+                  onClick={() => {
+                    if (existingMood) return;
+                    setMood(emoji);
+                  }}
                   onDoubleClick={() => handleMoodDoubleClick(emoji)}
                   disabled={isSubmitting}
                   aria-label={`Mood ${score}`}
@@ -363,6 +368,11 @@ export const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
                 </button>
               ))}
             </div>
+            {existingMood && (
+              <p className="mt-1 text-[10px] text-[#37352f]/60">
+                오늘 기분은 이미 설정되어 있어요.(더블클릭하여 수정하기)
+              </p>
+            )}
           </div>
           {/* Template Name */}
           <div>
