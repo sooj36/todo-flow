@@ -62,7 +62,7 @@ Props: { day, date, tasks, isToday? }
 ```
 
 **레이아웃:**
-- 헤더: Daily Automation Flow + Notion 연결 상태
+- 헤더: Notion 연결 상태
 - 본문: React Flow 캔버스 with nodes & edges
 - MiniMap, Controls, Background
 

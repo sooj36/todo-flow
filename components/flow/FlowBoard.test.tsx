@@ -65,7 +65,6 @@ describe("FlowBoard", () => {
   it("renders the connected state with React Flow", () => {
     render(<FlowBoard />);
 
-    expect(screen.getByText("Daily Automation Flow")).toBeInTheDocument();
     expect(screen.getAllByText("Notion connected").length).toBeGreaterThan(0);
 
     // React Flow components should be rendered

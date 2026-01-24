@@ -37,9 +37,6 @@ export const FlowBoardHeader: React.FC<FlowBoardHeaderProps> = ({
           <Zap size={18} fill="currentColor" className="drop-shadow-sm" />
         </div>
         <div>
-          <h2 className="text-base font-semibold text-primary">
-            Daily Automation Flow
-          </h2>
           <div className="flex items-center gap-2">
             {loading && (
               <span className="flex items-center gap-1 text-[11px] text-secondary font-semibold tracking-wide">
@@ -82,6 +79,9 @@ export const FlowBoardHeader: React.FC<FlowBoardHeaderProps> = ({
         </div>
 
 
+        {/* <button className="p-2.5 bg-white/80 border border-[#e6e2f3] rounded-full text-secondary hover:text-primary transition-all shadow-sm">
+          <Plus size={16} />
+        </button> */}
         <div className="flex items-center gap-2">
           <button
             onClick={handleSync}
@@ -102,9 +102,6 @@ export const FlowBoardHeader: React.FC<FlowBoardHeaderProps> = ({
             </span>
           )}
         </div>
-        <button className="p-2.5 bg-white/80 border border-[#e6e2f3] rounded-full text-secondary hover:text-primary transition-all shadow-sm">
-          <Plus size={16} />
-        </button>
       </div>
     </div>
   );

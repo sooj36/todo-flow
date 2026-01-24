@@ -101,7 +101,6 @@ describe('FlowBoard - Flow Step Refactoring', () => {
         render(<FlowBoard />);
 
         // Verify core UI is rendered
-        expect(screen.getByText('Daily Automation Flow')).toBeInTheDocument();
         expect(screen.getAllByText('Notion connected').length).toBeGreaterThan(0);
     });
 
@@ -120,8 +119,7 @@ describe('FlowBoard - Flow Step Refactoring', () => {
         rerender(<FlowBoard />);
 
         // Component should remain stable (getAllByText for rerender scenario)
-        const elements = screen.getAllByText('Daily Automation Flow');
-        expect(elements.length).toBeGreaterThan(0);
+        expect(screen.getAllByText('Notion connected').length).toBeGreaterThan(0);
     });
 
     it('토글 시 진행률/퍼센트가 즉시 갱신된다', async () => {
