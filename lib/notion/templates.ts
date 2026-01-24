@@ -3,6 +3,7 @@
 
 import { Client } from '@notionhq/client';
 import type { TaskTemplate, TaskColor, Frequency } from '@/types';
+import { DEFAULT_COLOR, isValidColor } from '@/lib/schema/templates';
 import {
     extractTitle,
     extractRichText,
@@ -34,11 +35,17 @@ export async function getTaskTemplates(client: Client, databaseId: string): Prom
 
         const properties = page.properties;
 
+        const rawColor = extractSelect<string>(properties['Color'], DEFAULT_COLOR);
+        const normalizedColor = rawColor.trim().toLowerCase();
+        const color: TaskColor = isValidColor(normalizedColor)
+            ? (normalizedColor as TaskColor)
+            : DEFAULT_COLOR;
+
         templates.push({
             id: page.id,
             name: extractTitle(properties['Name']),
             icon: extractRichText(properties['Icon'], '📋'),
-            color: extractSelect<TaskColor>(properties['Color'], 'gray'),
+            color,
             isRepeating: extractCheckbox(properties['Is Repeating'], false),
             defaultFrequency: extractSelect<Frequency>(properties['Default Frequency'], 'daily'),
             active: extractCheckbox(properties['Active'], true),
