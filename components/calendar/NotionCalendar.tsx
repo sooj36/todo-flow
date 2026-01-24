@@ -436,7 +436,7 @@ const CalendarDay: React.FC<CalendarDayProps> = ({
     <div
       data-testid={`calendar-day-${day}`}
       onClick={() => onClick?.(day)}
-      className={`group relative min-h-[100px] rounded-2xl p-3 transition-all hover:shadow-lg cursor-pointer ${selectedBg} ${borderClass} hover:bg-white`}
+      className={`group relative min-h-[100px] rounded-2xl p-3 transition-all hover:shadow-lg cursor-pointer overflow-hidden ${selectedBg} ${borderClass} hover:bg-white`}
     >
       {/* Today dot: only show if today but NOT selected */}
       {isToday && !isSelected && (
@@ -465,9 +465,9 @@ const CalendarDay: React.FC<CalendarDayProps> = ({
 
       {data && data.totalTasks > 0 && (
         <div className="space-y-2">
-          <div className="flex items-center justify-between text-[10px] text-secondary">
-            <span>{data.completedTasks}/{data.totalTasks} steps</span>
-            <span>{Math.round(completionRate * 100)}%</span>
+          <div className="flex items-center justify-between text-[10px] text-secondary min-w-0">
+            <span className="truncate">{data.completedTasks}/{data.totalTasks}</span>
+            <span className="shrink-0">{Math.round(completionRate * 100)}%</span>
           </div>
           <div className="w-full h-1.5 bg-[#e6e2f3] rounded-full overflow-hidden">
             <div
