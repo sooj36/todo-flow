@@ -33,9 +33,7 @@
 
 - 테스트
 
-  - Vitest
-  - Testing Library
-  - jsdom
+  - Vitest, Testing Library, jsdom
 
 
 ## 문서 맵
