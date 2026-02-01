@@ -6,17 +6,24 @@
 
 
 ## 주요 기능
+- 반복 task를 하루 인스턴스로 생성하고, flow-step 진행을 화면 오른쪽 FlowBoard에서 시각화
+- 왼쪽 캘린더 화면에 완료 누적/채움도 표시
+- Notion 템플릿-스텝-인스턴스 DB와 양방향 연동, 수동 동기화 및 생성 플로우
+- 검색창 입력 -> Notion 프로젝트 페이지 조회 -> LLM이 핵심 요약/포인트 자동 추출
 
 ## 기술 스택
+  - Next.js 14 (App Router)
+  - React 18
+  - TypeScript
+  - Tailwind CSS v4
+  - Notion API (@notionhq/client)
+  - Google Gemini SDK (@google/generative-ai)
+  - React Flow
+  - Zod
+  - Vitest + Testing Library
+  - ESLint (Next.js config)
 
 <img width="1486" height="808" alt="image" src="https://github.com/user-attachments/assets/2cbf9770-1a99-40e4-902c-7068926aa192" />
-
-## 스펙 요약
-- 비전/기능: 반복 Task 시각화, Notion API 연동 예정. Phase 1은 UI/빈 상태, Phase 2는 Notion 연결/클라이언트 구성, Phase 3는 데이터 바인딩 및 E2E.
-- 아키텍처: Next.js App Router, TypeScript strict. 데이터 흐름은 `useTaskTemplates` -> `useTaskInstances` 훅.
-- UI/UX: 캘린더는 월을 1-15, 16-말일로 분할해 채움도 하이라이트. FlowBoard는 Phase 2에서 드래그 앤 드롭 지원. 연동 전엔 빈 상태 표시.
-- 제약: `any` 금지, Tailwind만 사용. MVP는 cron/멀티유저 제외.
-- 참고: `docs/PRD.md`, `docs/DATA_MODEL.md`, `docs/COMPONENTS.md`.
 
 ## 문서 맵
 - `docs/PRD.md` 제품 요구사항
