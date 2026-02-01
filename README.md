@@ -32,6 +32,6 @@
 - `docs/log.md` 작업 로그
 - `docs/CLAUDE.md` Claude 노트
 
---
+---
 
 <img width="1486" height="808" alt="image" src="https://github.com/user-attachments/assets/2cbf9770-1a99-40e4-902c-7068926aa192" />
