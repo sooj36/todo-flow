@@ -12,16 +12,31 @@
 - 검색창 입력 -> Notion 프로젝트 페이지 조회 -> LLM이 핵심 요약/포인트 자동 추출
 
 ## 기술 스택
-  - Next.js 14 (App Router)
+
+- UI
   - React 18
-  - TypeScript
   - Tailwind CSS v4
-  - Notion API (@notionhq/client)
-  - Google Gemini SDK (@google/generative-ai)
   - React Flow
+  - Lucide Icons
+
+- API/데이터
+
+  - Next.js 14
+  - Notion API
+  - Google Gemini SDK
   - Zod
-  - Vitest + Testing Library
-  - ESLint (Next.js config)
+
+- 개발 도구
+
+  - TypeScript
+  - ESLint
+
+- 테스트
+
+  - Vitest
+  - Testing Library
+  - jsdom
+
 
 ## 문서 맵
 - `docs/PRD.md` 제품 요구사항
