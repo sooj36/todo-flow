@@ -2,7 +2,14 @@
 <img width="1486" height="808" alt="image" src="https://github.com/user-attachments/assets/2cbf9770-1a99-40e4-902c-7068926aa192" />
 
 
+## 프로젝트 소개 
 반복 Task를 시각화하고, 전체 캘린더 한눈에 보는 Flow Planner.
+
+## 배경 및 목적
+
+## 주요 기능
+
+## 기술 스택
 
 ## 스펙 요약
 - 비전/기능: 반복 Task 시각화, Notion API 연동 예정. Phase 1은 UI/빈 상태, Phase 2는 Notion 연결/클라이언트 구성, Phase 3는 데이터 바인딩 및 E2E.
