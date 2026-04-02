@@ -28,6 +28,8 @@ import { useFlowSteps } from "@/hooks/useFlowSteps";
 import { CustomFlowNode } from "./CustomFlowNode";
 import { FlowBoardHeader } from "./FlowBoardHeader";
 import { TaskStatus } from "@/types";
+import { useAgentRecommendations } from "@/hooks/useAgentRecommendations";
+import { RecommendationPanel } from "@/components/agent/RecommendationPanel";
 
 
 interface FlowBoardProps {
@@ -47,6 +49,9 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({
   onTemplateProgressChange,
   onDayStepProgressChange,
 }) => {
+  const recommendationPanelEnabled =
+    process.env.NEXT_PUBLIC_ENABLE_RECOMMENDATION_PANEL === "true";
+
   // Helper function to format Date to YYYY-MM-DD
   const formatDateString = (date: Date): string => {
     const year = date.getFullYear();
@@ -56,6 +61,14 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({
   };
 
   const dateString = formatDateString(selectedDate);
+  const recommendations = useAgentRecommendations();
+
+  useEffect(() => {
+    if (!recommendationPanelEnabled) return;
+    recommendations.fetch(dateString);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dateString, recommendationPanelEnabled]);
+
   const { instances, loading: instancesLoading, error: instancesError, refetch: refetchInstances } = useTaskInstances(dateString);
   const { templates, loading: templatesLoading, error: templatesError, refetch: refetchTemplates } = useTaskTemplates();
   const prevDateRef = useRef(dateString);
@@ -309,6 +322,17 @@ export const FlowBoard: React.FC<FlowBoardProps> = ({
 
       {/* Dot background */}
       <div className="flex-1 relative bg-[#E6E2AC]/30">
+        {recommendationPanelEnabled && (
+          <div className="absolute top-4 left-4 z-10 w-72">
+            <RecommendationPanel
+              items={recommendations.items}
+              phase={recommendations.phase}
+              onRefresh={() => recommendations.fetch(dateString)}
+              errorMessage={recommendations.errorMessage}
+            />
+          </div>
+        )}
+
         <ReactFlow
           nodes={isDateChanging ? [] : nodes}
           edges={isDateChanging ? [] : edges}
